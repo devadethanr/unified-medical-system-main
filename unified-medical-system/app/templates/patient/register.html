@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+   <head>
+      <!-- Required meta tags -->
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <title>UMS - Patient Registration</title>
+      <!-- Favicon -->
+      <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
+      <!-- Bootstrap CSS -->
+      <link id="bootstrap-css" rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+      <!-- Typography CSS -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/typography.css') }}">
+      <!-- Style CSS -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+      <!-- Style-Rtl CSS -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/style-rtl.css') }}">
+      <!-- Responsive CSS -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+      <script>
+        function clearForm() {
+            if (window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.href);
+            }
+        }
+       </script>
+    </head>
+   <body onload = 'clearForm()'>
+      <!-- loader Start -->
+      <div id="loading">
+         <div id="loading-center">
+         </div>
+      </div>
+      <!-- loader END -->
+        <!-- Sign in Start -->
+        <section class="sign-in-page">
+            <div class="container sign-in-page-bg mt-5 mb-md-5 mb-0 p-0">
+                <div class="row no-gutters">
+                    <div class="col-md-6 text-center">
+                        <div class="sign-in-detail text-white">
+                            <a class="sign-in-logo mb-5" href="index.html"><img src="{{ url_for('static', filename='images/logo-white.png') }}" class="img-fluid" alt="logo"></a>
+                            <div class="owl-carousel" data-autoplay="true" data-loop="true" data-nav="false" data-dots="true" data-items="1" data-items-laptop="1" data-items-tab="1" data-items-mobile="1" data-items-mobile-sm="1" data-margin="0">
+                                <div class="item">
+                                    <img src="{{ url_for('static', filename='images/login/1.png') }}" class="img-fluid mb-4" alt="logo">
+                                    <h4 class="mb-1 text-white">Unified</h4>
+                                    <p>Get access to all your medical files.</p>
+                                </div>
+                                <div class="item">
+                                    <img src="{{ url_for('static', filename='images/login/2.png') }}" class="img-fluid mb-4" alt="logo">
+                                    <h4 class="mb-1 text-white">Medical</h4>
+                                    <p>create and manage appointments</p>
+                                </div>
+                                <div class="item">
+                                    <img src="{{ url_for('static', filename='images/login/3.png') }}" class="img-fluid mb-4" alt="logo">
+                                    <h4 class="mb-1 text-white">System</h4>
+                                    <p>Get your certificates</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 position-relative">
+                        <div class="sign-in-from">
+                            <h1 class="mb-0">   Patient Registration</h1>
+                            <form class="mt-4" id="registerForm" method="post" autocomplete="off">
+                                
+                                <div class="form-group">
+                                    <label for="name" class="my-2">Your Full Name</label>
+                                    <span id="nameError" class="text-danger"></span>
+                                    <input type="text" class="form-control mb-0" id="name" name = "name" placeholder="Your Full Name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email" class="my-2">Email address</label>
+                                    <span id="emailError" class="text-danger"></span>
+                                    <input type="email" class="form-control mb-0" id="email" name = "email" placeholder="Enter email" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="state">Select Input</label>
+                                    <select class="form-select my-2" id="state" name = "state" required>
+                                        <option value="not selected"selected>Select State</option>
+                                        <option value="AN">Andaman and Nicobar Islands</option>
+                                        <option value="AP">Andhra Pradesh</option>
+                                        <option value="AR">Arunachal Pradesh</option>
+                                        <option value="AS">Assam</option>
+                                        <option value="BR">Bihar</option>
+                                        <option value="CH">Chandigarh</option>
+                                        <option value="CT">Chhattisgarh</option>
+                                        <option value="DN">Dadra and Nagar Haveli and Daman and Diu</option>
+                                        <option value="DL">Delhi</option>
+                                        <option value="GA">Goa</option>
+                                        <option value="GJ">Gujarat</option>
+                                        <option value="HR">Haryana</option>
+                                        <option value="HP">Himachal Pradesh</option>
+                                        <option value="JK">Jammu and Kashmir</option>
+                                        <option value="JH">Jharkhand</option>
+                                        <option value="KA">Karnataka</option>
+                                        <option value="KL">Kerala</option>
+                                        <option value="LA">Ladakh</option>
+                                        <option value="LD">Lakshadweep</option>
+                                        <option value="MP">Madhya Pradesh</option>
+                                        <option value="MH">Maharashtra</option>
+                                        <option value="MN">Manipur</option>
+                                        <option value="ML">Meghalaya</option>
+                                        <option value="MZ">Mizoram</option>
+                                        <option value="NL">Nagaland</option>
+                                        <option value="OR">Odisha</option>
+                                        <option value="PY">Puducherry</option>
+                                        <option value="PB">Punjab</option>
+                                        <option value="RJ">Rajasthan</option>
+                                        <option value="SK">Sikkim</option>
+                                        <option value="TN">Tamil Nadu</option>
+                                        <option value="TG">Telangana</option>
+                                        <option value="TR">Tripura</option>
+                                        <option value="UP">Uttar Pradesh</option>
+                                        <option value="UT">Uttarakhand</option>
+                                        <option value="WB">West Bengal</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="phoneNumber">Phone Number</label>
+                                    <span id="phoneNumberError" class="text-danger"></span>
+                                    <input type="number" class="form-control mb-0" id="phoneNumber" name="phonenumber" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="password" class="my-2">Password</label>
+                                    <span id="passwordError" class="text-danger"></span>
+                                    <input type="password" class="form-control mb-0" id="password"  name = "password" placeholder="Password">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="confirm_password" class="my-2">Retype password</label>
+                                    <span id="confirmPasswordError" class="text-danger"></span>
+                                    <input type="confirm_password" class="form-control mb-0" id="confirm_password"  name = "confirm_password" placeholder="confirm_password">
+                                </div>
+                                
+                                <div class="d-flex justify-content-between w-100 align-items-center mt-2">
+                                    <div class="custom-control custom-checkbox d-inline-block mt-2 pt-1">
+                                        <input type="checkbox" class="custom-control-input" id="customCheck1">
+                                        <label class="custom-control-label" for="customCheck1">I accept <a href="#">Terms and Conditions</a></label>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary float-end">Register</button>
+                                </div>
+                                <div class="sign-info">
+                                    <span class="dark-color d-inline-block line-height-2">Already Have Account ? <a href="sign-in.html">Log In</a></span>
+                                    <ul class="iq-social-media">
+                                        <li><a href="#"><i class="ri-facebook-box-line"></i></a></li>
+                                        <li><a href="#"><i class="ri-twitter-line"></i></a></li>
+                                        <li><a href="#"><i class="ri-instagram-line"></i></a></li>
+                                    </ul>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Sign in END -->
+      <!-- Optional JavaScript -->
+      <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+      <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+      <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+      <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+      <!-- Appear JavaScript -->
+      <script src="{{ url_for('static', filename='js/jquery.appear.js') }}"></script>
+      <!-- Countdown JavaScript -->
+      <script src="{{ url_for('static', filename='js/countdown.min.js') }}"></script>
+      <!-- Counterup JavaScript -->
+      <script src="{{ url_for('static', filename='js/waypoints.min.js') }}"></script>
+      <script src="{{ url_for('static', filename='js/jquery.counterup.min.js') }}"></script>
+      <!-- Wow JavaScript -->
+      <script src="{{ url_for('static', filename='js/wow.min.js') }}"></script>
+      <!-- Apexcharts JavaScript -->
+      <script src="{{ url_for('static', filename='js/apexcharts.js') }}"></script>
+      <!-- Swiper Slider JavaScript -->
+      <script src="{{ url_for('static', filename='js/swiper-bundle.min.js') }}"></script>
+      <!-- Select2 JavaScript -->
+      <script src="{{ url_for('static', filename='js/select2.min.js') }}"></script>
+      <!-- Owl Carousel JavaScript -->
+      <script src="{{ url_for('static', filename='js/owl.carousel.min.js') }}"></script>
+      <!-- Magnific Popup JavaScript -->
+      <script src="{{ url_for('static', filename='js/jquery.magnific-popup.min.js') }}"></script>
+      <!-- Smooth Scrollbar JavaScript -->
+      <script src="{{ url_for('static', filename='js/smooth-scrollbar.js') }}"></script>
+      <!-- Chart Custom JavaScript -->
+      <script src="{{ url_for('static', filename='js/chart-custom.js') }}"></script>
+      <!-- Custom JavaScript -->
+      <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+      <script src="{{ url_for('static', filename='js/form-validation.js') }}"></script>
+   </body>
+</html>
