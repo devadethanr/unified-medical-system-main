@@ -12,9 +12,10 @@ import re, uuid
 from app.routes.auth import login
 patient_bp = Blueprint('patient', __name__)
 
-@patient_bp.route('/')
+@patient_bp.route('/dashboard', methods=['GET', 'POST'])
+@patient_bp.route('/', methods=['GET', 'POST'])
 def index():
-    return "Patient Dashboard"
+    return render_template('patient/dashboard.html')
 
 @login_manager.user_loader
 def load_user(user_id):

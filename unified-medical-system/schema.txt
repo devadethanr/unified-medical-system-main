@@ -16,3 +16,6 @@ patient registration details:
   dateOfBirth date
   gender string
   photo string [note: 'Path to patient photo']
+
+
+  
