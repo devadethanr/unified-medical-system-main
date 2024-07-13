@@ -3,48 +3,44 @@ from app import mongo
 from bson.objectid import ObjectId
 
 class User(UserMixin):
-    def __init__(self,umsId, username, email, password, user_type):
-        self.username = username
+    def __init__(self, _id, umsId, email, passwordHash, rolesId, username=None):
+        self.id = str(_id)  # This is needed by Flask-Login
+        self.umsId = umsId
         self.email = email
-        self.password = password
-        self.user_type = user_type
+        self.passwordHash = self.passwordHash = passwordHash[0] if isinstance(passwordHash, list) and len(passwordHash) > 0 else None
+        self.rolesId = rolesId
+        self.username = username
 
     @staticmethod
     def get(user_id):
-        user_data = mongo.db.users.find_one({"_id": ObjectId(user_id)})
+        user_data = mongo.db.login.find_one({"_id": ObjectId(user_id)})
         if user_data:
             return User(
-                umsId=user_data['umsId'],
-                username=user_data['username'],
-                email=user_data['email'],
-                password=user_data['password'],
-                user_type=user_data['user_type']
+                _id = user_data.get('_id'),
+                umsId=user_data.get('umsId'),
+                email=user_data.get('email'),
+                passwordHash=user_data.get('passwordHash'),
+                rolesId=user_data.get('rolesId'),
+                username=user_data.get('username')  # Optional
             )
         return None
 
     @staticmethod
-    def find_by_username(username):
-        user_data = mongo.db.users.find_one({"username": username})
+    def find_by_identifier(identifier):
+        # Search by email or umsId
+        user_data = mongo.db.login.find_one({
+            "$or": [
+                {"email": identifier},
+                {"umsId": identifier}
+            ]
+        })
         if user_data:
             return User(
-                umsId=user_data['umsId'],
-                username=user_data['username'],
-                email=user_data['email'],
-                password=user_data['password'],
-                user_type=user_data['user_type']
-            )
-        return None
-    
-    @staticmethod
-    def find_by_email(email):
-        user_data = mongo.db.users.find_one({"email": email})
-        if user_data:
-            print(user_data['umsId']) #for debugging
-            return User(
-                umsId=user_data['umsId'],
-                username=user_data['username'],
-                email=user_data['email'],
-                password=user_data['password'],
-                user_type=user_data['user_type']
+                _id= user_data.get('_id'),
+                umsId=user_data.get('umsId'),
+                email=user_data.get('email'),
+                passwordHash=user_data.get('passwordHash'),
+                rolesId=user_data.get('rolesId'),
+                username=user_data.get('username')  # Optional
             )
         return None

@@ -16,17 +16,27 @@ def load_user(user_id):
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
+        identifier = request.form['identifier']
         password = request.form['password']
-        print(username, password)  # For debugging
-        user = User.find_by_email(username)
-        print(user, password)  # For debugging
-        if user and check_password_hash(user.password, password) and user.user_type == 'patient':
-            login_user(user)
-            return redirect(url_for('patient.index'), code=302)
+        user = User.find_by_identifier(identifier)
+        print(identifier, password) # For debugging
+        if user:
+            if user.passwordHash is None:
+                print(identifier, password) #for debugging
+                flash('User password is missing')
+                return redirect(url_for('login'))
+            print(user.passwordHash, password) #for debugging
+            print(check_password_hash(user.passwordHash, password)) #for debugging
+            if check_password_hash(user.passwordHash, password) and user.rolesId == 4:
+                login_user(user)
+                return redirect(url_for('patient.index'), code=302)
+            else:
+                flash('Invalid identifier or password')
         else:
-            flash('Invalid username or password')
+            flash('User not found')
+    
     return render_template('auth/login.html')
+
 
 @auth_bp.route('/logout')
 @login_required

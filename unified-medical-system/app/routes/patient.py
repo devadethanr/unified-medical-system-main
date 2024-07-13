@@ -12,10 +12,15 @@ import re, uuid
 from app.routes.auth import login
 patient_bp = Blueprint('patient', __name__)
 
+
+# @patient_bp.route('/', methods=['GET', 'POST'])
 @patient_bp.route('/dashboard', methods=['GET', 'POST'])
-@patient_bp.route('/', methods=['GET', 'POST'])
 def index():
     return render_template('patient/dashboard.html')
+
+@patient_bp.route('/profile', methods=['GET', 'POST'])
+def profile():
+    return ("testing") #for debugging
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -37,7 +42,7 @@ def register():
         existing_user = mongo.db.users.find_one({'email': email})
         
         if existing_user:
-            print('Email already exists. Please use a different email.')  # For debugging
+            flash(' already exists! Please login. ', 'error')  # For debugging
             return redirect(url_for('patient.register'))
         
         print(request.form)  # For debugging
