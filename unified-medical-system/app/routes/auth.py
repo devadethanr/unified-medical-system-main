@@ -27,9 +27,21 @@ def login():
                 return redirect(url_for('login'))
             print(user.passwordHash, password) #for debugging
             print(check_password_hash(user.passwordHash, password)) #for debugging
-            if check_password_hash(user.passwordHash, password) and user.rolesId == 4:
-                login_user(user)
-                return redirect(url_for('patient.index'), code=302)
+            
+            #role selection
+            if check_password_hash(user.passwordHash, password):
+                if user.rolesId == 4:
+                    login_user(user)
+                    return redirect(url_for('patient.index'), code=302)
+                elif user.rolesId == 3:
+                    login_user(user)
+                    return redirect(url_for('doctor.index'), code=302)
+                elif user.rolesId == 2:
+                    login_user(user)
+                    return redirect(url_for('hospital.index'), code=302)
+                elif user.rolesId == 1:
+                    login_user(user)
+                    return redirect(url_for('admin.index'), code=302)
             else:
                 flash('Invalid identifier or password')
         else:
@@ -96,3 +108,5 @@ def google_authorized():
         })
 
     return redirect(url_for('patient.index'))
+
+
