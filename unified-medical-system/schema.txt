@@ -5,17 +5,15 @@ patient registration details:
   googleAuthId string //auto
   phoneNumber string //fu
   address string 
-  pincode integer
-  state string //fu
+  pincode integer ---
+  state string //fu ---
   status string //auto
   createdAt timestamp [default: 'CURRENT_TIMESTAMP'] //auto
   updatedAt timestamp [default: 'CURRENT_TIMESTAMP'] //auto
   deletedAt timestamp [note: 'Soft delete timestamp'] //auto
   passwordHash string [note: 'Hashed and salted password'] //fu -auto
   rolesId integer [primary key] //auto
-  dateOfBirth date
-  gender string
-  photo string [note: 'Path to patient photo']
+  dateOfBirth date ---
+  gender string ---
+  photo string [note: 'Path to patient photo'] ---
 
-
-  

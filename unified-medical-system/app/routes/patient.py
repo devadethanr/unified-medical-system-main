@@ -31,7 +31,6 @@ def generate_patient_id():
 
 @patient_bp.route('/register', methods=['GET', 'POST'])
 def register():    
-
     if request.method == 'POST':
         # Check if email already exists in the database
         email = request.form['email']
