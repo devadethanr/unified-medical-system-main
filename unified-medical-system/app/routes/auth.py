@@ -33,7 +33,7 @@ def login():
             else:
                 flash('Invalid identifier or password')
         else:
-            flash('User not found')
+            flash('User not found, please create an account')
     
     return render_template('auth/login.html')
 

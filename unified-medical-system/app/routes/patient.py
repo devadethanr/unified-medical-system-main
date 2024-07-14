@@ -12,8 +12,7 @@ import re, uuid
 from app.routes.auth import login
 patient_bp = Blueprint('patient', __name__)
 
-
-# @patient_bp.route('/', methods=['GET', 'POST'])
+@login_required
 @patient_bp.route('/dashboard', methods=['GET', 'POST'])
 def index():
     return render_template('patient/dashboard.html')
