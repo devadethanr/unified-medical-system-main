@@ -56,7 +56,7 @@ function validatePassword() {
     // Password strength check
     const passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+}{"':;?/|<>]).{8,}$/;
     if (!passwordPattern.test(passwordValue)) {
-        passwordError.textContent = 'Password must be at least 8 characters, containing at least one digit, one uppercase letter, one lowercase letter, and one special character.';
+        passwordError.textContent = 'Please use a stronger password.';
         return false;
     } else if (passwordValue !== confirmPasswordValue) {
         passwordError.textContent = 'Passwords do not match.';

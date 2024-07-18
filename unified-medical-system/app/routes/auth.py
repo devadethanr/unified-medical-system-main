@@ -30,17 +30,24 @@ def login():
             
             #role selection
             if check_password_hash(user.passwordHash, password):
+                print('Password correct') #for debugging
+                session['umsId'] = user.umsId
+                print(session['umsId']) #for debugging
                 if user.rolesId == 4:
                     login_user(user)
+                    print('Patient') #for debugging
                     return redirect(url_for('patient.index'), code=302)
                 elif user.rolesId == 3:
                     login_user(user)
+                    print('doctor') #for debugging
                     return redirect(url_for('doctor.index'), code=302)
                 elif user.rolesId == 2:
                     login_user(user)
+                    print('hosp') #for debugging
                     return redirect(url_for('hospital.index'), code=302)
                 elif user.rolesId == 1:
                     login_user(user)
+                    print('admin') #for debugging
                     return redirect(url_for('admin.index'), code=302)
             else:
                 flash('Invalid identifier or password')

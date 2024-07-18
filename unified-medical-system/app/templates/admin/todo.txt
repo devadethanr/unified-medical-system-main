@@ -1,0 +1,527 @@
+Admin Dashboard Outline:
+
+Sidebar
+Dashboard Overview
+User Management
+Patients
+View: List of patients, Single profile view
+Manage: Create, Edit, Deactivate
+Access Records: View and manage some patient records
+Doctors
+View: List of doctors, Single profile view
+Manage: Create, Edit, Deactivate
+Add and Verify Credentials: Approve or reject doctor credentials
+Access Records: View and manage doctor-related records
+Hospitals
+View: List of hospitals, Single profile view
+Manage: Create, Edit, Deactivate
+Approve or Reject Registration: Handle hospital registration requests
+Hospital Registration
+Access Directly: List of hospitals, View profile, Approve/Reject registrations
+Doctor Registration
+Access Directly: List of doctors, View profile, Approve/Reject registrations
+Logs
+Support Lists and Feedback
+Calendar
+Map
+
+Main Page
+Admin Profile
+Edit Profile: Accessible via navbar
+Notifications
+Accessible via navbar
+Statistics Cards
+Total Doctors
+Total Patients
+Total Hospitals
+Total Labs
+Charts
+Consultation/Day
+ER Cases/Day
+Appointments Cards
+Total Appointments
+Completed Appointments
+Cancelled Appointments
+Follow-up Appointments
+Recent Activity
+Display recent activities chart
+Detailed Implementation Outline
+Sidebar Implementation
+Dashboard Overview: A summary page with high-level statistics and recent activity.
+
+User Management
+
+Patients
+View
+List all patients with search and filter options.
+Single profile view showing detailed patient information.
+Manage
+Create new patient accounts.
+Edit existing patient profiles.
+Deactivate patient accounts.
+Access Records
+View and manage patient records (e.g., medical history, appointments).
+Doctors
+View
+List all doctors with search and filter options.
+Single profile view showing detailed doctor information.
+Manage
+Create new doctor accounts.
+Edit existing doctor profiles.
+Deactivate doctor accounts.
+Add and Verify Credentials
+Approve or reject doctor credentials and qualifications.
+Access Records
+View and manage doctor-related records.
+Hospitals
+View
+List all hospitals with search and filter options.
+Single profile view showing detailed hospital information.
+Manage
+Create new hospital accounts.
+Edit existing hospital profiles.
+Deactivate hospital accounts.
+Approve or Reject Registration
+Handle hospital registration requests.
+Hospital Registration: Direct access to the list of hospitals awaiting approval or rejection.
+
+Doctor Registration: Direct access to the list of doctors awaiting approval or rejection.
+
+Logs: View system logs for monitoring and troubleshooting.
+
+Support Lists and Feedback: Manage and respond to user support requests and feedback.
+
+Calendar: A calendar view for managing and scheduling appointments and events.
+
+Map: Geographical representation of hospitals, doctors, and potential disease outbreaks.
+
+Main Page Implementation
+Admin Profile
+
+Display admin profile information.
+Provide an option to edit the profile via the navbar.
+Notifications
+
+Display system notifications in the navbar.
+Statistics Cards
+
+Total Doctors: Display the total number of registered doctors.
+Total Patients: Display the total number of registered patients.
+Total Hospitals: Display the total number of registered hospitals.
+Total Labs: Display the total number of registered labs.
+Charts
+
+Consultation/Day: Chart showing daily consultations.
+ER Cases/Day: Chart showing daily ER cases.
+Appointments Cards
+
+Total Appointments: Display the total number of appointments.
+Completed Appointments: Display the number of completed appointments.
+Cancelled Appointments: Display the number of cancelled appointments.
+Follow-up Appointments: Display the number of follow-up appointments.
+Recent Activity
+
+Display a chart or list of recent activities within the system.
+
+
+
+
+
+
+
+
+
+
+
+
+//
+
+<!doctype html>
+<html lang="en" dir="ltr">
+
+<head>
+   <!-- Required meta tags -->
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+   <title>UMS - Admin Dashboard </title>
+   <!-- Favicon -->
+   <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
+   <!-- Bootstrap CSS -->
+   <link id="bootstrap-css" rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+   <!-- Typography CSS -->
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/typography.css') }}">
+   <!-- Style CSS -->
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+   <!-- Style-Rtl CSS -->
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/style-rtl.css') }}">
+   <!-- Responsive CSS -->
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+   <!-- Full calendar -->
+   <link href="{{ url_for('static', filename='fullcalendar/core/main.css') }}" rel='stylesheet' />
+   <link href="{{ url_for('static', filename='fullcalendar/daygrid/main.css') }}" rel='stylesheet' />
+   <link href="{{ url_for('static', filename='fullcalendar/timegrid/main.css') }}" rel='stylesheet' />
+   <link href="{{ url_for('static', filename='fullcalendar/list/main.css') }}" rel='stylesheet' />
+   <!-- Flatpickr CSS -->
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/flatpickr.min.css') }}">
+</head>
+
+<body>
+   <!-- loader Start -->
+   <div id="loading">
+      <div id="loading-center">
+
+      </div>
+   </div>
+   <!-- loader END -->
+   <!-- Wrapper Start -->
+   <div class="wrapper">
+      <!-- Sidebar  -->
+      <div class="iq-sidebar">
+         <div class="iq-sidebar-logo d-flex justify-content-between">
+            <a href="index.html">
+               <img src="images/logo.png" class="img-fluid" alt="">
+               <span>UMS</span>
+            </a>
+            <div class="iq-menu-bt-sidebar">
+               <div class="iq-menu-bt align-self-center">
+                  <div class="wrapper-menu">
+                     <div class="main-circle"><i class="ri-more-fill"></i></div>
+                     <div class="hover-circle"><i class="ri-more-2-fill"></i></div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div id="sidebar-scrollbar">
+            <nav class="iq-sidebar-menu">
+                <ul class="iq-menu">
+                    <li class="iq-menu-title"><i class="ri-subtract-line"></i><span>Admin Dashboard</span></li>
+                    <li>
+                        <a href="index.html" class="iq-waves-effect"><i class="ri-hospital-fill"></i><span>Welcome back {{admin_data['name']}}</span></a>
+                    </li>
+                    <li>
+                     <hr class="iq-divider">
+                  </li>
+                    <li>
+                     <a href="#" class="iq-waves-effect"><i class="ri-user-fill"></i><span>User Management</span></a>
+                   </li>
+                    <li>
+                        <a href="#" class="iq-waves-effect"><i class="ri-group-fill"></i><span>Patients</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
+                        <ul class="iq-submenu">
+                           <li><a href="#"><i class="ri-list-check"></i><span>View</span></a></li>
+                           <li><a href="#"><i class="ri-add-circle-line"></i><span>Manage</span></a></li>
+                           <li><a href="#"><i class="ri-file-list-fill"></i><span>Access Records</span></a></li>
+                        </ul>
+                     </li>
+                     <li>
+                        <a href="#" class="iq-waves-effect"><i class="ri-user-3-fill"></i><span>Doctors</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
+                        <ul class="iq-submenu">
+                            <li><a href="#"><i class="ri-list-check"></i><span>View</span></a></li>
+                            <li><a href="#"><i class="ri-add-circle-line"></i><span>Manage</span></a></li>
+                            <li><a href="#"><i class="ri-check-double-fill"></i><span>Add and Verify Credentials</span></a></li>
+                            <li><a href="#"><i class="ri-file-list-fill"></i><span>Access Records</span></a></li>
+                        </ul>
+                    </li>
+                    <li>
+                     <a href="#" class="iq-waves-effect"><i class="ri-hospital-fill"></i><span>Hospitals</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
+                     <ul class="iq-submenu">
+                         <li><a href="#"><i class="ri-list-check"></i><span>View</span></a></li>
+                         <li><a href="#"><i class="ri-add-circle-line"></i><span>Manage</span></a></li>
+                         <li><a href="#"><i class="ri-check-double-fill"></i><span>Approve or Reject Registration</span></a></li>
+                     </ul>
+                   </li>
+                    <li>
+                        <a href="#" class="iq-waves-effect"><i class="ri-file-list-fill"></i><span>Hospital Registration</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
+                        <ul class="iq-submenu">
+                            <li><a href="#"><i class="ri-list-check"></i><span>Access Directly</span></a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" class="iq-waves-effect"><i class="ri-file-list-fill"></i><span>Doctor Registration</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
+                        <ul class="iq-submenu">
+                            <li><a href="#"><i class="ri-list-check"></i><span>Access Directly</span></a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" class="iq-waves-effect"><i class="ri-calendar-event-fill"></i><span>Calendar</span></a>
+                    </li>
+                    <li>
+                        <a href="#" class="iq-waves-effect"><i class="ri-map-pin-2-fill"></i><span>Map</span></a>
+                    </li>
+                    <li>
+                        <a href="#" class="iq-waves-effect"><i class="ri-user-fill"></i><span>Support</span></i></a>
+                        <ul class="iq-submenu">
+                            <li><a href="#"><i class="ri-list-check"></i><span>Manage</span></a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" class="iq-waves-effect"><i class="ri-settings-5-fill"></i><span>Feedback</span></a>
+                        <ul class="iq-submenu">
+                           <li><a href="#"><i class="ri-list-check"></i><span>Manage</span></a></li>
+                       </ul>
+                    </li>
+                </ul>
+            </nav>
+            <div class="p-3"></div>
+        </div>  
+      </div>
+
+      //====================================================================================================================//
+
+      <!doctype html>
+<html lang="en" dir="ltr">
+
+<head>
+   <!-- Required meta tags -->
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+   <title>UMS - Admin Dashboard </title>
+   <!-- Favicon -->
+   <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
+   <!-- Bootstrap CSS -->
+   <link id="bootstrap-css" rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+   <!-- Typography CSS -->
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/typography.css') }}">
+   <!-- Style CSS -->
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+   <!-- Style-Rtl CSS -->
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/style-rtl.css') }}">
+   <!-- Responsive CSS -->
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+   <!-- Full calendar -->
+   <link href="{{ url_for('static', filename='fullcalendar/core/main.css') }}" rel='stylesheet' />
+   <link href="{{ url_for('static', filename='fullcalendar/daygrid/main.css') }}" rel='stylesheet' />
+   <link href="{{ url_for('static', filename='fullcalendar/timegrid/main.css') }}" rel='stylesheet' />
+   <link href="{{ url_for('static', filename='fullcalendar/list/main.css') }}" rel='stylesheet' />
+   <!-- Flatpickr CSS -->
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/flatpickr.min.css') }}">
+</head>
+
+<body>
+   <!-- loader Start -->
+   <div id="loading">
+      <div id="loading-center">
+
+      </div>
+   </div>
+   <!-- loader END -->
+   <!-- Wrapper Start -->
+   <div class="wrapper">
+      <!-- Sidebar  -->
+      <div class="iq-sidebar">
+         <div class="iq-sidebar-logo d-flex justify-content-between">
+            <a href="index.html">
+               <img src="images/logo.png" class="img-fluid" alt="">
+               <span>UMS</span>
+            </a>
+            <div class="iq-menu-bt-sidebar">
+               <div class="iq-menu-bt align-self-center">
+                  <div class="wrapper-menu">
+                     <div class="main-circle"><i class="ri-more-fill"></i></div>
+                     <div class="hover-circle"><i class="ri-more-2-fill"></i></div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div id="sidebar-scrollbar">
+            <nav class="iq-sidebar-menu">
+                <ul class="iq-menu">
+                    <li class="iq-menu-title"><i class="ri-subtract-line"></i><span>Admin Dashboard</span></li>
+                    <li>
+                        <a href="index.html" class="iq-waves-effect"><i class="ri-hospital-fill"></i><span>Welcome back {{admin_data['name']}}</span></a>
+                    </li>
+                    <li>
+                     <hr class="iq-divider">
+                  </li>
+                    <li>
+                     <a href="#" class="iq-waves-effect"><i class="ri-user-fill"></i><span>User Management</span></a>
+                   </li>
+                    <li>
+                        <a href="#" class="iq-waves-effect"><i class="ri-group-fill"></i><span>Patients</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
+                        <ul class="iq-submenu">
+                           <li><a href="#"><i class="ri-list-check"></i><span>View</span></a></li>
+                           <li><a href="#"><i class="ri-add-circle-line"></i><span>Manage</span></a></li>
+                           <li><a href="#"><i class="ri-file-list-fill"></i><span>Access Records</span></a></li>
+                        </ul>
+                     </li>
+                     <li>
+                        <a href="#" class="iq-waves-effect"><i class="ri-user-3-fill"></i><span>Doctors</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
+                        <ul class="iq-submenu">
+                            <li><a href="#"><i class="ri-list-check"></i><span>View</span></a></li>
+                            <li><a href="#"><i class="ri-add-circle-line"></i><span>Manage</span></a></li>
+                            <li><a href="#"><i class="ri-check-double-fill"></i><span>Add and Verify Credentials</span></a></li>
+                            <li><a href="#"><i class="ri-file-list-fill"></i><span>Access Records</span></a></li>
+                        </ul>
+                    </li>
+                    <li>
+                     <a href="#" class="iq-waves-effect"><i class="ri-hospital-fill"></i><span>Hospitals</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
+                     <ul class="iq-submenu">
+                         <li><a href="#"><i class="ri-list-check"></i><span>View</span></a></li>
+                         <li><a href="#"><i class="ri-add-circle-line"></i><span>Manage</span></a></li>
+                         <li><a href="#"><i class="ri-check-double-fill"></i><span>Approve or Reject Registration</span></a></li>
+                     </ul>
+                   </li>
+                    <li>
+                        <a href="#" class="iq-waves-effect"><i class="ri-file-list-fill"></i><span>Hospital Registration</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
+                        <ul class="iq-submenu">
+                            <li><a href="#"><i class="ri-list-check"></i><span>Access Directly</span></a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" class="iq-waves-effect"><i class="ri-file-list-fill"></i><span>Doctor Registration</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
+                        <ul class="iq-submenu">
+                            <li><a href="#"><i class="ri-list-check"></i><span>Access Directly</span></a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" class="iq-waves-effect"><i class="ri-calendar-event-fill"></i><span>Calendar</span></a>
+                    </li>
+                    <li>
+                        <a href="#" class="iq-waves-effect"><i class="ri-map-pin-2-fill"></i><span>Map</span></a>
+                    </li>
+                    <li>
+                        <a href="#" class="iq-waves-effect"><i class="ri-user-fill"></i><span>Support</span></i></a>
+                        <ul class="iq-submenu">
+                            <li><a href="#"><i class="ri-list-check"></i><span>Manage</span></a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" class="iq-waves-effect"><i class="ri-settings-5-fill"></i><span>Feedback</span></a>
+                        <ul class="iq-submenu">
+                           <li><a href="#"><i class="ri-list-check"></i><span>Manage</span></a></li>
+                       </ul>
+                    </li>
+                </ul>
+            </nav>
+            <div class="p-3"></div>
+        </div>  
+      </div>
+//----------------------
+
+<!doctype html>
+<html lang="en" dir="ltr">
+
+<head>
+   <!-- Required meta tags -->
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+   <title>UMS - Admin Dashboard </title>
+   <!-- Favicon -->
+   <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
+   <!-- Bootstrap CSS -->
+   <link id="bootstrap-css" rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+   <!-- Typography CSS -->
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/typography.css') }}">
+   <!-- Style CSS -->
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+   <!-- Style-Rtl CSS -->
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/style-rtl.css') }}">
+   <!-- Responsive CSS -->
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+   <!-- Full calendar -->
+   <link href="{{ url_for('static', filename='fullcalendar/core/main.css') }}" rel='stylesheet' />
+   <link href="{{ url_for('static', filename='fullcalendar/daygrid/main.css') }}" rel='stylesheet' />
+   <link href="{{ url_for('static', filename='fullcalendar/timegrid/main.css') }}" rel='stylesheet' />
+   <link href="{{ url_for('static', filename='fullcalendar/list/main.css') }}" rel='stylesheet' />
+   <!-- Flatpickr CSS -->
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/flatpickr.min.css') }}">
+</head>
+
+<body>
+   <!-- loader Start -->
+   <div id="loading">
+      <div id="loading-center">
+
+      </div>
+   </div>
+   <!-- loader END -->
+   <!-- Wrapper Start -->
+   <div class="wrapper">
+      <!-- Sidebar  -->
+      <div class="iq-sidebar">
+         <div class="iq-sidebar-logo d-flex justify-content-between">
+            <a href="index.html">
+               <img src="images/logo.png" class="img-fluid" alt="">
+               <span>UMS</span>
+            </a>
+            <div class="iq-menu-bt-sidebar">
+               <div class="iq-menu-bt align-self-center">
+                  <div class="wrapper-menu">
+                     <div class="main-circle"><i class="ri-more-fill"></i></div>
+                     <div class="hover-circle"><i class="ri-more-2-fill"></i></div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div id="sidebar-scrollbar">
+            <nav class="iq-sidebar-menu">
+                <ul class="iq-menu">
+                    <li class="iq-menu-title"><i class="ri-subtract-line"></i><span>Admin Dashboard</span></li>
+                    <li>
+                        <a href="index.html" class="iq-waves-effect"><i class="ri-hospital-fill"></i><span>Welcome back {{admin_data['name']}}</span></a>
+                    </li>
+                    <li>
+                     <hr class="iq-divider">
+                  </li>
+                    <li>
+                     <a href="#" class="iq-waves-effect"><i class="ri-user-fill"></i><span>User Management</span></a>
+                   </li>
+                    <li>
+                        <a href="#" class="iq-waves-effect"><i class="ri-group-fill"></i><span>Patients</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
+                        <ul class="iq-submenu">
+                           <li><a href="#"><i class="ri-list-check"></i><span>View</span></a></li>
+                           <li><a href="#"><i class="ri-add-circle-line"></i><span>Manage</span></a></li>
+                           <li><a href="#"><i class="ri-file-list-fill"></i><span>Access Records</span></a></li>
+                        </ul>
+                     </li>
+                     <li>
+                        <a href="#" class="iq-waves-effect"><i class="ri-user-3-fill"></i><span>Doctors</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
+                        <ul class="iq-submenu">
+                            <li><a href="#"><i class="ri-list-check"></i><span>View</span></a></li>
+                            <li><a href="#"><i class="ri-add-circle-line"></i><span>Manage</span></a></li>
+                            <li><a href="#"><i class="ri-check-double-fill"></i><span>Add and Verify Credentials</span></a></li>
+                            <li><a href="#"><i class="ri-file-list-fill"></i><span>Access Records</span></a></li>
+                        </ul>
+                    </li>
+                    <li>
+                     <a href="#" class="iq-waves-effect"><i class="ri-hospital-fill"></i><span>Hospitals</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
+                     <ul class="iq-submenu">
+                         <li><a href="#"><i class="ri-list-check"></i><span>View</span></a></li>
+                         <li><a href="#"><i class="ri-add-circle-line"></i><span>Manage</span></a></li>
+                         <li><a href="#"><i class="ri-check-double-fill"></i><span>Approve or Reject Registration</span></a></li>
+                     </ul>
+                   </li>
+                    <li>
+                        <a href="#" class="iq-waves-effect"><i class="ri-file-list-fill"></i><span>Hospital Registration</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
+                        <ul class="iq-submenu">
+                            <li><a href="#"><i class="ri-list-check"></i><span>Access Directly</span></a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" class="iq-waves-effect"><i class="ri-file-list-fill"></i><span>Doctor Registration</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
+                        <ul class="iq-submenu">
+                            <li><a href="#"><i class="ri-list-check"></i><span>Access Directly</span></a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" class="iq-waves-effect"><i class="ri-calendar-event-fill"></i><span>Calendar</span></a>
+                    </li>
+                    <li>
+                        <a href="#" class="iq-waves-effect"><i class="ri-map-pin-2-fill"></i><span>Map</span></a>
+                    </li>
+                    <li>
+                        <a href="#" class="iq-waves-effect"><i class="ri-user-fill"></i><span>Support</span></i></a>
+                        <ul class="iq-submenu">
+                            <li><a href="#"><i class="ri-list-check"></i><span>Manage</span></a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" class="iq-waves-effect"><i class="ri-settings-5-fill"></i><span>Feedback</span></a>
+                        <ul class="iq-submenu">
+                           <li><a href="#"><i class="ri-list-check"></i><span>Manage</span></a></li>
+                       </ul>
+                    </li>
+                </ul>
+            </nav>
+            <div class="p-3"></div>
+        </div>  
+      </div>

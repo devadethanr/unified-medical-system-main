@@ -2,10 +2,12 @@ from flask import Flask
 from flask_pymongo import PyMongo
 from flask_login import LoginManager
 from authlib.integrations.flask_client import OAuth
+from flask_session import Session
 
 mongo = PyMongo()
 login_manager = LoginManager()
 oauth = OAuth()
+
 
 GOOGLE_CLIENT_ID = '806603351387-asf74r67qn6101dtjmrdiqpbqq301vrm.apps.googleusercontent.com'
 GOOGLE_CLIENT_SECRET = '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'
@@ -13,7 +15,7 @@ GOOGLE_CLIENT_SECRET = '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'
 def create_app(config_class='config.DevelopmentConfig'):
     app = Flask(__name__)
     app.config.from_object(config_class)
-
+    
     try:
         mongo.init_app(app)
     except Exception as e:
@@ -21,7 +23,12 @@ def create_app(config_class='config.DevelopmentConfig'):
     
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
-
+    
+    #session management and storage
+    app.config['SESSION_TYPE'] = 'filesystem'
+    app.config['SESSION_FILE_DIR'] = '/tmp/flask_session'  # Directory for storing session files
+    Session(app)
+    
     # Configure Google OAuth
     oauth.register(
         name='google',
