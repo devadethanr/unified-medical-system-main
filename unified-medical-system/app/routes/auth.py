@@ -24,7 +24,7 @@ def login():
             if user.passwordHash is None:
                 print(identifier, password) #for debugging
                 flash('User password is missing')
-                return redirect(url_for('login'))
+                return redirect(url_for('auth.login'))
             print(user.passwordHash, password) #for debugging
             print(check_password_hash(user.passwordHash, password)) #for debugging
             

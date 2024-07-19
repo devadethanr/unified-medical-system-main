@@ -17,6 +17,13 @@
       <link rel="stylesheet" href="{{ url_for('static', filename='css/style-rtl.css') }}">
       <!-- Responsive CSS -->
       <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+      <script>
+        function clearForm() {
+            if (window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.href);
+            }
+        }
+       </script>
    </head>
    <body>
       <!-- loader Start -->
@@ -43,6 +50,7 @@
                   </div>
                </div>
             </div>
+            
             <div id="sidebar-scrollbar">
                <nav class="iq-sidebar-menu">
                    <ul class="iq-menu">
@@ -136,6 +144,10 @@
                            <a class="search-link" href="#"><i class="ri-search-line"></i></a>
                         </form>
                      </div>
+                     <ol class="breadcrumb ">
+                        <li class="breadcrumb-item"><a href="{{ url_for('admin.index') }}"><i class="ri-home-4-line me-1 float-start"></i>Dashboard</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Profile</li>
+                     </ol>
                      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" href="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                      <i class="ri-menu-3-line"></i>
                      </button>
@@ -412,12 +424,67 @@
                                  <div class="col-8">Not Specified</div>
                                  <div class="col-4">Updated At:</div>
                                  <div class="col-8">{{ admin_data.updatedAt }}</div>
-                                 <div class="col-4">Created At:</div>
+                                 <div class="col-4">Created At:</div>   
                                  <div class="col-8">{{ admin_data.createdAt }}</div>
                                  <div class="col-4">UMS ID:</div>
                                  <div class="col-8">{{ admin_data.umsId }}</div>
                                  <div class="col-4">Status:</div>
                                  <div class="col-8">{{ admin_data.status }}</div>
+                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#profile-edit-modal">
+                                    Edit Profile
+                                  </button>
+                                  <!--profile edit  Modal -->
+                                  <div class="modal fade" id="profile-edit-modal" tabindex="-1" role="dialog" aria-labelledby="profile-edit-modal" aria-hidden="true">
+                                     <div class="modal-dialog modal-dialog-scrollable" role="document">
+                                        <div class="modal-content">
+                                           <div class="modal-header">
+                                              <h4 class="modal-title" id="profile-edit-modal"><b>Edit Admin profile</b></h4>
+                                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                           </div>
+                                           <div class="modal-body">
+                                             <form id="registerForm" action="{{ url_for('admin.profile') }}" autocomplete='off' method="post">
+                                                <input type="hidden" name="form_type" value="update_profile">
+                                                <div class="mb-3">
+                                                   <label for="name" class="form-label">Name</label>
+                                                   <span id="nameError" class="text-danger"></span>
+                                                   <input type="text" class="form-control" id="name" name="name" value="{{ admin_data.name }}" placeholder="Enter name" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                   <label for="email" class="form-label">Email</label>
+                                                   <span id="emailError" class="text-danger"></span>
+                                                   <input type="email" class="form-control" id="email" name="email" value="{{ admin_data.email }}" placeholder="Enter email" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                   <label for="phoneNumber" class="form-label">Phone Number</label>
+                                                   <span id="phoneNumberError" class="text-danger"></span>
+                                                   <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value="{{ admin_data.phoneNumber }}" placeholder="Enter phone number" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                   <label for="status" class="form-label">Status</label>
+                                                   <select class="form-select" id="status" name="status" required>
+                                                      <option value="active" {% if admin_data.status == 'active' %}selected{% endif %}>Active</option>
+                                                      <option value="inactive" {% if admin_data.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                                                   </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                   <label for="password" class="form-label">Original or new password</label>
+                                                   <span id="passwordError" class="text-danger"></span>
+                                                   <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                   <label for="confirm_password" class="form-label">Retype Password</label>
+                                                   <span id="confirmPasswordError" class="text-danger"></span>
+                                                   <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm password" required>
+                                                </div>
+                                                <button type="submit" class="btn btn-primary">Save changes</button>
+                                             </form>
+                                           </div>
+                                           <div class="modal-footer">
+                                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                           </div>
+                                        </div>
+                                     </div>
+                                  </div>
                               </div>
                            </div>
                         </div>
@@ -593,5 +660,6 @@
       <script src="{{ url_for('static', filename='js/chart-custom.js') }}"></script>
       <!-- Custom JavaScript -->
       <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+      <script src="{{ url_for('static', filename='js/form-validation.js') }}"></script>
    </body>
 </html>

@@ -1,6 +1,6 @@
 Admin Dashboard Outline:
 
-Sidebar
+{% comment %} Sidebar
 Dashboard Overview
 User Management
 Patients
@@ -23,7 +23,7 @@ Access Directly: List of doctors, View profile, Approve/Reject registrations
 Logs
 Support Lists and Feedback
 Calendar
-Map
+Map {% endcomment %}
 
 Main Page
 Admin Profile
