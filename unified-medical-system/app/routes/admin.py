@@ -9,9 +9,9 @@ admin_bp = Blueprint('admin', __name__)
 
 # global data for admin
 global_admin_data = {
-    'total_patients': mongo.db.patients.count_documents({}),
-    'total_doctors': mongo.db.doctors.count_documents({}),
-    'total_hospitals': mongo.db.hospitals.count_documents({})
+    'patients_count': mongo.db.patients.count_documents({}),
+    'doctors_count': mongo.db.doctors.count_documents({}),
+    'hospitals_count': mongo.db.hospitals.count_documents({})
 }
 
 #admin dashboard
@@ -20,7 +20,7 @@ global_admin_data = {
 def index():
     admin_data = mongo.db.users.find_one({'umsId': session['umsId']})
     print(admin_data) #for debugging
-    return render_template('admin/dashboard.html', admin_data=admin_data)
+    return render_template('admin/dashboard.html', admin_data=admin_data, global_admin_data=global_admin_data)
 
 #admin profile
 @admin_bp.route('/profile', methods=['GET', 'POST'])
