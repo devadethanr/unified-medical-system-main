@@ -63,23 +63,19 @@ def update_profile():
         flash('Profile updated successfully', 'success')
     return redirect(url_for('admin.profile'))
 
-# #patients list view
+# patients list view
 @admin_bp.route('/api/patients', methods=['GET'])
 @login_required
 def api_patients():
     # Fetch patients and user information
     patients = list(mongo.db.patients.find())
     patients__user_info = list(mongo.db.users.find({'rolesId': 4}))
-
     # Create a dictionary to map userId to user information
     patient_info_dict = {patient['umsId']: patient for patient in patients__user_info}
-
-    # Iterate over the patients list and add user information
     for patient in patients:
         patient['_id'] = str(patient['_id'])  # Convert ObjectId to string
         patient['createdAt'] = patient['createdAt'].strftime('%Y-%m-%d %H:%M:%S') if patient.get('createdAt') else None
         patient['updatedAt'] = patient['updatedAt'].strftime('%Y-%m-%d %H:%M:%S') if patient.get('updatedAt') else None
-        
         # Add user information to the patient object
         patient_info = patient_info_dict.get(patient['umsId'])
         if patient_info:
@@ -95,21 +91,20 @@ def api_patients():
 @login_required
 def api_doctors():
     # Fetch doctors and user information
-    print('flag1') #for debuggin
     doctors = list(mongo.db.doctors.find())
     doctors__user_info = list(mongo.db.users.find({'rolesId': 3}))
-    print(doctors__user_info) #for debugging
-    # Create a dictionary to map userId to user information
     doctor_info_dict = {doctor['umsId']: doctor for doctor in doctors__user_info}
-    # Iterate over the doctors list and add user information
     for doctor in doctors:
         doctor['_id'] = str(doctor['_id'])
         doctor['createdAt'] = doctor['createdAt'].strftime('%Y-%m-%d %H:%M:%S') if doctor.get('createdAt') else None
         doctor['updatedAt'] = doctor['updatedAt'].strftime('%Y-%m-%d %H:%M:%S') if doctor.get('updatedAt') else None
-        if doctor_info_dict:
+        doctor_info = doctor_info_dict.get(doctor['umsId'])
+        if doctor_info:
             doctor['user_info'] = {
-                'name': doctor_info_dict.get('name'),
-                'email': doctor_info_dict.get('email'),
+                'name': doctor_info.get('name'),
+                'email': doctor_info.get('email'),
+                'gender': doctor_info.get('gender'),
+                'specialization': doctor_info.get('specialization'),
                 # Add more fields as needed
             }
     return jsonify(doctors)
