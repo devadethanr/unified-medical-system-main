@@ -116,4 +116,3 @@ def google_authorized():
 
     return redirect(url_for('patient.index'))
 
-

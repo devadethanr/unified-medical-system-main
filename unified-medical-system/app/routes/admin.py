@@ -5,6 +5,8 @@ from app import mongo
 from app.models import User
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask import jsonify
+
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -22,6 +24,7 @@ def index():
     admin_data = mongo.db.users.find_one({'umsId': session['umsId']})
     print(admin_data) #for debugging
     return render_template('admin/dashboard.html', admin_data=admin_data, global_admin_data=global_admin_data)
+
 
 #admin profile
 @admin_bp.route('/profile', methods=['GET', 'POST'])
@@ -58,3 +61,20 @@ def update_profile():
                             'email': admin_data['email']}})
         flash('Profile updated successfully', 'success')
     return redirect(url_for('admin.profile'))
+
+# #patients list view
+# @admin_bp.route('/patients', methods=['GET'])
+# @login_required
+# def patients():
+#     return render_template('admin/patients.html')
+
+@admin_bp.route('/api/patients', methods=['GET'])
+@login_required
+def api_patients():
+    patients = list(mongo.db.patients.find())
+    patients__user_info = list(mongo.db.users.find({'rolesId': 4}))
+    for patient in patients:
+        patient['_id'] = str(patient['_id'])  # Convert ObjectId to string
+        patient['createdAt'] = patient['createdAt'].strftime('%Y-%m-%d %H:%M:%S') if patient.get('createdAt') else None
+        patient['updatedAt'] = patient['updatedAt'].strftime('%Y-%m-%d %H:%M:%S') if patient.get('updatedAt') else None
+    return jsonify(patients)
