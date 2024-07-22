@@ -2,11 +2,13 @@ import re
 from flask import Blueprint, render_template, redirect, url_for, request, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required
-from app import mongo, login_manager, oauth
+from app import mongo, login_manager, oauth, mail
 from app.models import User
 from bson.objectid import ObjectId
+from flask_mail import Message
 from app.utils import generate_patient_id
 from datetime import datetime
+import random
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -48,7 +50,6 @@ def login():
                 flash('Invalid identifier or password')
         else:
             flash('User not found, please create an account')
-    
     return render_template('auth/login.html')
 
 
@@ -111,3 +112,70 @@ def google_authorized():
 
     return redirect(url_for('patient.index'))
 
+#routes for password reset
+#forget password page
+@auth_bp.route("/forgot_password")
+def password():
+    return render_template('auth/forgot_password.html')
+
+#for otp generation and sending mail
+@auth_bp.route("/email_verify", methods=['GET','POST'])
+def email_verification():
+    if request.method == 'POST':
+        email = request.form['email']
+        #wants to implement umsId verification also
+        user = mongo.db.users.find_one({'email': email})
+        if user:
+            otp_code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+            session['otp_code'] = otp_code
+            session['email'] = email
+            msg = Message('Password Reset', recipients=[email])
+            msg = Message('Forgot Password', sender='devadethanr@mca.ajce.in', recipients=[email])
+            msg.html = render_template('auth/otp_design.html', name=user['name'], otp_code=otp_code)
+            try:
+                mail.send(msg)
+                flash('OTP successfully mailed', 'success')
+                return redirect(url_for('auth.otp_verify'))
+            except Exception as e:
+                print(f"Error sending email: {e}")  
+                flash('Email not sent: ' + str(e), 'danger')
+        else:
+            flash('Email not found', 'danger')
+    return render_template('auth/forgot_password.html')
+
+#for otp verification
+@auth_bp.route("/otp_verify", methods=['GET','POST'])
+def otp_verify():
+    if request.method == 'POST':
+        print('OTP verification started') #for debugging
+        otp = request.form['otp']
+        print('OTP entered:', otp) #for debugging
+        print(otp, session.get('otp_code')) #for debugging
+        if otp == session.get('otp_code'):
+            print ('OTP verified successfully') #for debugging
+            flash('OTP verified successfully', 'success')
+            return redirect(url_for('auth.reset_password'))
+        else:
+            flash('Invalid OTP', 'danger')
+    return render_template('auth/otp_verify.html')
+
+#reset password page
+@auth_bp.route('/reset_password', methods=['GET', 'POST'])
+def reset_password():
+    if request.method == 'POST':
+        password = request.form['password']
+        email = session.get('email')
+
+        if not email:
+            flash('No email in session', 'danger')
+            return redirect(url_for('auth/forgot_password'))
+        # Hash the new password
+        hashed_password = generate_password_hash(password)
+
+        mongo.db.users.update_one({'email': email}, {'$set': {'passwordHash': [hashed_password]}})
+        mongo.db.login.update_one({'email': email}, {'$set': {'passwordHash': [hashed_password]}})
+
+        flash('Your password has been reset successfully', 'success')
+        return redirect(url_for('auth.login'))
+    
+    return render_template('auth/reset_password.html')
