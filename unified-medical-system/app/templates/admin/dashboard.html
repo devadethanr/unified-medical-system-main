@@ -646,6 +646,8 @@
  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
  <!-- Custom DataTables Initialization -->
+
+ <!-- patient datatables -->
  <script>
    $(document).ready(function() {
       $('.patient-view-modal').on('shown.bs.modal', function() {
@@ -667,7 +669,7 @@
                   {
                      "data": null,
                      "render": function(data, type, row) {
-                        return '<a href="/edit_patient/' + row.umsId + '" class="btn btn-primary">Edit</a>';
+                         return '<a href="' + "{{ url_for('admin.patient_profile', patient_id='') }}" + row.umsId + '" class="btn btn-primary">Edit</a>';
                      }
                   }
                ]

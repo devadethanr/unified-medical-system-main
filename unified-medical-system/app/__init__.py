@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from flask import Flask
+from flask import Flask, render_template, redirect, url_for
 from flask_pymongo import PyMongo
 from flask_login import LoginManager
 import random
@@ -57,6 +57,15 @@ def create_app(config_class='config.DevelopmentConfig'):
     )
     
     oauth.init_app(app)
+    
+    # Error handlers
+    @app.errorhandler(404)
+    def page_not_found(e):
+        return render_template('error/404.html'), 404
+
+    @app.errorhandler(500)
+    def internal_server_error(e):
+        return render_template('error/500.html'), 500
 
     from app.routes import admin, patient, doctor, hospital, auth
     app.register_blueprint(auth.auth_bp, url_prefix='/auth')

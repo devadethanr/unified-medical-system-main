@@ -8,6 +8,8 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import jsonify
 
+from app.routes.auth import login
+
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -108,3 +110,21 @@ def api_doctors():
                 # Add more fields as needed
             }
     return jsonify(doctors)
+
+#single patient view
+@admin_bp.route('/patient_profile/<string:patient_id>', methods=['POST', 'GET'])
+@login_required
+def patient_profile(patient_id):
+    patient_data = []
+    patient = mongo.db.patients.find_one({'umsId': patient_id})
+    patient_user_info = mongo.db.users.find_one({'umsId': patient_id})
+    
+    if patient and patient_user_info:
+        patient_data.append(patient)
+        patient_data.append(patient_user_info)
+        print(patient_data) #for debugging
+        return render_template('admin/patient-profile.html', patient_data=patient_data)
+    else:
+        flash('Patient not found', 'danger')
+        return redirect(url_for('admin.index'))
+
