@@ -1,6 +1,6 @@
 Admin Dashboard Outline:
 
-{% comment %} Sidebar
+Sidebar
 Dashboard Overview
 User Management
 Patients
@@ -23,18 +23,20 @@ Access Directly: List of doctors, View profile, Approve/Reject registrations
 Logs
 Support Lists and Feedback
 Calendar
-Map {% endcomment %}
+Map
 
 Main Page
-Admin Profile
-Edit Profile: Accessible via navbar
+
+Admin Profile 
+Edit Profile: Accessible via navbar //
 Notifications
 Accessible via navbar
-Statistics Cards
-Total Doctors
-Total Patients
-Total Hospitals
-Total Labs
+Statistics Cards //
+Total Doctors //
+Total Patients //
+Total Hospitals //
+Total Labs //
+
 Charts
 Consultation/Day
 ER Cases/Day
@@ -122,14 +124,3 @@ Follow-up Appointments: Display the number of follow-up appointments.
 Recent Activity
 
 Display a chart or list of recent activities within the system.
-
-
-
-
-
-
-
-
-
-
-

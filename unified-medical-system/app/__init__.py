@@ -1,3 +1,5 @@
+import os
+from dotenv import load_dotenv
 from flask import Flask
 from flask_pymongo import PyMongo
 from flask_login import LoginManager
@@ -11,8 +13,8 @@ login_manager = LoginManager()
 oauth = OAuth()
 mail = Mail()
 
-GOOGLE_CLIENT_ID = '806603351387-asf74r67qn6101dtjmrdiqpbqq301vrm.apps.googleusercontent.com'
-GOOGLE_CLIENT_SECRET = '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'
+GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
 
 def create_app(config_class='config.DevelopmentConfig'):
     app = Flask(__name__)
