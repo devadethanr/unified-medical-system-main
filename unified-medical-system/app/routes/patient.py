@@ -87,3 +87,5 @@ def register():
         flash('User registered successfully!')
         return redirect(url_for('patient.index'))
     return render_template('patient/register.html')
+
+#upate profile 

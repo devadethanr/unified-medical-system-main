@@ -24,6 +24,7 @@ global_admin_data = {
 @admin_bp.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
+    global admin_data
     admin_data = mongo.db.users.find_one({'umsId': session['umsId']})
     print(admin_data) #for debugging
     return render_template('admin/dashboard.html', admin_data=admin_data, global_admin_data=global_admin_data)
@@ -33,6 +34,7 @@ def index():
 @admin_bp.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
+    global admin_data
     admin_data = mongo.db.users.find_one({'umsId': session['umsId']})
     admin_data['phoneNumber'] = admin_data.get('phoneNumber', [None])[0]
     if request.method == 'POST':
@@ -123,7 +125,7 @@ def patient_profile(patient_id):
         patient_data.append(patient)
         patient_data.append(patient_user_info)
         print(patient_data) #for debugging
-        return render_template('admin/patient-profile.html', patient_data=patient_data)
+        return render_template('admin/patient-profile.html', patient_data=patient_data, admin_data = admin_data)
     else:
         flash('Patient not found', 'danger')
         return redirect(url_for('admin.index'))

@@ -53,74 +53,73 @@
             
             <div id="sidebar-scrollbar">
                <nav class="iq-sidebar-menu">
-                   <ul class="iq-menu">
-                       <li class="iq-menu-title"><i class="ri-subtract-line"></i><span>Admin Dashboard</span></li>
-                       <li>
-                           <a href="index.html" class="iq-waves-effect"><i class="ri-hospital-fill"></i><span>Welcome back {{patient_data['name']}}</span></a>
-                       </li>
-                       <li>
-                        <hr class="iq-divider">
+                  <ul class="iq-menu">
+                      <li class="iq-menu-title"><i class="ri-subtract-line"></i><span>Admin Dashboard</span></li>
+                      <li>
+                          <a href="index.html" class="iq-waves-effect"><i class="ri-hospital-fill"></i><span>Welcome back {{admin_data['name']}}</span></a>
+                      </li>
+                      <li>
+                       <hr class="iq-divider">
+                    </li>
+                      <li>
+                       <a href="#" class="iq-waves-effect"><i class="ri-user-fill"></i><span>User Management</span></a>
                      </li>
-                       <li>
-                        <a href="#" class="iq-waves-effect"><i class="ri-user-fill"></i><span>User Management</span></a>
-                      </li>
-                       <li>
-                           <a href="#" class="iq-waves-effect"><i class="ri-group-fill"></i><span>Patients</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
-                           <ul class="iq-submenu">
-                              <li><a href="#"><i class="ri-list-check"></i><span>View</span></a></li>
-                              <li><a href="#"><i class="ri-add-circle-line"></i><span>Manage</span></a></li>
-                              <li><a href="#"><i class="ri-file-list-fill"></i><span>Access Records</span></a></li>
-                           </ul>
-                        </li>
-                        <li>
-                           <a href="#" class="iq-waves-effect"><i class="ri-user-3-fill"></i><span>Doctors</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
-                           <ul class="iq-submenu">
-                               <li><a href="#"><i class="ri-list-check"></i><span>View</span></a></li>
-                               <li><a href="#"><i class="ri-add-circle-line"></i><span>Manage</span></a></li>
-                               <li><a href="#"><i class="ri-check-double-fill"></i><span>Add and Verify Credentials</span></a></li>
-                               <li><a href="#"><i class="ri-file-list-fill"></i><span>Access Records</span></a></li>
-                           </ul>
-                       </li>
-                       <li>
-                        <a href="#" class="iq-waves-effect"><i class="ri-hospital-fill"></i><span>Hospitals</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
-                        <ul class="iq-submenu">
-                            <li><a href="#"><i class="ri-list-check"></i><span>View</span></a></li>
-                            <li><a href="#"><i class="ri-add-circle-line"></i><span>Manage</span></a></li>
-                            <li><a href="#"><i class="ri-check-double-fill"></i><span>Approve or Reject Registration</span></a></li>
-                        </ul>
-                      </li>
-                       <li>
-                           <a href="#" class="iq-waves-effect"><i class="ri-file-list-fill"></i><span>Hospital Registration</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
-                           <ul class="iq-submenu">
-                               <li><a href="#"><i class="ri-list-check"></i><span>Access Directly</span></a></li>
-                           </ul>
-                       </li>
-                       <li>
-                           <a href="#" class="iq-waves-effect"><i class="ri-file-list-fill"></i><span>Doctor Registration</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
-                           <ul class="iq-submenu">
-                               <li><a href="#"><i class="ri-list-check"></i><span>Access Directly</span></a></li>
-                           </ul>
-                       </li>
-                       <li>
-                           <a href="#" class="iq-waves-effect"><i class="ri-calendar-event-fill"></i><span>Calendar</span></a>
-                       </li>
-                       <li>
-                           <a href="#" class="iq-waves-effect"><i class="ri-map-pin-2-fill"></i><span>Map</span></a>
-                       </li>
-                       <li>
-                           <a href="#" class="iq-waves-effect"><i class="ri-user-fill"></i><span>Support</span></i></a>
-                           <ul class="iq-submenu">
-                               <li><a href="#"><i class="ri-list-check"></i><span>Manage</span></a></li>
-                           </ul>
-                       </li>
-                       <li>
-                           <a href="#" class="iq-waves-effect"><i class="ri-settings-5-fill"></i><span>Feedback</span></a>
-                           <ul class="iq-submenu">
-                              <li><a href="#"><i class="ri-list-check"></i><span>Manage</span></a></li>
+                      <li>
+                          <a href="#" class="iq-waves-effect"><i class="ri-group-fill"></i><span>Patients</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
+                          <ul class="iq-submenu">
+                             <li><a href="#" data-bs-toggle="modal" data-bs-target=".patient-view-modal"><i class="ri-list-check"></i><span>View / Manage</span></a></li>
+                             <li><a href="#"><i class="ri-file-list-fill"></i><span>Access Records</span></a></li>
                           </ul>
                        </li>
-                   </ul>
-               </nav>
+  
+                       <li>
+                          <a href="#" class="iq-waves-effect"><i class="ri-user-3-fill"></i><span>Doctors</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
+                          <ul class="iq-submenu">
+                             <li><a href="#" data-bs-toggle="modal" data-bs-target=".doctor-view-modal"><i class="ri-list-check"></i><span>View / Manage</span></a></li>
+                              <li><a href="#"><i class="ri-check-double-fill"></i><span>Add and Verify Credentials</span></a></li>
+                              <li><a href="#"><i class="ri-file-list-fill"></i><span>Access Records</span></a></li>
+                          </ul>
+                      </li>
+                      <li>
+                       <a href="#" class="iq-waves-effect"><i class="ri-hospital-fill"></i><span>Hospitals</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
+                       <ul class="iq-submenu">
+                           <li><a href="#"><i class="ri-list-check"></i><span>View</span></a></li>
+                           <li><a href="#"><i class="ri-add-circle-line"></i><span>Manage</span></a></li>
+                           <li><a href="#"><i class="ri-check-double-fill"></i><span>Approve or Reject Registration</span></a></li>
+                       </ul>
+                     </li>
+                      <li>
+                          <a href="#" class="iq-waves-effect"><i class="ri-file-list-fill"></i><span>Hospital Registration</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
+                          <ul class="iq-submenu">
+                              <li><a href="#"><i class="ri-list-check"></i><span>Access Directly</span></a></li>
+                          </ul>
+                      </li>
+                      <li>
+                          <a href="#" class="iq-waves-effect"><i class="ri-file-list-fill"></i><span>Doctor Registration</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
+                          <ul class="iq-submenu">
+                              <li><a href="#"><i class="ri-list-check"></i><span>Access Directly</span></a></li>
+                          </ul>
+                      </li>
+                      <li>
+                          <a href="#" class="iq-waves-effect"><i class="ri-calendar-event-fill"></i><span>Calendar</span></a>
+                      </li>
+                      <li>
+                          <a href="#" class="iq-waves-effect"><i class="ri-map-pin-2-fill"></i><span>Map</span></a>
+                      </li>
+                      <li>
+                          <a href="#" class="iq-waves-effect"><i class="ri-user-fill"></i><span>Support</span></i></a>
+                          <ul class="iq-submenu">
+                              <li><a href="#"><i class="ri-list-check"></i><span>Manage</span></a></li>
+                          </ul>
+                      </li>
+                      <li>
+                          <a href="#" class="iq-waves-effect"><i class="ri-settings-5-fill"></i><span>Feedback</span></a>
+                          <ul class="iq-submenu">
+                             <li><a href="#"><i class="ri-list-check"></i><span>Manage</span></a></li>
+                         </ul>
+                      </li>
+                  </ul>
+              </nav>
                <div class="p-3"></div>
            </div>  
          </div>
@@ -132,11 +131,11 @@
                   <div class="iq-sidebar-logo">
                      <div class="top-logo">
                         <a href="index.html" class="logo">
-                        <img src="images/logo.png" class="img-fluid" alt="">
-                        <span>UMS</span>
+                           <img src="images/logo.png" class="img-fluid" alt="">
+                           <span>UMS</span>
                         </a>
                      </div>
-                  </div>
+                  </div>   
                   <nav class="navbar navbar-expand-lg navbar-light p-0">
                      <div class="iq-search-bar">
                         <form action="#" class="searchbox">
@@ -146,10 +145,11 @@
                      </div>
                      <ol class="breadcrumb ">
                         <li class="breadcrumb-item"><a href="{{ url_for('admin.index') }}"><i class="ri-home-4-line me-1 float-start"></i>Dashboard</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Profile</li>
+                        <li class="breadcrumb-item active"><a href="#"><i class="ri-home-4-line me-1 float-start"></i>Patient Profile View</a></li>
                      </ol>
-                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" href="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                     <i class="ri-menu-3-line"></i>
+                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" href="#navbarSupportedContent"
+                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <i class="ri-menu-3-line"></i>
                      </button>
                      <div class="iq-menu-bt align-self-center">
                         <div class="wrapper-menu">
@@ -171,45 +171,12 @@
                                  <div class="iq-card shadow-none m-0">
                                     <div class="iq-card-body p-0 ">
                                        <div class="bg-primary p-3">
-                                          <h5 class="mb-0 text-white d-flex justify-content-between">All Notifications<small class="badge  badge-dark float-end pt-1">4</small></h5>
+                                          <h5 class="mb-0 text-white d-flex justify-content-between">All
+                                             Notifications<small class="badge  badge-dark float-end pt-1 ms-2">4</small>
+                                          </h5>
                                        </div>
-                                       <a href="#" class="iq-sub-card" >
-                                          <div class="media align-items-center d-flex">
-                                             <div class="">
-                                                <img class="avatar-40 rounded" src="images/user/01.jpg" alt="">
-                                             </div>
-                                             <div class="media-body ms-3">
-                                                <h6 class="mb-0 ">Emma Watson Bini</h6>
-                                                <small class="float-end font-size-12">Just Now</small>
-                                                <p class="mb-0">95 MB</p>
-                                             </div>
-                                          </div>
-                                       </a>
-                                       <a href="#" class="iq-sub-card" >
-                                          <div class="media align-items-center d-flex">
-                                             <div class="">
-                                                <img class="avatar-40 rounded" src="images/user/02.jpg" alt="">
-                                             </div>
-                                             <div class="media-body ms-3">
-                                                <h6 class="mb-0 ">New customer is join</h6>
-                                                <small class="float-end font-size-12">5 days ago</small>
-                                                <p class="mb-0">Jond Bini</p>
-                                             </div>
-                                          </div>
-                                       </a>
-                                       <a href="#" class="iq-sub-card" >
-                                          <div class="media align-items-center d-flex">
-                                             <div class="">
-                                                <img class="avatar-40 rounded" src="images/user/03.jpg" alt="">
-                                             </div>
-                                             <div class="media-body ms-3">
-                                                <h6 class="mb-0 ">Two customer is left</h6>
-                                                <small class="float-end font-size-12">2 days ago</small>
-                                                <p class="mb-0">Jond Bini</p>
-                                             </div>
-                                          </div>
-                                       </a>
-                                       <a href="#" class="iq-sub-card" >
+   
+                                       <a href="#" class="iq-sub-card">
                                           <div class="media align-items-center d-flex">
                                              <div class="">
                                                 <img class="avatar-40 rounded" src="images/user/04.jpg" alt="">
@@ -227,16 +194,17 @@
                            </li>
                            <li class="nav-item dropdown">
                               <a href="#" class="search-toggle iq-waves-effect">
-                              <i class="ri-mail-open-fill"></i>
-                              <span class="bg-primary count-mail"></span>
-                           </a>
+                                 <i class="ri-mail-open-fill"></i>
+                                 <span class="bg-primary count-mail"></span>
+                              </a>
                               <div class="iq-sub-dropdown">
                                  <div class="iq-card shadow-none m-0">
                                     <div class="iq-card-body p-0 ">
                                        <div class="bg-primary p-3">
-                                          <h5 class="mb-0 text-white d-flex justify-content-between">All Messages<small class="badge  badge-dark float-end pt-1">5</small></h5>
+                                          <h5 class="mb-0 text-white d-flex justify-content-between">All Messages<small
+                                                class="badge  badge-dark float-end pt-1 ms-2">5</small></h5>
                                        </div>
-                                       <a href="#" class="iq-sub-card" >
+                                       <a href="#" class="iq-sub-card">
                                           <div class="media align-items-center d-flex">
                                              <div class="">
                                                 <img class="avatar-40 rounded" src="images/user/01.jpg" alt="">
@@ -244,50 +212,6 @@
                                              <div class="media-body ms-3">
                                                 <h6 class="mb-0 ">Bini Emma Watson</h6>
                                                 <small class="float-start font-size-12">13 Jun</small>
-                                             </div>
-                                          </div>
-                                       </a>
-                                       <a href="#" class="iq-sub-card" >
-                                          <div class="media align-items-center d-flex">
-                                             <div class="">
-                                                <img class="avatar-40 rounded" src="images/user/02.jpg" alt="">
-                                             </div>
-                                             <div class="media-body ms-3">
-                                                <h6 class="mb-0 ">Lorem Ipsum Watson</h6>
-                                                <small class="float-start font-size-12">20 Apr</small>
-                                             </div>
-                                          </div>
-                                       </a>
-                                       <a href="#" class="iq-sub-card" >
-                                          <div class="media align-items-center d-flex">
-                                             <div class="">
-                                                <img class="avatar-40 rounded" src="images/user/03.jpg" alt="">
-                                             </div>
-                                             <div class="media-body ms-3">
-                                                <h6 class="mb-0 ">Why do we use it?</h6>
-                                                <small class="float-start font-size-12">30 Jun</small>
-                                             </div>
-                                          </div>
-                                       </a>
-                                       <a href="#" class="iq-sub-card" >
-                                          <div class="media align-items-center d-flex">
-                                             <div class="">
-                                                <img class="avatar-40 rounded" src="images/user/04.jpg" alt="">
-                                             </div>
-                                             <div class="media-body ms-3">
-                                                <h6 class="mb-0 ">Variations Passages</h6>
-                                                <small class="float-start font-size-12">12 Sep</small>
-                                             </div>
-                                          </div>
-                                       </a>
-                                       <a href="#" class="iq-sub-card" >
-                                          <div class="media align-items-center d-flex">
-                                             <div class="">
-                                                <img class="avatar-40 rounded" src="images/user/05.jpg" alt="">
-                                             </div>
-                                             <div class="media-body ms-3">
-                                                <h6 class="mb-0 ">Lorem Ipsum generators</h6>
-                                                <small class="float-start font-size-12">5 Dec</small>
                                              </div>
                                           </div>
                                        </a>
@@ -300,9 +224,9 @@
                      <ul class="navbar-list">
                         <li>
                            <a href="#" class="search-toggle iq-waves-effect d-flex align-items-center">
-                              <img src="{{ url_for('static', filename='images/user/1.jpg') }}" class="img-fluid rounded" alt="user">
+                              <img src="images/user/1.jpg" class="img-fluid rounded" alt="user">
                               <div class="caption">
-                                 <h6 class="mb-0 line-height">{{patient_data['name']}}</h6>
+                                 <h6 class="mb-0 line-height">{{admin_data['name']}}</h6>
                                  <span class="font-size-12">Available</span>
                               </div>
                            </a>
@@ -310,10 +234,10 @@
                               <div class="iq-card shadow-none m-0">
                                  <div class="iq-card-body p-0 ">
                                     <div class="bg-primary p-3">
-                                       <h5 class="mb-0 text-white line-height">Hello {{patient_data['name']}}</h5>
+                                       <h5 class="mb-0 text-white line-height">Hello {{admin_data['name']}}</h5>
                                        <span class="text-white font-size-12">Available</span>
                                     </div>
-                                    <a href="profile.html" class="iq-sub-card iq-bg-primary-hover">
+                                    <a href="{{ url_for('admin.profile') }}" class="iq-sub-card iq-bg-primary-hover">
                                        <div class="media align-items-center d-flex">
                                           <div class="rounded iq-card-icon iq-bg-primary">
                                              <i class="ri-file-user-line"></i>
@@ -324,41 +248,9 @@
                                           </div>
                                        </div>
                                     </a>
-                                    <a href="profile-edit.html" class="iq-sub-card iq-bg-primary-hover">
-                                       <div class="media align-items-center d-flex">
-                                          <div class="rounded iq-card-icon iq-bg-primary">
-                                             <i class="ri-profile-line"></i>
-                                          </div>
-                                          <div class="media-body ms-3">
-                                             <h6 class="mb-0 ">Edit Profile</h6>
-                                             <p class="mb-0 font-size-12">Modify your personal details.</p>
-                                          </div>
-                                       </div>
-                                    </a>
-                                    <a href="account-setting.html" class="iq-sub-card iq-bg-primary-hover">
-                                       <div class="media align-items-center d-flex">
-                                          <div class="rounded iq-card-icon iq-bg-primary">
-                                             <i class="ri-account-box-line"></i>
-                                          </div>
-                                          <div class="media-body ms-3">
-                                             <h6 class="mb-0 ">Account settings</h6>
-                                             <p class="mb-0 font-size-12">Manage your account parameters.</p>
-                                          </div>
-                                       </div>
-                                    </a>
-                                    <a href="privacy-setting.html" class="iq-sub-card iq-bg-primary-hover">
-                                       <div class="media align-items-center d-flex">
-                                          <div class="rounded iq-card-icon iq-bg-primary">
-                                             <i class="ri-lock-line"></i>
-                                          </div>
-                                          <div class="media-body ms-3">
-                                             <h6 class="mb-0 ">Privacy Settings</h6>
-                                             <p class="mb-0 font-size-12">Control your privacy parameters.</p>
-                                          </div>
-                                       </div>
-                                    </a>
                                     <div class="d-inline-block w-100 text-center p-3">
-                                       <a class="bg-primary iq-sign-btn" href="sign-in.html" role="button">Sign out<i class="ri-login-box-line ms-2"></i></a>
+                                       <a class="bg-primary iq-sign-btn"  href="{{ url_for('auth.logout') }}" role="button">Sign out<i
+                                             class="ri-login-box-line ms-2"></i></a>
                                     </div>
                                  </div>
                               </div>
@@ -385,93 +277,9 @@
                                  <span>Last profile update: {{ patient_data.updatedAt }}</span>
                               </br>
                                  <span>UMS ID: {{ patient_data[0].get('umsId', 'N/A') }}</span>
-                                 <p class="mb-0">Unified Medical System Administrator Profile.</p>
+                                 <p class="mb-0">Unified Medical System Patient Profile.</p>
                               </div>
                               <hr>
-                           </div>
-                        </div>
-                     </div>
-                     <div class="iq-card">
-                        <div class="iq-card-header d-flex justify-content-between">
-                           <div class="iq-header-title">
-                              <h4 class="card-title">Personal Information</h4>
-                           </div>
-                        </div>
-                        <div class="iq-card-body">
-                           <div class="about-info m-0 p-0">
-                              <div class="row">
-                                 <div class="col-4">User:</div>
-                                 <div class="col-8">{{ patient_data[1].get('name', 'N/A') }}</div>
-                                 <div class="col-4">Email:</div>
-                                 <div class="col-8"><a href="mailto:{{ patient_data[1].get('email', 'N/A') }}"> {{ patient_data[1].get('email', 'N/A') }}   </a></div>
-                                 <div class="col-4">Phone:</div>
-                                 <div class="col-8"><a tel:{{ patient_data[1].get('phoneNumber', ['N/A'])[0] }}">{{ patient_data[1].get('phoneNumber', ['N/A'])[0] }}</a></div>
-                                 <div class="col-4">State:</div>
-                                 <div class="col-8">Not Specified</div>
-                                 <div class="col-4">Updated At:</div>
-                                 <div class="col-8">{{ patient_data[0].get('updatedAt', 'N/A') }}</div>
-                                 <div class="col-4">Created At:</div>   
-                                 <div class="col-8">{{ patient_data[0].get('createdAt', 'N/A') }}</div>
-                                 <div class="col-4">UMS ID:</div>
-                                 <div class="col-8">{{ patient_data[0].get('umsId', 'N/A') }}</div>
-                                 <div class="col-4">Status:</div>
-                                 <div class="col-8 text-success">{{ patient_data[1].get('status', 'N/A') }}</div>
-                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#profile-edit-modal">
-                                    Edit Profile
-                                  </button>
-                                  <!--profile edit  Modal -->
-                                  <div class="modal fade" id="profile-edit-modal" tabindex="-1" role="dialog" aria-labelledby="profile-edit-modal" aria-hidden="true">
-                                     <div class="modal-dialog modal-dialog-scrollable" role="document">
-                                        <div class="modal-content">
-                                           <div class="modal-header">
-                                              <h4 class="modal-title" id="profile-edit-modal"><b>Edit Admin profile</b></h4>
-                                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                           </div>
-                                           <div class="modal-body">
-                                             <form id="registerForm" action="{{ url_for('admin.profile') }}" autocomplete='off' method="post">
-                                                <input type="hidden" name="form_type" value="update_profile">
-                                                <div class="mb-3">
-                                                   <label for="name" class="form-label">Name</label>
-                                                   <span id="nameError" class="text-danger"></span>
-                                                   <input type="text" class="form-control" id="name" name="name" value="{{ patient_data.name }}" placeholder="Enter name" required>
-                                                </div>
-                                                <div class="mb-3">
-                                                   <label for="email" class="form-label">Email</label>
-                                                   <span id="emailError" class="text-danger"></span>
-                                                   <input type="email" class="form-control" id="email" name="email" value="{{ patient_data.email }}" placeholder="Enter email" required>
-                                                </div>
-                                                <div class="mb-3">
-                                                   <label for="phoneNumber" class="form-label">Phone Number</label>
-                                                   <span id="phoneNumberError" class="text-danger"></span>
-                                                   <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value="{{ patient_data.phoneNumber }}" placeholder="Enter phone number" required>
-                                                </div>
-                                                <div class="mb-3">
-                                                   <label for="status" class="form-label">Status</label>
-                                                   <select class="form-select" id="status" name="status" required>
-                                                      <option value="active" {% if patient_data.status == 'active' %}selected{% endif %}>Active</option>
-                                                      <option value="inactive" {% if patient_data.status == 'inactive' %}selected{% endif %}>Inactive</option>
-                                                   </select>
-                                                </div>
-                                                <div class="mb-3">
-                                                   <label for="password" class="form-label">Original or new password</label>
-                                                   <span id="passwordError" class="text-danger"></span>
-                                                   <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
-                                                </div>
-                                                <div class="mb-3">
-                                                   <label for="confirm_password" class="form-label">Retype Password</label>
-                                                   <span id="confirmPasswordError" class="text-danger"></span>
-                                                   <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm password" required>
-                                                </div>
-                                                <button type="submit" class="btn btn-primary">Save changes</button>
-                                             </form>
-                                           </div>
-                                           <div class="modal-footer">
-                                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                           </div>
-                                        </div>
-                                     </div>
-                                  </div>
-                              </div>
                            </div>
                         </div>
                      </div>
@@ -482,33 +290,88 @@
                            <div class="iq-card">
                               <div class="iq-card-header d-flex justify-content-between">
                                  <div class="iq-header-title">
-                                    <h4 class="card-title">Speciality</h4>
+                                    <h4 class="card-title">Personal Information</h4>
                                  </div>
                               </div>
                               <div class="iq-card-body">
-                                 <ul class="speciality-list m-0 p-0">
-                                    <li class="d-flex mb-4 align-items-center">
-                                       <div class="user-img img-fluid"><a href="#" class="iq-bg-primary"><i class="ri-award-fill"></i></a></div>
-                                       <div class="media-support-info ms-3">
-                                          <h6>professional</h6>
-                                          <p class="mb-0">Certified Skin Treatment</p>
-                                       </div>
-                                    </li>
-                                    <li class="d-flex mb-4 align-items-center">
-                                       <div class="user-img img-fluid"><a href="#" class="iq-bg-warning"><i class="ri-award-fill"></i></a></div>
-                                       <div class="media-support-info ms-3">
-                                          <h6>Certified</h6>
-                                          <p class="mb-0">Cold Laser Operation</p>
-                                       </div>
-                                    </li>
-                                    <li class="d-flex mb-4 align-items-center">
-                                       <div class="user-img img-fluid"><a href="#" class="iq-bg-info"><i class="ri-award-fill"></i></a></div>
-                                       <div class="media-support-info ms-3">
-                                          <h6>Medication Laser</h6>
-                                          <p class="mb-0">Hair Lose Product</p>
-                                       </div>
-                                    </li>
-                                 </ul>
+                                 <div class="about-info m-0 p-0">
+                                    <div class="row">
+                                       <div class="col-4">Name:</div>
+                                       <div class="col-8">{{ patient_data[1].get('name', 'N/A') }}</div>
+                                       <div class="col-4">Email:</div>
+                                       <div class="col-8"><a href="mailto:{{ patient_data[1].get('email', 'N/A') }}"> {{ patient_data[1].get('email', 'N/A') }}   </a></div>
+                                       <div class="col-4">Phone:</div>
+                                       <div class="col-8"><a tel:{{ patient_data[1].get('phoneNumber', ['N/A'])[0] }}">{{ patient_data[1].get('phoneNumber', ['N/A'])[0] }}</a></div>
+                                       <div class="col-4">State:</div>
+                                       <div class="col-8">{{ patient_data[1].get('state', 'N/A') }}</div>
+                                       <div class="col-4">Address:</div>
+                                       <div class="col-8">{{ patient_data[1].get('address', 'N/A') }}</div>
+                                       <div class="col-4">Updated At:</div>
+                                       <div class="col-8">{{ patient_data[0].get('updatedAt', 'N/A') }}</div>
+                                       <div class="col-4">Created At:</div>   
+                                       <div class="col-8">{{ patient_data[0].get('createdAt', 'N/A') }}</div>
+                                       <div class="col-4">Status:</div>
+                                       <div class="col-8 text-success">{{ patient_data[1].get('status', 'N/A') }}</div>
+                                       <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#profile-edit-modal">
+                                          Edit Profile
+                                        </button>
+                                        <!--profile edit  Modal -->
+                                        <div class="modal fade" id="profile-edit-modal" tabindex="-1" role="dialog" aria-labelledby="profile-edit-modal" aria-hidden="true">
+                                           <div class="modal-dialog modal-dialog-scrollable" role="document">
+                                              <div class="modal-content">
+                                                 <div class="modal-header">
+                                                    <h4 class="modal-title" id="profile-edit-modal"><b>Edit User profile</b></h4>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                 </div>
+                                                 <div class="modal-body">
+                                                   <div class="modal-body">
+                                                      <h4 class="modal-title" id="profile-edit-modal"><b>Patient Profile Edit</b></h4>
+                                                      <form id="registerForm" action="{{ url_for('admin.profile') }}" autocomplete='off' method="post">
+                                                         <input type="hidden" name="form_type" value="update_profile">
+                                                         <div class="mb-3">
+                                                            <label for="name" class="form-label">Name</label>
+                                                            <span id="nameError" class="text-danger"></span>
+                                                            <input type="text" class="form-control" id="name" name="name" value="{{ patient_data.name }}" placeholder="Enter name" required>
+                                                         </div>
+                                                         <div class="mb-3">
+                                                            <label for="email" class="form-label">Email</label>
+                                                            <span id="emailError" class="text-danger"></span>
+                                                            <input type="email" class="form-control" id="email" name="email" value="{{ patient_data.email }}" placeholder="Enter email" required>
+                                                         </div>
+                                                         <div class="mb-3">
+                                                            <label for="phoneNumber" class="form-label">Phone Number</label>
+                                                            <span id="phoneNumberError" class="text-danger"></span>
+                                                            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value="{{ patient_data.phoneNumber }}" placeholder="Enter phone number" required>
+                                                         </div>
+                                                         <div class="mb-3">
+                                                            <label for="status" class="form-label">Status</label>
+                                                            <select class="form-select" id="status" name="status" required>
+                                                               <option value="active" {% if patient_data.status == 'active' %}selected{% endif %}>Active</option>
+                                                               <option value="inactive" {% if patient_data.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                                                            </select>
+                                                         </div>
+                                                         <div class="mb-3">
+                                                            <label for="password" class="form-label">Original or new password</label>
+                                                            <span id="passwordError" class="text-danger"></span>
+                                                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+                                                         </div>
+                                                         <div class="mb-3">
+                                                            <label for="confirm_password" class="form-label">Retype Password</label>
+                                                            <span id="confirmPasswordError" class="text-danger"></span>
+                                                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm password" required>
+                                                         </div>
+                                                         <button type="submit" class="btn btn-primary">Save changes</button>
+                                                      </form>
+                                                   </div>
+                                                 </div>
+                                                 <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                 </div>
+                                              </div>
+                                           </div>
+                                        </div>
+                                    </div>
+                                 </div>
                               </div>
                            </div>
                         </div>
@@ -516,35 +379,7 @@
                            <div class="iq-card">
                               <div class="iq-card-header d-flex justify-content-between">
                                  <div class="iq-header-title">
-                                    <h4 class="card-title">Notifications</h4>
-                                 </div>
-                              </div>
-                              <div class="iq-card-body">
-                                 <ul class="iq-timeline">
-                                    <li>
-                                       <div class="timeline-dots border-success"></div>
-                                       <h6 class="">Dr. Joy Send you Photo</h6>
-                                       <small class="mt-1">23 November 2019</small>
-                                    </li>
-                                    <li>
-                                       <div class="timeline-dots border-danger"></div>
-                                       <h6 class="">Reminder : Opertion Time!</h6>
-                                       <small class="mt-1">20 November 2019</small>
-                                    </li>
-                                    <li>
-                                       <div class="timeline-dots border-primary"></div>
-                                       <h6 class="mb-1">Patient Call</h6>
-                                       <small class="mt-1">19 November 2019</small>
-                                    </li>
-                                 </ul>
-                              </div>
-                           </div>
-                        </div>
-                        <div class="col-md-6">
-                           <div class="iq-card">
-                              <div class="iq-card-header d-flex justify-content-between">
-                                 <div class="iq-header-title">
-                                    <h4 class="card-title">Schedule</h4>
+                                    <h4 class="card-title">Appointments Record</h4>
                                  </div>
                               </div>
                               <div class="iq-card-body">
@@ -555,36 +390,6 @@
                                        <div class="d-inline-block w-100">
                                           <p class="badge badge-primary">09:00 AM </p>
                                        </div>
-                                    </li>
-                                    <li>
-                                       <h6 class="float-start mb-1">  Anna Mull (Fever)</h6>
-                                       <small class="float-end mt-1">Today</small>
-                                       <div class="d-inline-block w-100">
-                                          <p class="badge badge-danger">09:15 AM </p>
-                                       </div>
-                                    </li>
-                                    <li>
-                                       <h6 class="float-start mb-1">Petey Cruiser (X-ray)</h6>
-                                       <small class="float-end mt-1">Today</small>
-                                       <div class="d-inline-block w-100">
-                                          <p class="badge badge-warning">10:00 AM </p>
-                                       </div>
-                                    </li>
-                                    <li>
-                                       <h6 class="float-start mb-1">Anna Sthesia (Full body Check up)</h6>
-                                       <small class="float-end mt-1">Today</small>
-                                       <div class="d-inline-block w-100">
-                                          <p class="badge badge-info">01:00 PM </p>
-                                       </div>
-                                    </li>
-                                    <li>
-                                       <h6 class="float-start mb-1">Paul Molive (Operation)</h6>
-                                       <small class="float-end mt-1">Tomorrow</small>
-                                       <div class="d-inline-block w-100">
-                                          <p class="badge badge-success">09:00 AM </p>
-                                       </div>
-                                    </li>
-                                    
                                  </ul>
                               </div>
                            </div>
@@ -592,25 +397,7 @@
                   </div>
                </div>   
             </div>
-            <!-- Footer -->
-            <footer class="bg-white iq-footer">
-               <div class="container-fluid">
-                  <div class="row">
-                     <div class="col-lg-6">
-                        <ul class="list-inline mb-0">
-                           <li class="list-inline-item"><a href="privacy-policy.html">Privacy Policy</a></li>
-                           <li class="list-inline-item"><a href="terms-of-service.html">Terms of Use</a></li>
-                        </ul>
-                     </div>
-                     <div class="col-lg-6 text-end">
-                        Copyright <span id="copyright"> 
-<script>document.getElementById('copyright').appendChild(document.createTextNode(new Date().getFullYear()))</script>
-</span> <a href="#">UMS</a> All Rights Reserved.
-                     </div>
-                  </div>
-               </div>
-            </footer>
-            <!-- Footer END -->
+
          </div>
       </div>
       <!-- Wrapper END -->
