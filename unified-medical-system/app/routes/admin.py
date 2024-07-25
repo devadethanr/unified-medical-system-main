@@ -1,13 +1,11 @@
 from pydoc import doc
 import re
-from flask import Blueprint, render_template, redirect, url_for, request, flash, session
+from flask import Blueprint, render_template, redirect, url_for, request, flash, session, jsonify
 from flask_login import login_required
 from app import mongo
 from app.models import User
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask import jsonify
-
 from app.routes.auth import login
 
 
@@ -24,6 +22,7 @@ global_admin_data = {
 @admin_bp.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
+    """Render the admin dashboard."""
     global admin_data
     admin_data = mongo.db.users.find_one({'umsId': session['umsId']})
     print(admin_data) #for debugging
@@ -34,6 +33,7 @@ def index():
 @admin_bp.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
+    """Handle admin profile view and updates."""
     global admin_data
     admin_data = mongo.db.users.find_one({'umsId': session['umsId']})
     admin_data['phoneNumber'] = admin_data.get('phoneNumber', [None])[0]
@@ -43,6 +43,7 @@ def profile():
     return render_template('admin/profile.html', admin_data=admin_data, global_admin_data=global_admin_data)
 
 def update_profile():
+    """Update admin profile information."""
     admin_data = mongo.db.users.find_one({'umsId': session['umsId']})
     # Get the updated data from the form
     admin_data['name'] = request.form.get('name')
@@ -71,6 +72,7 @@ def update_profile():
 @admin_bp.route('/api/patients', methods=['GET'])
 @login_required
 def api_patients():
+    """Fetch and return patient data as JSON."""
     # Fetch patients and user information
     patients = list(mongo.db.patients.find())
     patients__user_info = list(mongo.db.users.find({'rolesId': 4}))
@@ -94,6 +96,7 @@ def api_patients():
 @admin_bp.route('/api/doctors', methods=['GET'])
 @login_required
 def api_doctors():
+    """Fetch and return doctor data as JSON."""
     # Fetch doctors and user information
     doctors = list(mongo.db.doctors.find())
     doctors__user_info = list(mongo.db.users.find({'rolesId': 3}))
@@ -113,10 +116,48 @@ def api_doctors():
             }
     return jsonify(doctors)
 
+@admin_bp.route('/api/doctors/awaiting-approval', methods=['GET'])
+@login_required
+def api_doctors_awaiting_approval():
+    """Fetch and return data of doctors awaiting approval as JSON."""
+    # Fetch doctors awaiting approval from the login collection
+    awaiting_approval = list(mongo.db.login.find({'rolesId': 3, 'status': 'awaiting_approval'}))
+    print(f"Found {len(awaiting_approval)} doctors awaiting approval")
+    
+    doctors_data = []
+    for login_entry in awaiting_approval:
+        umsId = login_entry['umsId']
+        # Fetch user info
+        user_info = mongo.db.users.find_one({'umsId': umsId})
+        # Fetch doctor info
+        doctor_info = mongo.db.doctors.find_one({'umsId': umsId}) 
+        if user_info and doctor_info:
+            doctor_data = {
+                'umsId': umsId,
+                'name': user_info.get('name'),
+                'email': user_info.get('email'),
+                'gender': user_info.get('gender'),
+                'phoneNumber': user_info.get('phoneNumber', [None])[0],
+                'specialization': doctor_info.get('specialization'),
+                'qualification': doctor_info.get('qualification'),
+                'experience': doctor_info.get('experience'),
+                'createdAt': login_entry.get('createdAt'),
+                'updatedAt': login_entry.get('updatedAt')
+            } 
+            # Convert ObjectId to string and format dates
+            doctor_data['_id'] = str(doctor_info['_id'])
+            doctor_data['createdAt'] = doctor_data['createdAt'].strftime('%Y-%m-%d %H:%M:%S') if doctor_data.get('createdAt') else None
+            doctor_data['updatedAt'] = doctor_data['updatedAt'].strftime('%Y-%m-%d %H:%M:%S') if doctor_data.get('updatedAt') else None
+            doctors_data.append(doctor_data)
+    print(f"Returning {len(doctors_data)} doctors data")
+    print(doctors_data) #for debugging
+    return jsonify(doctors_data)
+
 #single patient view
 @admin_bp.route('/patient_profile/<string:patient_id>', methods=['POST', 'GET'])
 @login_required
 def patient_profile(patient_id):
+    """Retrieve and display patient profile information."""
     patient_data = []
     patient = mongo.db.patients.find_one({'umsId': patient_id})
     patient_user_info = mongo.db.users.find_one({'umsId': patient_id})
@@ -129,4 +170,3 @@ def patient_profile(patient_id):
     else:
         flash('Patient not found', 'danger')
         return redirect(url_for('admin.index'))
-
