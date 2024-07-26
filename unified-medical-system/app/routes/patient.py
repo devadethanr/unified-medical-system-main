@@ -12,8 +12,8 @@ import re, uuid
 from app.routes.auth import login
 patient_bp = Blueprint('patient', __name__)
 
-@login_required
 @patient_bp.route('/dashboard', methods=['GET', 'POST'])
+@login_required
 def index():
     return render_template('patient/dashboard.html')
 
@@ -36,14 +36,13 @@ def register():
         email = request.form['email']
         password = request.form['password']
         if password != request.form['confirm_password']:
-            print('Passwords do not match. Please try again.') # For debugging
+            print('Passwords do not match. Please try again.')
         existing_user = mongo.db.users.find_one({'email': email})
         
         if existing_user:
-            flash(' already exists! Please login. ', 'error')  # For debugging
+            flash(' already exists! Please login. ', 'error')
             return redirect(url_for('patient.register'))
         
-        print(request.form)  # For debugging
         name = request.form['name']
         password = generate_password_hash(request.form['password']),
         phone_number = request.form['phonenumber'],
@@ -51,7 +50,6 @@ def register():
         user_type = 'patient'
         print(name, email, password, user_type)  # For debugging
         umsId = generate_patient_id()
-        print(umsId) # For debugging
         created_at = updated_at = datetime.now()
         
         mongo.db.users.insert_one({

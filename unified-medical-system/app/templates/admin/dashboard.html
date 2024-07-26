@@ -87,11 +87,11 @@
                     <li>
                      <a href="#" class="iq-waves-effect"><i class="ri-hospital-fill"></i><span>Hospitals</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
                      <ul class="iq-submenu">
-                         <li><a href="#"><i class="ri-list-check"></i><span>View</span></a></li>
+                         <li><a href="#" data-bs-toggle="modal" data-bs-target="#hospitalListModal"><i class="ri-list-check"></i><span>View</span></a></li>
                          <li><a href="#"><i class="ri-add-circle-line"></i><span>Manage</span></a></li>
                          <li><a href="#"><i class="ri-check-double-fill"></i><span>Approve or Reject Registration</span></a></li>
                      </ul>
-                   </li>
+                   </li>   
                     <li>
                         <a href="#" class="iq-waves-effect"><i class="ri-file-list-fill"></i><span>Hospital Registration</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
                         <ul class="iq-submenu">
@@ -768,7 +768,7 @@
       console.log('Reject doctor with UMS ID:', umsId);
    }
  </script>
-   
+
 
  <!-- Appear JavaScript -->
  <script src="{{ url_for('static', filename='js/jquery.appear.js') }}"></script>

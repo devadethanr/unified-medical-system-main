@@ -1,15 +1,15 @@
 Admin Dashboard Outline:
 
-Sidebar
+{% comment %} Sidebar {% endcomment %}
 Dashboard Overview
 User Management
 Patients
-View: List of patients, Single profile view
+{% comment %} View: List of patients, Single profile view {% endcomment %}
 Manage: Create, Edit, Deactivate
 Access Records: View and manage some patient records
 
 Doctors
-View: List of doctors, Single profile view
+{% comment %} View: List of doctors, Single profile view {% endcomment %}
 Manage: Create, Edit, Deactivate
 Add and Verify Credentials: Approve or reject doctor credentials
 Access Records: View and manage doctor-related records
