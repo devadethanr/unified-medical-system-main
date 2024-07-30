@@ -172,11 +172,11 @@ def patient_profile(patient_id):
         return redirect(url_for('admin.index'))
     
 #hospitals list view with status "active"
-@admin_bp.route('/api/hospitals', methods=['GET'])
+@admin_bp.route('/api/hospitals', methods=['POST','GET'])
 @login_required
 def api_hospitals():
     """Fetch and return active hospital data as JSON."""
-    hospitals = list(mongo.db.hospitals.find({'status': 'active'}))
+    hospitals = list(mongo.db.hospitals.find())
     hospitals_user_info = list(mongo.db.users.find({'rolesId': 2, 'status': 'active'}))
     
     hospital_info_dict = {hospital['umsId']: hospital for hospital in hospitals_user_info}
