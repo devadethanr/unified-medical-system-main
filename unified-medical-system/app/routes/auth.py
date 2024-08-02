@@ -14,7 +14,11 @@ auth_bp = Blueprint('auth', __name__)
 
 @login_manager.user_loader
 def load_user(user_id):
+    
     return User.get(user_id)
+@auth_bp.route('/register', methods=['GET'])
+def register():
+    return render_template('common/register.html')
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():

@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Unified Registration - UMS</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background-color: cyan; /* Cyan background */
+        }
+        .blob {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 150px; /* Smaller blob */
+            height: 150px;
+            background: rgba(0, 0, 0, 0.5); /* Black blob */
+            border-radius: 50%;
+            filter: blur(30px);
+            animation: moveBlob 10s ease-in-out infinite;
+            z-index: 1;
+        }
+        .large-blob {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 400px; /* Larger blob */
+            height: 400px;
+            background: rgba(0, 100, 0, 0.5); /* Dark green blob */
+            border-radius: 50%;
+            filter: blur(50px);
+            animation: moveLargeBlob 15s ease-in-out infinite;
+            z-index: 0;
+        }
+        @keyframes moveBlob {
+            0% {
+                transform: translate(-50%, -50%) translateX(0) translateY(0);
+            }
+            25% {
+                transform: translate(-50%, -50%) translateX(100px) translateY(-50px);
+            }
+            50% {
+                transform: translate(-50%, -50%) translateX(-100px) translateY(50px);
+            }
+            75% {
+                transform: translate(-50%, -50%) translateX(50px) translateY(100px);
+            }
+            100% {
+                transform: translate(-50%, -50%) translateX(0) translateY(0);
+            }
+        }
+        @keyframes moveLargeBlob {
+            0% {
+                transform: translate(-50%, -50%) translateX(0) translateY(0);
+            }
+            25% {
+                transform: translate(-50%, -50%) translateX(200px) translateY(-100px);
+            }
+            50% {
+                transform: translate(-50%, -50%) translateX(-200px) translateY(100px);
+            }
+            75% {
+                transform: translate(-50%, -50%) translateX(100px) translateY(200px);
+            }
+            100% {
+                transform: translate(-50%, -50%) translateX(0) translateY(0);
+            }
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            color: white;
+            width: 95%;
+            max-width: 800px; /* Increased max-width for a wider card */
+            position: relative;
+            z-index: 2;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+        .btn {
+            margin: 10px;
+            border-radius: 25px;
+            padding: 15px 20px; /* Reduced padding to make the button less wider */
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+        .btn-primary {
+            background-color: #007bff;
+        }
+        .btn-success {
+            background-color: #28a745;
+        }
+        .btn-info {
+            background-color: #17a2b8;
+        }
+        .btn:hover {
+            filter: brightness(1.1);
+        }
+    </style>
+</head>
+<body>
+
+<div class="large-blob"></div>
+<div class="blob"></div>
+
+<div class="card">
+    <h1>Welcome to Unified Medical System</h1>
+    <p>Please select your user type to register:</p>
+    <a href="{{ url_for('patient.register') }}" class="btn btn-primary">Patient Registration</a>
+    <a href="{{ url_for('hospital.register') }}" class="btn btn-success">Hospital Registration</a>
+    <a href="{{ url_for('doctor.register') }}" class="btn btn-info">Doctor Registration</a>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+</body>
+</html>

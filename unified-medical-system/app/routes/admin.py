@@ -8,7 +8,6 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.routes.auth import login
 
-
 admin_bp = Blueprint('admin', __name__)
 
 # global data for admin
@@ -27,7 +26,6 @@ def index():
     admin_data = mongo.db.users.find_one({'umsId': session['umsId']})
     print(admin_data) #for debugging
     return render_template('admin/dashboard.html', admin_data=admin_data, global_admin_data=global_admin_data)
-
 
 #admin profile
 @admin_bp.route('/profile', methods=['GET', 'POST'])
@@ -188,5 +186,5 @@ def api_hospitals():
             hospital['name'] = hospital_info.get('name')
             hospital['email'] = hospital_info.get('email')
             hospital['state'] = hospital_info.get('state')
-    
+            hospital['status'] = hospital_info.get('status')
     return jsonify(hospitals)
