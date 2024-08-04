@@ -117,6 +117,15 @@
         .btn:hover {
             filter: brightness(1.1);
         }
+        /* New animation class */
+        .loading {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
@@ -134,5 +143,16 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+<script>
+    document.querySelectorAll('.btn').forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent default link behavior
+            this.classList.add('loading'); // Add loading class
+            setTimeout(() => {
+                window.location.href = this.href; // Redirect after 2 seconds
+            }, 2000);
+        });
+    });
+</script>
 </body>
 </html>

@@ -188,3 +188,23 @@ def api_hospitals():
             hospital['state'] = hospital_info.get('state')
             hospital['status'] = hospital_info.get('status')
     return jsonify(hospitals)
+
+@admin_bp.route('/api/approve_doctor', methods=['POST'])
+@login_required
+def approve_doctor():
+    """Approve a doctor and update their status."""
+    umsId = request.form.get('umsId')
+    mongo.db.login.update_one({'umsId': umsId}, {'$set': {'status': 'active'}})
+    mongo.db.doctors.update_one({'umsId': umsId}, {'$set': {'status': 'active'}})
+    mongo.db.users.update_one({'umsId': umsId}, {'$set': {'status': 'active'}})
+    return jsonify({'message': 'Doctor approved successfully'})
+
+@admin_bp.route('/api/reject_doctor', methods=['POST'])
+@login_required
+def reject_doctor():
+    """Reject a doctor and update their status."""
+    umsId = request.form.get('umsId')
+    mongo.db.login.update_one({'umsId': umsId}, {'$set': {'status': 'rejected'}})
+    mongo.db.doctors.update_one({'umsId': umsId}, {'$set': {'status': 'rejected'}})
+    mongo.db.users.update_one({'umsId': umsId}, {'$set': {'status': 'rejected'}})
+    return jsonify({'message': 'Doctor rejected successfully'})

@@ -797,11 +797,35 @@
    function approveDoctor(umsId) {
       // Implement approval logic here
       console.log('Approve doctor with UMS ID:', umsId);
+      $.ajax({
+          url: "{{ url_for('admin.approve_doctor') }}", // New route for approval
+          type: 'POST',
+          data: { umsId: umsId },
+          success: function(response) {
+              console.log(response.message);
+              // Optionally refresh the table or modal
+          },
+          error: function(xhr, status, error) {
+              console.error('Error approving doctor:', error);
+          }
+      });
    }
    
    function rejectDoctor(umsId) {
       // Implement rejection logic here
       console.log('Reject doctor with UMS ID:', umsId);
+      $.ajax({
+          url: "{{ url_for('admin.reject_doctor') }}", // New route for rejection
+          type: 'POST',
+          data: { umsId: umsId },
+          success: function(response) {
+              console.log(response.message);
+              // Optionally refresh the table or modal
+          },
+          error: function(xhr, status, error) {
+              console.error('Error rejecting doctor:', error);
+          }
+      });
    }
 </script>
 <!-- Custom DataTables Initialization for Hospitals -->
