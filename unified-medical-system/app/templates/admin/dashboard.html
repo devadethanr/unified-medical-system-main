@@ -88,7 +88,7 @@
                      <a href="#" class="iq-waves-effect"><i class="ri-hospital-fill"></i><span>Hospitals</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
                      <ul class="iq-submenu">
                          <li><a href="#" data-bs-toggle="modal" data-bs-target=".hospital-view-modal"><i class="ri-list-check"></i><span>View / Manage</span></a></li>
-                         <li><a href="#"><i class="ri-check-double-fill"></i><span>Approve or Reject Registration</span></a></li>
+                         <li><a href="#" data-bs-toggle="modal" data-bs-target=".hospital-approval-modal"><i class="ri-check-double-fill"></i><span>Approve or Reject Registration</span></a></li>
                      </ul>
                    </li>   
                     <li>
@@ -162,6 +162,11 @@
                   </div>
                   <div class="collapse navbar-collapse" id="navbarSupportedContent">
                      <ul class="navbar-nav ms-auto navbar-list">
+                        <!-- Dark Mode Toggle -->
+                        <div class="form-check form-switch">
+                           <input class="form-check-input" type="checkbox" id="darkModeToggle">
+                           <label class="form-check-label" for="darkModeToggle">Dark Mode</label>
+                        </div>
                         <li class="nav-item iq-full-screen">
                            <a href="#" class="iq-waves-effect" id="btnFullscreen"><i class="ri-fullscreen-line"></i></a>
                         </li>
@@ -373,7 +378,8 @@
       </div>
    </div>
  <!-- Doctor Approval Modal end-->
- <!-- Hospital View Modal -->
+
+<!-- Hospital View Modal -->
 <div class="modal fade hospital-view-modal" tabindex="-1" role="dialog" aria-hidden="true">
    <div class="modal-dialog modal-xl modal-dialog-scrollable">
        <div class="modal-content">
@@ -388,10 +394,43 @@
                        <thead>
                            <tr>
                                <th>UMS ID</th>
+                               <th>License Number</th>
+                               <th>Created At</th>
+                               <th>Updated At</th>
+                               <th>Name</th>
+                               <th>State</th>
+                           </tr>
+                       </thead>
+                   </table>
+               </div>
+           </div>
+           <div class="modal-footer">
+               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+           </div>
+       </div>
+   </div>
+</div>
+<!-- Hospital View Modal end -->
+
+<!-- Hospital Approval Modal -->
+<div class="modal fade hospital-approval-modal" tabindex="-1" role="dialog" aria-hidden="true">
+   <div class="modal-dialog modal-xl modal-dialog-scrollable">
+       <div class="modal-content">
+           <div class="modal-header">
+               <h5 class="modal-title"><b>Hospitals Awaiting Approval</b></h5>
+               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+           </div>
+           <div class="modal-body">
+               <div class="container mt-5">
+                   <h2>Hospitals Awaiting Approval List</h2>
+                   <table id="hospitalsApprovalTable" class="table table-striped table-bordered">
+                       <thead>
+                           <tr>
+                               <th>UMS ID</th>
                                <th>Name</th>
                                <th>Email</th>
+                               <th>License Number</th>
                                <th>State</th>
-                               <th>Status</th>
                                <th>Created At</th>
                                <th>Updated At</th>
                                <th>Actions</th>
@@ -406,7 +445,7 @@
        </div>
    </div>
 </div>
-<!-- Hospital View Modal end -->
+<!-- Hospital Approval Modal end -->
 
          <div class="container-fluid">
             <div class="row">
@@ -703,13 +742,13 @@
                   "dataSrc": ""
                },
                "columns": [
-                  { "data": "umsId" },
-                  { "data": "createdAt" },
-                  { "data": "updatedAt" },
-                  { "data": "dateOfBirth" },
-                  { "data": "user_info.name" },
-                  { "data": "user_info.email" },
-                  { "data": "gender" },
+                  { "data": "umsId", "defaultContent": "not specified" },
+                  { "data": "createdAt", "defaultContent": "not specified" },
+                  { "data": "updatedAt", "defaultContent": "not specified" },
+                  { "data": "dateOfBirth", "defaultContent": "not specified" },
+                  { "data": "user_info.name", "defaultContent": "not specified" },
+                  { "data": "user_info.email", "defaultContent": "not specified" },
+                  { "data": "gender", "defaultContent": "not specified" },
                   {
                      "data": null,
                      "render": function(data, type, row) {
@@ -742,13 +781,19 @@
                   { "data": "dateOfBirth" },
                   { "data": "user_info.name" },
                   { "data": "user_info.email" },
-                  { "data": "user_infor.gender"},
-                  { "data": "user_info.speciality" }, // Corrected the key
+                  { "data": "user_info.gender" },
+                  { "data": "user_info.speciality" },
                   {
                      "data": null,
                      "render": function(data, type, row) {
-                        return '<a href="/edit_doctor/' + row.umsId + '" class="btn btn-primary">Edit</a>';
+                        return '<a href="' + "{{ url_for('admin.edit_doctor', doctor_id='') }}" + row.umsId + '" class="btn btn-primary">Edit</a>';
                      }
+                  }
+               ],
+               "columnDefs": [
+                  {
+                     "defaultContent": "not specified",
+                     "targets": "_all"
                   }
                ]
             });
@@ -759,7 +804,58 @@
 
 <!-- doctor approval datatables -->
 <script>
+   let currentDoctorId = null;
+
+   function approveDoctor(umsId) {
+      currentDoctorId = umsId;
+      $('#approveDoctorModal').modal('show');
+   }
+
+   function rejectDoctor(umsId) {
+      currentDoctorId = umsId;
+      $('#rejectDoctorModal').modal('show');
+   }
+
+   function confirmApprove() {
+      if (currentDoctorId) {
+         $.ajax({
+            url: "{{ url_for('admin.approve_doctor') }}", // New route for approval
+            type: 'POST',
+            data: { umsId: currentDoctorId },
+            success: function(response) {
+               console.log(response.message);
+               $('#approveDoctorModal').modal('hide');
+               $('#doctorsApprovalTable').DataTable().ajax.reload(); // Refresh the table
+            },
+            error: function(xhr, status, error) {
+               console.error('Error approving doctor:', error);
+            }
+         });
+      }
+   }
+
+   function confirmReject() {
+      if (currentDoctorId) {
+         $.ajax({
+            url: "{{ url_for('admin.reject_doctor') }}", // New route for rejection
+            type: 'POST',
+            data: { umsId: currentDoctorId },
+            success: function(response) {
+               console.log(response.message);
+               $('#rejectDoctorModal').modal('hide');
+               $('#doctorsApprovalTable').DataTable().ajax.reload(); // Refresh the table
+            },
+            error: function(xhr, status, error) {
+               console.error('Error rejecting doctor:', error);
+            }
+         });
+      }
+   }
+
    $(document).ready(function() {
+      $('#confirmApproveButton').on('click', confirmApprove);
+      $('#confirmRejectButton').on('click', confirmReject);
+
       $('.doctor-approval-modal').on('shown.bs.modal', function() {
          console.log('Approval Modal shown, initializing DataTable...');
          if (!$.fn.DataTable.isDataTable('#doctorsApprovalTable')) {
@@ -828,7 +924,8 @@
       });
    }
 </script>
-<!-- Custom DataTables Initialization for Hospitals -->
+
+<!-- Hospital DataTable Initialization -->
 <script>
    $(document).ready(function() {
        $('.hospital-view-modal').on('shown.bs.modal', function() {
@@ -840,17 +937,43 @@
                        "dataSrc": ""
                    },
                    "columns": [
-                       { "data": "umsId" },
-                       { "data": "name" },
-                       { "data": "email" },
-                       { "data": "state" },
-                       { "data": "status" },
-                       { "data": "createdAt" },
-                       { "data": "updatedAt" },
+                       { "data": "umsId", "render": function(data) { return data || "not specified"; } },
+                       { "data": "licenseNumber", "render": function(data) { return data || "not specified"; } },
+                       { "data": "createdAt", "render": function(data) { return data ? new Date(data).toLocaleString() : "not specified"; } },
+                       { "data": "updatedAt", "render": function(data) { return data ? new Date(data).toLocaleString() : "not specified"; } },
+                       { "data": "name", "render": function(data) { return data || "not specified"; } },
+                       { "data": "state", "render": function(data) { return data || "not specified"; } }
+                   ]
+               });
+           }
+       });
+   });
+</script>
+
+<!-- Hospital Approval DataTable Initialization -->
+<script>
+   $(document).ready(function() {
+       $('.hospital-approval-modal').on('shown.bs.modal', function() {
+           console.log('Modal shown, initializing DataTable for hospitals awaiting approval...');
+           if (!$.fn.DataTable.isDataTable('#hospitalsApprovalTable')) {
+               $('#hospitalsApprovalTable').DataTable({
+                   "ajax": {
+                       "url": "{{ url_for('admin.api_hospitals_awaiting_approval') }}",
+                       "dataSrc": ""
+                   },
+                   "columns": [
+                       { "data": "umsId", "render": function(data) { return data || "not specified"; } },
+                       { "data": "name", "render": function(data) { return data || "not specified"; } },
+                       { "data": "email", "render": function(data) { return data || "not specified"; } },
+                       { "data": "licenseNumber", "render": function(data) { return data || "not specified"; } },
+                       { "data": "state", "render": function(data) { return data || "not specified"; } },
+                       { "data": "createdAt", "render": function(data) { return data ? new Date(data).toLocaleString() : "not specified"; } },
+                       { "data": "updatedAt", "render": function(data) { return data ? new Date(data).toLocaleString() : "not specified"; } },
                        {
                            "data": null,
                            "render": function(data, type, row) {
-                               return '<a href="/hospital_profile/' + row.umsId + '" class="btn btn-primary">View</a>';
+                               return '<button onclick="approveHospital(\'' + row.umsId + '\')" class="btn btn-success btn-sm">Approve</button> ' +
+                                      '<button onclick="rejectHospital(\'' + row.umsId + '\')" class="btn btn-danger btn-sm">Reject</button>';
                            }
                        }
                    ]
@@ -858,6 +981,40 @@
            }
        });
    });
+
+   function approveHospital(umsId) {
+       // Implement approval logic here
+       console.log('Approve hospital with UMS ID:', umsId);
+       $.ajax({
+           url: "{{ url_for('admin.approve_hospital') }}", // New route for approval
+           type: 'POST',
+           data: { umsId: umsId },
+           success: function(response) {
+               console.log(response.message);
+               $('#hospitalsApprovalTable').DataTable().ajax.reload(); // Refresh the table
+           },
+           error: function(xhr, status, error) {
+               console.error('Error approving hospital:', error);
+           }
+       });
+   }
+
+   function rejectHospital(umsId) {
+       // Implement rejection logic here
+       console.log('Reject hospital with UMS ID:', umsId);
+       $.ajax({
+           url: "{{ url_for('admin.reject_hospital') }}", // New route for rejection
+           type: 'POST',
+           data: { umsId: umsId },
+           success: function(response) {
+               console.log(response.message);
+               $('#hospitalsApprovalTable').DataTable().ajax.reload(); // Refresh the table
+           },
+           error: function(xhr, status, error) {
+               console.error('Error rejecting hospital:', error);
+           }
+       });
+   }
 </script>
 
  <!-- Appear JavaScript -->
@@ -897,5 +1054,39 @@
  <script src="{{ url_for('static', filename='js/chart-custom.js') }}"></script>
  <!-- Custom JavaScript -->
  <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+
+ <!-- Dark Mode Toggle Script -->
+ <script>
+   $(document).ready(function() {
+      // Check localStorage for dark mode preference
+      if (localStorage.getItem('darkMode') === 'enabled') {
+         enableDarkMode();
+         $('#darkModeToggle').prop('checked', true);
+      }
+
+      // Function to enable dark mode
+      function enableDarkMode() {
+         if (!$('#dark-mode-css').length) {
+            $('head').append('<link id="dark-mode-css" rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}">');
+         }
+         localStorage.setItem('darkMode', 'enabled');
+      }
+
+      // Function to disable dark mode
+      function disableDarkMode() {
+         $('#dark-mode-css').remove();
+         localStorage.setItem('darkMode', 'disabled');
+      }
+
+      // Toggle dark mode on switch change
+      $('#darkModeToggle').on('change', function() {
+         if (this.checked) {
+            enableDarkMode();
+         } else {
+            disableDarkMode();
+         }
+      });
+   });
+</script>
 </body>
 </html>

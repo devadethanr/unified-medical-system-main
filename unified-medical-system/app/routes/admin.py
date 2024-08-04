@@ -86,10 +86,27 @@ def api_patients():
             patient['user_info'] = {
                 'name': patient_info.get('name'),
                 'email': patient_info.get('email'),
-                # Add more fields as needed
             }
     return jsonify(patients)
 
+#single patient view
+@admin_bp.route('/patient_profile/<string:patient_id>', methods=['POST', 'GET'])
+@login_required
+def patient_profile(patient_id):
+    """Retrieve and display patient profile information."""
+    patient_data = []
+    patient = mongo.db.patients.find_one({'umsId': patient_id})
+    patient_user_info = mongo.db.users.find_one({'umsId': patient_id})
+    
+    if patient and patient_user_info:
+        patient_data.append(patient)
+        patient_data.append(patient_user_info)
+        return render_template('admin/patient-profile.html', patient_data=patient_data, admin_data = admin_data)
+    else:
+        flash('Patient not found', 'danger')
+        return redirect(url_for('admin.index'))
+    
+    
 #doctor list view
 @admin_bp.route('/api/doctors', methods=['GET'])
 @login_required
@@ -110,18 +127,62 @@ def api_doctors():
                 'email': doctor_info.get('email'),
                 'gender': doctor_info.get('gender'),
                 'specialization': doctor_info.get('specialization'),
-                # Add more fields as needed
             }
     return jsonify(doctors)
 
+#doctor profile view
+@admin_bp.route('/edit_doctor/<string:doctor_id>', methods=['POST','GET'])
+@login_required
+def edit_doctor(doctor_id):
+    """Fetch and display doctor profile for editing."""
+    doctor_data = mongo.db.doctors.find_one({'umsId': doctor_id})
+    if not doctor_data:
+        flash('Doctor not found', 'danger')
+        return redirect(url_for('admin.index'))
+    # Fetch user information from users collection for not specified values
+    user_info = mongo.db.users.find_one({'umsId': doctor_id})
+    doctor_data['name'] = doctor_data.get('name', user_info.get('name', 'None'))
+    doctor_data['email'] = doctor_data.get('email', user_info.get('email', 'None'))
+    doctor_data['phone'] = doctor_data.get('phone', user_info.get('phoneNumber', ['None'])[0])
+    doctor_data['specialization'] = doctor_data.get('specialization', 'None')
+    doctor_data['state'] = doctor_data.get('state', user_info.get('state', 'None'))
+    doctor_data['address'] = doctor_data.get('address', user_info.get('address', 'None'))
+    doctor_data['updatedAt'] = doctor_data.get('updatedAt', datetime.now()).strftime('%Y-%m-%d %H:%M:%S')
+    doctor_data['createdAt'] = doctor_data.get('createdAt', datetime.now()).strftime('%Y-%m-%d %H:%M:%S')
+    doctor_data['status'] = doctor_data.get('status', 'None')
+    return render_template('admin/doctor-profile.html', doctor_data=doctor_data, admin_data=admin_data)
+
+#approve doctor
+@admin_bp.route('/api/approve_doctor', methods=['POST'])
+@login_required
+def approve_doctor():
+    """Approve a doctor and update their status and updatedAt time."""
+    umsId = request.form.get('umsId')
+    current_time = datetime.now()
+    mongo.db.login.update_one({'umsId': umsId}, {'$set': {'status': 'active', 'updatedAt': current_time}})
+    mongo.db.doctors.update_one({'umsId': umsId}, {'$set': {'status': 'active', 'updatedAt': current_time}})
+    mongo.db.users.update_one({'umsId': umsId}, {'$set': {'status': 'active', 'updatedAt': current_time}})
+    return jsonify({'message': 'Doctor approved successfully'})
+
+#reject doctor
+@admin_bp.route('/api/reject_doctor', methods=['POST'])
+@login_required
+def reject_doctor():
+    """Reject a doctor and update their status and updatedAt time."""
+    umsId = request.form.get('umsId')
+    current_time = datetime.now()
+    mongo.db.login.update_one({'umsId': umsId}, {'$set': {'status': 'rejected', 'updatedAt': current_time}})
+    mongo.db.doctors.update_one({'umsId': umsId}, {'$set': {'status': 'rejected', 'updatedAt': current_time}})
+    mongo.db.users.update_one({'umsId': umsId}, {'$set': {'status': 'rejected', 'updatedAt': current_time}})
+    return jsonify({'message': 'Doctor rejected successfully'})
+
+#doctot awaiting approval list
 @admin_bp.route('/api/doctors/awaiting-approval', methods=['GET'])
 @login_required
 def api_doctors_awaiting_approval():
     """Fetch and return data of doctors awaiting approval as JSON."""
     # Fetch doctors awaiting approval from the login collection
     awaiting_approval = list(mongo.db.login.find({'rolesId': 3, 'status': 'awaiting_approval'}))
-    print(f"Found {len(awaiting_approval)} doctors awaiting approval")
-    
     doctors_data = []
     for login_entry in awaiting_approval:
         umsId = login_entry['umsId']
@@ -147,30 +208,10 @@ def api_doctors_awaiting_approval():
             doctor_data['createdAt'] = doctor_data['createdAt'].strftime('%Y-%m-%d %H:%M:%S') if doctor_data.get('createdAt') else None
             doctor_data['updatedAt'] = doctor_data['updatedAt'].strftime('%Y-%m-%d %H:%M:%S') if doctor_data.get('updatedAt') else None
             doctors_data.append(doctor_data)
-    print(f"Returning {len(doctors_data)} doctors data")
-    print(doctors_data) #for debugging
     return jsonify(doctors_data)
 
-#single patient view
-@admin_bp.route('/patient_profile/<string:patient_id>', methods=['POST', 'GET'])
-@login_required
-def patient_profile(patient_id):
-    """Retrieve and display patient profile information."""
-    patient_data = []
-    patient = mongo.db.patients.find_one({'umsId': patient_id})
-    patient_user_info = mongo.db.users.find_one({'umsId': patient_id})
-    
-    if patient and patient_user_info:
-        patient_data.append(patient)
-        patient_data.append(patient_user_info)
-        print(patient_data) #for debugging
-        return render_template('admin/patient-profile.html', patient_data=patient_data, admin_data = admin_data)
-    else:
-        flash('Patient not found', 'danger')
-        return redirect(url_for('admin.index'))
-    
 #hospitals list view with status "active"
-@admin_bp.route('/api/hospitals', methods=['POST','GET'])
+@admin_bp.route('/api/hospitals', methods=['GET'])
 @login_required
 def api_hospitals():
     """Fetch and return active hospital data as JSON."""
@@ -183,28 +224,47 @@ def api_hospitals():
         hospital['_id'] = str(hospital['_id'])  # Convert ObjectId to string
         hospital_info = hospital_info_dict.get(hospital['umsId'])
         if hospital_info:
-            hospital['name'] = hospital_info.get('name')
+            hospital['name'] = hospital_info.get('name')  # Ensure this field exists
             hospital['email'] = hospital_info.get('email')
             hospital['state'] = hospital_info.get('state')
             hospital['status'] = hospital_info.get('status')
     return jsonify(hospitals)
 
-@admin_bp.route('/api/approve_doctor', methods=['POST'])
+@admin_bp.route('/api/hospitals/awaiting_approval', methods=['GET'])
 @login_required
-def approve_doctor():
-    """Approve a doctor and update their status."""
-    umsId = request.form.get('umsId')
-    mongo.db.login.update_one({'umsId': umsId}, {'$set': {'status': 'active'}})
-    mongo.db.doctors.update_one({'umsId': umsId}, {'$set': {'status': 'active'}})
-    mongo.db.users.update_one({'umsId': umsId}, {'$set': {'status': 'active'}})
-    return jsonify({'message': 'Doctor approved successfully'})
+def api_hospitals_awaiting_approval():
+    """Fetch and return hospital data with status 'awaiting_approval' as JSON."""
+    hospitals = list(mongo.db.users.find({'rolesId': 2, 'status': 'awaiting_approval'}))
+    for hospital in hospitals:
+        hospital['_id'] = str(hospital['_id'])  # Convert ObjectId to string
+    return jsonify(hospitals)
 
-@admin_bp.route('/api/reject_doctor', methods=['POST'])
+@admin_bp.route('/api/hospitals/approve', methods=['POST'])
 @login_required
-def reject_doctor():
-    """Reject a doctor and update their status."""
-    umsId = request.form.get('umsId')
-    mongo.db.login.update_one({'umsId': umsId}, {'$set': {'status': 'rejected'}})
-    mongo.db.doctors.update_one({'umsId': umsId}, {'$set': {'status': 'rejected'}})
-    mongo.db.users.update_one({'umsId': umsId}, {'$set': {'status': 'rejected'}})
-    return jsonify({'message': 'Doctor rejected successfully'})
+def approve_hospital():
+    """Approve a hospital."""
+    if request.method == 'POST':
+        umsId = request.form.get('umsId')
+        if umsId:
+            mongo.db.users.update_one({'umsId': umsId}, {'$set': {'status': 'active', 'updatedAt': datetime.now()}})
+            mongo.db.hospitals.update_one({'umsId': umsId}, {'$set': {'status': 'active', 'updatedAt': datetime.now()}})
+            return jsonify({'message': 'Hospital approved successfully.'})
+        else:
+            return jsonify({'error': 'UMS ID not provided.'}), 400
+    else:
+        return jsonify({'error': 'Invalid request method.'}), 405
+    
+@admin_bp.route('/api/hospitals/reject', methods=['POST'])
+@login_required
+def reject_hospital():
+    """Reject a hospital."""
+    if request.method == 'POST':
+        umsId = request.form.get('umsId')
+        if umsId:
+            mongo.db.users.update_one({'umsId': umsId}, {'$set': {'status': 'rejected', 'updatedAt': datetime.now()}})
+            mongo.db.hospitals.update_one({'umsId': umsId}, {'$set': {'status': 'rejected', 'updatedAt': datetime.now()}})
+            return jsonify({'message': 'Hospital rejected successfully.'})
+        else:
+            return jsonify({'error': 'UMS ID not provided.'}), 400
+    else:
+        return jsonify({'error': 'Invalid request method.'}), 405

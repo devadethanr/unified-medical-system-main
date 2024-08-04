@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>UMS - Admin Dashboard</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
+    <!-- Bootstrap CSS -->
+    <link id="bootstrap-css" rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <!-- Typography CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/typography.css') }}">
+    <!-- Style CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Style-Rtl CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style-rtl.css') }}">
+    <!-- Responsive CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+    <!-- Full calendar -->
+    <link href="{{ url_for('static', filename='fullcalendar/core/main.css') }}" rel='stylesheet' />
+    <link href="{{ url_for('static', filename='fullcalendar/daygrid/main.css') }}" rel='stylesheet' />
+    <link href="{{ url_for('static', filename='fullcalendar/timegrid/main.css') }}" rel='stylesheet' />
+    <link href="{{ url_for('static', filename='fullcalendar/list/main.css') }}" rel='stylesheet' />
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/flatpickr.min.css') }}">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
+ 
+</head>
+<body>
+    <!-- loader Start -->
+    <div id="loading">
+        <div id="loading-center"></div>
+    </div>
+    <!-- loader END -->
+    <!-- Wrapper Start -->
+    <div class="wrapper">
+        <!-- Sidebar -->
+        {% include 'admin/sidebar.html' %}
+        <!-- Page Content -->
+        <div id="content-page" class="content-page">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="iq-card">
+                            <div class="iq-card-body ps-0 pe-0 pt-0">
+                                <div class="docter-details-block">
+                                    <div class="doc-profile-bg bg-primary" style="height:150px;"></div>
+                                    <div class="docter-profile text-center">  
+                                        <img src="{{ url_for('static', filename='images/user/11.png') }}" alt="profile-img" class="avatar-130 img-fluid">
+                                    </div>
+                                    <div class="text-center mt-3 ps-3 pe-3">
+                                        <h4><b>{{ doctor_data['name'] }}</b></h4>
+                                        <span>Last profile update: {{ doctor_data['updatedAt'] }}</span>
+                                        <br>
+                                        <span>UMS ID: {{ doctor_data['umsId'] }}</span>
+                                        <p class="mb-0">Unified Medical System Doctor Profile.</p>
+                                    </div>
+                                    <hr>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="iq-card">
+                                    <div class="iq-card-header d-flex justify-content-between">
+                                        <div class="iq-header-title">
+                                            <h4 class="card-title">Personal Information</h4>
+                                        </div>
+                                    </div>
+                                    <div class="iq-card-body">
+                                        <div class="about-info m-0 p-0">
+                                            <div class="row">
+                                                <div class="col-4">Name:</div>
+                                                <div class="col-8">{{ doctor_data['name'] }}</div>
+                                                <div class="col-4">Email:</div>
+                                                <div class="col-8"><a href="mailto:{{ doctor_data['email'] }}">{{ doctor_data['email'] }}</a></div>
+                                                <div class="col-4">Phone:</div>
+                                                <div class="col-8"><a href="tel:{{ doctor_data['phoneNumber'] }}">{{ doctor_data['phoneNumber'] }}</a></div>
+                                                <div class="col-4">Specialization:</div>
+                                                <div class="col-8">{{ doctor_data['specialization'] }}</div>
+                                                <div class="col-4">State:</div>
+                                                <div class="col-8">{{ doctor_data['state'] }}</div>
+                                                <div class="col-4">Address:</div>
+                                                <div class="col-8">{{ doctor_data['address'] }}</div>
+                                                <div class="col-4">Updated At:</div>
+                                                <div class="col-8">{{ doctor_data['updatedAt'] }}</div>
+                                                <div class="col-4">Created At:</div>   
+                                                <div class="col-8">{{ doctor_data['createdAt'] }}</div>
+                                                <div class="col-4">Status:</div>
+                                                <div class="col-8 {{ 'text-success' if doctor_data['status'] == 'active' else 'text-danger' }}">{{ doctor_data['status'] }}</div>
+                                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#profile-edit-modal">
+                                                    Edit Profile
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="iq-card">
+                                    <div class="iq-card-header d-flex justify-content-between">
+                                        <div class="iq-header-title">
+                                            <h4 class="card-title">Appointments Record</h4>
+                                        </div>
+                                    </div>
+                                    <div class="iq-card-body">
+                                        <ul class="list-inline m-0 p-0">
+                                            <!-- Example appointment record -->
+                                            <li>
+                                                <h6 class="float-start mb-1">Ruby Saul (Blood Check)</h6>
+                                                <small class="float-end mt-1">Today</small>
+                                                <div class="d-inline-block w-100">
+                                                    <p class="badge badge-primary">09:00 AM</p>
+                                                </div>
+                                            </li>
+                                            <!-- Add more appointment records as needed -->
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>   
+            </div>
+        </div>
+    </div>
+    <!-- Optional JavaScript -->
+    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+</body>
+</html>
+
+ <!-- Appear JavaScript -->
+ <script src="{{ url_for('static', filename='js/jquery.appear.js') }}"></script>
+ <!-- Countdown JavaScript -->
+ <script src="{{ url_for('static', filename='js/countdown.min.js') }}"></script>
+ <!-- Counterup JavaScript -->
+ <script src="{{ url_for('static', filename='js/waypoints.min.js') }}"></script>
+ <script src="{{ url_for('static', filename='js/jquery.counterup.min.js') }}"></script>
+ <!-- Wow JavaScript -->
+ <script src="{{ url_for('static', filename='js/wow.min.js') }}"></script>
+ <!-- Apexcharts JavaScript -->
+ <script src="{{ url_for('static', filename='js/apexcharts.js') }}"></script>
+ <!-- Swiper Slider JavaScript -->
+ <script src="{{ url_for('static', filename='js/swiper-bundle.min.js') }}"></script>
+ <!-- Select2 JavaScript -->
+ <script src="{{ url_for('static', filename='js/select2.min.js') }}"></script>
+ <!-- Owl Carousel JavaScript -->
+ <script src="{{ url_for('static', filename='js/owl.carousel.min.js') }}"></script>
+ <!-- Magnific Popup JavaScript -->
+ <script src="{{ url_for('static', filename='js/jquery.magnific-popup.min.js') }}"></script>
+ <!-- Smooth Scrollbar JavaScript -->
+ <script src="{{ url_for('static', filename='js/smooth-scrollbar.js') }}"></script>
+ <!-- lottie JavaScript -->
+ <script src="{{ url_for('static', filename='js/lottie.js') }}"></script>
+ <!-- am core JavaScript -->
+ <script src="{{ url_for('static', filename='js/core.js') }}"></script>
+ <!-- am charts JavaScript -->
+ <script src="{{ url_for('static', filename='js/amcharts.js') }}"></script>
+ <!-- am animated JavaScript -->
+ <script src="{{ url_for('static', filename='js/animated.js') }}"></script>
+ <!-- am kelly JavaScript -->
+ <script src="{{ url_for('static', filename='js/kelly.js') }}"></script>
+ <!-- Flatpicker Js -->
+ <script src="{{ url_for('static', filename='js/flatpickr.js') }}"></script>
+ <!-- Chart Custom JavaScript -->
+ <script src="{{ url_for('static', filename='js/chart-custom.js') }}"></script>
+ <!-- Custom JavaScript -->
+ <script src="{{ url_for('static', filename='js/custom.js') }}"></script>

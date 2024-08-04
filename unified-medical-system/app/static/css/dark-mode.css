@@ -1,0 +1,35 @@
+/* dark-mode.css */
+body, .iq-card, .navbar, .iq-sidebar {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+.iq-card {
+    background-color: #1e1e1e;
+}
+
+.navbar, .iq-sidebar {
+    background-color: #1e1e1e;
+}
+
+/* Dark mode for other components */
+.table {
+    background-color: #2a2a2a;
+    color: #ffffff;
+}
+
+.table th, .table td {
+    border-color: #444444;
+}
+
+.btn-primary {
+    background-color: #1a73e8;
+    border-color: #1a73e8;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+/* Adjust other component styles as needed */
