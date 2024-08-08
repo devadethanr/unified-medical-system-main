@@ -11,7 +11,7 @@ hospital_bp = Blueprint('hospital', __name__)
 @hospital_bp.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
-    return "Hospital Dashboard"
+    return render_template('hospital/dashboard.html')
 
 def generate_hospital_id():
     return 'UMSH' + re.sub('-', '', str(uuid.uuid4()))[:8].upper()

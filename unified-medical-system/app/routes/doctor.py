@@ -1,6 +1,6 @@
 from calendar import c
 from venv import create
-from flask import Blueprint, render_template, redirect, url_for, request, flash
+from flask import Blueprint, render_template, redirect, url_for, request, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required
 from app import mongo, login_manager
@@ -12,22 +12,124 @@ from app.routes.auth import login
 
 doctor_bp = Blueprint('doctor', __name__)
 
-@login_required
-@doctor_bp.route('/dashboard', methods=['GET', 'POST'])
-def index():
-    return render_template('doctor/dashboard.html')
-
-@doctor_bp.route('/profile', methods=['GET', 'POST'])
-def profile():
-    return ("testing") #for debugging
-
 @login_manager.user_loader
 def load_user(user_id):
     return User.get(user_id)
 
+@login_required
+@doctor_bp.route('/dashboard', methods=['GET', 'POST'])
+def index():
+    doctor_data = mongo.db.users.find_one({'umsId': session['umsId']})
+    doctor_data['phoneNumber'] = doctor_data.get('phoneNumber', [None])[0]
+    return render_template('doctor/dashboard.html', doctor_data=doctor_data)
+
+@doctor_bp.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    """Handle doctor profile view and updates."""
+    global doctor_data
+    doctor_data = mongo.db.users.find_one({'umsId': session['umsId']})
+    doctor_data['phoneNumber'] = doctor_data.get('phoneNumber', [None])[0]
+    if request.method == 'POST':
+        if request.form.get('form_type') == 'update_profile':
+            return update_profile()
+    return render_template('doctor/profile.html', doctor_data=doctor_data)
+
+def update_profile():
+    """Update doctor profile information."""
+    doctor_data = mongo.db.users.find_one({'umsId': session['umsId']})
+    # Get the updated data from the form
+    doctor_data['name'] = request.form.get('name')
+    doctor_data['email'] = request.form.get('email')
+    doctor_data['phoneNumber'] = [request.form.get('phoneNumber')]
+    passw = request.form.get('password')
+    cpassw = request.form.get('confirm_password')
+    doctor_data['updatedAt'] = datetime.now()
+    
+    if passw != cpassw:
+        flash('Passwords do not match', 'danger')
+        return redirect(url_for('doctor.profile'))
+    else:
+        doctor_data.pop('password', None)
+        doctor_data['passwordHash'] = generate_password_hash(passw)
+        mongo.db.users.update_one({'umsId': session['umsId']}, {'$set': doctor_data})
+        mongo.db.login.update_one({'umsId': session['umsId']},
+                      {'$set': {'passwordHash': [doctor_data['passwordHash']],
+                            'updatedAt': doctor_data['updatedAt'],
+                            'email': doctor_data['email']}})
+        flash('Profile updated successfully', 'success')
+    return redirect(url_for('doctor.profile'))
+
 def generate_doctor_id():
     return 'UMSD' + re.sub('-', '', str(uuid.uuid4()))[:8].upper()
 
+@doctor_bp.route('/inbox')
+def inbox():
+    if 'doctor' not in session:
+        return redirect(url_for('doctor.login'))
+    doctor_id = session['doctor']
+    messages = mongo.db.messages.find({'receiver': doctor_id})
+    return render_template('doctor/inbox.html', messages=messages)
+
+@doctor_bp.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    if request.method == 'POST':
+        # Update doctor profile logic here
+        pass
+    return render_template('doctor/edit_profile.html')
+
+@doctor_bp.route('/compose', methods=['GET', 'POST'])
+@login_required
+def compose():
+    if request.method == 'POST':
+        # Compose email logic here
+        pass
+    return render_template('doctor/compose.html')
+
+@doctor_bp.route('/hospital_details')
+@login_required
+def hospital_details():
+    return render_template('doctor/hospital_details.html')
+
+@doctor_bp.route('/edit_hospital', methods=['GET', 'POST'])
+@login_required
+def edit_hospital():
+    if request.method == 'POST':
+        # Update hospital details logic here
+        pass
+    return render_template('doctor/edit_hospital.html')
+
+@doctor_bp.route('/appointments')
+@login_required
+def appointments():
+    return render_template('doctor/appointments.html')
+
+
+@doctor_bp.route('/appointment_history')
+@login_required
+def appointment_history():
+    return render_template('doctor/appointments_history.html')
+
+@doctor_bp.route('/calendar')
+@login_required
+def calendar():
+    return render_template('doctor/calendar.html')
+
+@doctor_bp.route('/timeline')
+@login_required
+def timeline():
+    return render_template('doctor/timeline.html')
+
+@doctor_bp.route('/map')
+@login_required
+def map():
+    return render_template('doctor/map.html')
+
+@doctor_bp.route('/lock_screen')
+@login_required
+def lock_screen():
+    return render_template('doctor/lock_screen.html')
 
 @doctor_bp.route('/register', methods=['GET', 'POST'])
 def register():    
@@ -86,3 +188,5 @@ def register():
         flash('Doctor registered successfully!')
         return redirect(url_for('doctor.index'))
     return render_template('doctor/register.html')
+
+

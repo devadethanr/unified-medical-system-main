@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+   <head>
+      <!-- Required meta tags -->
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <title>UMS - Doctor Profile</title>
+      <!-- Favicon -->
+      <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
+      <!-- Bootstrap CSS -->
+      <link id="bootstrap-css" rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+      <!-- Typography CSS -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/typography.css') }}">
+      <!-- Style CSS -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+      <!-- Style-Rtl CSS -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/style-rtl.css') }}">
+      <!-- Responsive CSS -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+   </head>
+   <body>
+      <!-- loader Start -->
+      <div id="loading">
+         <div id="loading-center">
+         </div>
+      </div>
+      <!-- loader END -->
+      <!-- Wrapper Start -->
+      <div class="wrapper">
+         <!-- Sidebar  -->
+         <div class="iq-sidebar">
+            <div class="iq-sidebar-logo d-flex justify-content-between">
+               <a href="{{ url_for('doctor.index') }}">
+               <img src="{{ url_for('static', filename='images/logo.png') }}" class="img-fluid" alt="">
+               <span>UMS</span>
+               </a>
+               <div class="iq-menu-bt-sidebar">
+                  <div class="iq-menu-bt align-self-center">
+                     <div class="wrapper-menu">
+                        <div class="main-circle"><i class="ri-more-fill"></i></div>
+                           <div class="hover-circle"><i class="ri-more-2-fill"></i></div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div id="sidebar-scrollbar">
+               <nav class="iq-sidebar-menu">
+                  <ul class="iq-menu">
+                     <li class="iq-menu-title"><i class="ri-subtract-line"></i><span>Dashboard</span></li>
+                     <li>
+                        <a href="{{ url_for('doctor.index') }}" class="iq-waves-effect"><i class="ri-hospital-fill"></i><span>Doctor Dashboard</span></a>
+                     </li>
+                  </ul>
+               </nav>
+               <div class="p-3"></div>
+            </div>
+         </div>
+         <!-- Page Content  -->
+         <div id="content-page" class="content-page">
+            <!-- TOP Nav Bar -->
+            <div class="iq-top-navbar">
+               <div class="iq-navbar-custom">
+                  <div class="iq-sidebar-logo">
+                     <div class="top-logo">
+                        <a href="{{ url_for('doctor.index') }}" class="logo">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" class="img-fluid" alt="">
+                        <span>UMS</span>
+                        </a>
+                     </div>
+                  </div>
+                  <nav class="navbar navbar-expand-lg navbar-light p-0">
+                     <div class="iq-search-bar">
+                        <form action="#" class="searchbox">
+                           <input type="text" class="text search-input" placeholder="Type here to search...">
+                           <a class="search-link" href="#"><i class="ri-search-line"></i></a>
+                        </form>
+                     </div>
+                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" href="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                     <i class="ri-menu-3-line"></i>
+                     </button>
+                     <div class="iq-menu-bt align-self-center">
+                        <div class="wrapper-menu">
+                           <div class="main-circle"><i class="ri-more-fill"></i></div>
+                           <div class="hover-circle"><i class="ri-more-2-fill"></i></div>
+                        </div>
+                     </div>
+                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                           <li class="nav-item iq-full-screen">
+                              <a href="#" class="iq-waves-effect" id="btnFullscreen"><i class="ri-fullscreen-line"></i></a>
+                           </li>
+                        </ul>
+                     </div>
+                     <ul class="navbar-list">
+                        <li>
+                           <a href="#" class="search-toggle iq-waves-effect d-flex align-items-center">
+                              <img src="{{ url_for('static', filename='images/user/1.jpg') }}" class="img-fluid rounded" alt="user">
+                              <div class="caption">
+                                 <h6 class="mb-0 line-height">{{ doctor_data.name }}</h6>
+                                 <span class="font-size-12">Available</span>
+                              </div>
+                           </a>
+                           <div class="iq-sub-dropdown iq-user-dropdown">
+                              <div class="iq-card shadow-none m-0">
+                                 <div class="iq-card-body p-0 ">
+                                    <div class="bg-primary p-3">
+                                       <h5 class="mb-0 text-white line-height">Hello {{ doctor_data.name }}</h5>
+                                       <span class="text-white font-size-12">Available</span>
+                                    </div>
+                                    <div class="d-inline-block w-100 text-center p-3">
+                                       <a class="bg-primary iq-sign-btn" href="{{ url_for('auth.logout') }}" role="button">Sign out<i class="ri-login-box-line ms-2"></i></a>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                        </li>
+                     </ul>
+                  </nav>
+               </div>
+            </div>
+            <!-- TOP Nav Bar END -->
+            <div class="container-fluid">
+               <div class="row">
+                  <div class="col-lg-4">
+                     <div class="iq-card">
+                        <div class="iq-card-body ps-0 pe-0 pt-0">
+                           <div class="docter-details-block">
+                              <div class="doc-profile-bg bg-primary" style="height:150px;">
+                              </div>
+                              <div class="docter-profile text-center">
+                                 <img src="{{ url_for('static', filename='images/user/11.png') }}" alt="profile-img" class="avatar-130 img-fluid">
+                              </div>
+                              <div class="text-center mt-3 ps-3 pe-3">
+                                 <h4><b>{{ doctor_data.name }}</b></h4>
+                                 <p>Doctor</p>
+                                 <p class="mb-0">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Delectus repudiandae eveniet harum.</p>
+                              </div>
+                              <hr>
+                              <ul class="doctoe-sedual d-flex align-items-center justify-content-between p-0 m-0">
+                                 <li class="text-center">
+                                    <h3 class="counter">4500</h3>
+                                    <span>Operations</span>
+                                  </li>
+                                  <li class="text-center">
+                                    <h3 class="counter">100</h3>
+                                    <span>Hospital</span>
+                                  </li>
+                                  <li class="text-center">
+                                    <h3 class="counter">10000</h3>
+                                    <span>Patients</span>
+                                  </li>
+                              </ul>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="iq-card">
+                        <div class="iq-card-header d-flex justify-content-between">
+                           <div class="iq-header-title">
+                              <h4 class="card-title">Personal Information</h4>
+                           </div>
+                        </div>
+                        <div class="iq-card-body">
+                           <div class="about-info m-0 p-0">
+                              <div class="row">
+                                 <div class="col-4">First Name:</div>
+                                 <div class="col-8">{{ doctor_data.name.split()[0] }}</div>
+                                 <div class="col-4">Last Name:</div>
+                                 <div class="col-8">{{ doctor_data.name.split()[-1] }}</div>
+                                 <div class="col-4">Age:</div>
+                                 <div class="col-8">27</div>
+                                 <div class="col-4">Position:</div>
+                                 <div class="col-8">Senior Doctor</div>
+                                 <div class="col-4">Email:</div>
+                                 <div class="col-8"><a href="mailto:{{ doctor_data.email }}"> {{ doctor_data.email }} </a></div>
+                                 <div class="col-4">Phone:</div>
+                                 <div class="col-8"><a href="tel:{{ doctor_data.phoneNumber[0] }}">{{ doctor_data.phoneNumber[0] }}</a></div>
+                                 <div class="col-4">Location:</div>
+                                 <div class="col-8">USA</div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="col-lg-8">
+                     <div class="row">
+                        <div class="col-md-6">
+                           <div class="iq-card">
+                              <div class="iq-card-header d-flex justify-content-between">
+                                 <div class="iq-header-title">
+                                    <h4 class="card-title">Speciality</h4>
+                                 </div>
+                              </div>
+                              <div class="iq-card-body">
+                                 <ul class="speciality-list m-0 p-0">
+                                    <li class="d-flex mb-4 align-items-center">
+                                       <div class="user-img img-fluid"><a href="#" class="iq-bg-primary"><i class="ri-award-fill"></i></a></div>
+                                       <div class="media-support-info ms-3">
+                                          <h6>professional</h6>
+                                          <p class="mb-0">Certified Skin Treatment</p>
+                                       </div>
+                                    </li>
+                                    <li class="d-flex mb-4 align-items-center">
+                                       <div class="user-img img-fluid"><a href="#" class="iq-bg-warning"><i class="ri-award-fill"></i></a></div>
+                                       <div class="media-support-info ms-3">
+                                          <h6>Certified</h6>
+                                          <p class="mb-0">Cold Laser Operation</p>
+                                       </div>
+                                    </li>
+                                    <li class="d-flex mb-4 align-items-center">
+                                       <div class="user-img img-fluid"><a href="#" class="iq-bg-info"><i class="ri-award-fill"></i></a></div>
+                                       <div class="media-support-info ms-3">
+                                          <h6>Medication Laser</h6>
+                                          <p class="mb-0">Hair Lose Product</p>
+                                       </div>
+                                    </li>
+                                 </ul>
+                              </div>
+                           </div>
+                        </div>
+                        <div class="col-md-12">
+                           <div class="iq-card">
+                              <div class="iq-card-header d-flex justify-content-between">
+                                 <div class="iq-header-title">
+                                    <h4 class="card-title">Education</h4>
+                                 </div>
+                              </div>
+                              <div class="iq-card-body">
+                                 <div class="table-responsive">
+                                    <table class="table mb-0 table-borderless">
+                                     <thead>
+                                         <tr>
+                                             <th scope="col">Year</th>
+                                             <th scope="col">Degree</th>
+                                             <th scope="col">Institute</th>
+                                             <th scope="col">Result</th>
+                                         </tr>
+                                     </thead>
+                                     <tbody>
+                                         <tr>
+                                             <td>2010</td>
+                                             <td>MBBS, M.D</td>
+                                             <td>University of Wyoming</td>
+                                             <td><span class="badge badge-success">Distinction</span></td>
+                                         </tr>
+                                         <tr>
+                                             <td>2014</td>
+                                             <td>M.D. of Medicine</td>
+                                             <td>Netherland Medical College</td>
+                                             <td><span class="badge badge-success">Distinction</span></td>
+                                         </tr>
+                                     </tbody>
+                                    </table>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                        <div class="col-md-12">
+                           <div class="iq-card">
+                              <div class="iq-card-header d-flex justify-content-between">
+                                 <div class="iq-header-title">
+                                    <h4 class="card-title">Experience</h4>
+                                 </div>
+                              </div>
+                              <div class="iq-card-body">
+                                 <div class="table-responsive">
+                                    <table class="table mb-0 table-borderless">
+                                     <thead>
+                                         <tr>
+                                             <th scope="col">Year</th>
+                                             <th scope="col">Department</th>
+                                             <th scope="col">Position</th>
+                                             <th scope="col">Hospital</th>
+                                             <th scope="col">Feedback</th>
+                                         </tr>
+                                     </thead>
+                                     <tbody>
+                                         <tr>
+                                             <td>2014 - 2018</td>
+                                             <td>MBBS, M.D</td>
+                                             <td>Senior Doctor</td>
+                                             <td>Midtown Medical Clinic</td>
+                                             <td><span class="badge badge-primary">Good</span></td>
+                                         </tr>
+                                         <tr>
+                                             <td>2018 - 2020</td>
+                                             <td>M.D. of Medicine</td>
+                                             <td>Associate Prof.</td>
+                                             <td>Netherland Medical College</td>
+                                             <td><span class="badge badge-success">excellence</span></td>
+                                         </tr>
+                                     </tbody>
+                                    </table>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <!-- Footer -->
+            <footer class="bg-white iq-footer">
+               <div class="container-fluid">
+                  <div class="row">
+                     <div class="col-lg-6">
+                     </div>
+                     <div class="col-lg-6 text-end">
+                        Copyright <span id="copyright"> 
+                           <script>document.getElementById('copyright').appendChild(document.createTextNode(new Date().getFullYear()))</script>
+                        </span> <a href="#">UMS</a> All Rights Reserved.
+                     </div>
+                  </div>
+               </div>
+            </footer>
+            <!-- Footer END -->
+         </div>
+      </div>
+      <!-- Wrapper END -->
+      <!-- Optional JavaScript -->
+      <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+      <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+      <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+      <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+      <!-- Appear JavaScript -->
+      <script src="{{ url_for('static', filename='js/jquery.appear.js') }}"></script>
+      <!-- Countdown JavaScript -->
+      <script src="{{ url_for('static', filename='js/countdown.min.js') }}"></script>
+      <!-- Counterup JavaScript -->
+      <script src="{{ url_for('static', filename='js/waypoints.min.js') }}"></script>
+      <script src="{{ url_for('static', filename='js/jquery.counterup.min.js') }}"></script>
+      <!-- Wow JavaScript -->
+      <script src="{{ url_for('static', filename='js/wow.min.js') }}"></script>
+      <!-- Apexcharts JavaScript -->
+      <script src="{{ url_for('static', filename='js/apexcharts.js') }}"></script>
+      <!-- Swiper Slider JavaScript -->
+      <script src="{{ url_for('static', filename='js/swiper-bundle.min.js') }}"></script>
+      <!-- Select2 JavaScript -->
+      <script src="{{ url_for('static', filename='js/select2.min.js') }}"></script>
+      <!-- Owl Carousel JavaScript -->
+      <script src="{{ url_for('static', filename='js/owl.carousel.min.js') }}"></script>
+      <!-- Magnific Popup JavaScript -->
+      <script src="{{ url_for('static', filename='js/jquery.magnific-popup.min.js') }}"></script>
+      <!-- Smooth Scrollbar JavaScript -->
+      <script src="{{ url_for('static', filename='js/smooth-scrollbar.js') }}"></script>
+      <!-- lottie JavaScript -->
+      <script src="{{ url_for('static', filename='js/lottie.js') }}"></script>
+      <!-- Chart Custom JavaScript -->
+      <script src="{{ url_for('static', filename='js/chart-custom.js') }}"></script>
+      <!-- Custom JavaScript -->
+      <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+   </body>
+</html>
