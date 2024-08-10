@@ -16,11 +16,18 @@ doctor_bp = Blueprint('doctor', __name__)
 def load_user(user_id):
     return User.get(user_id)
 
+def generate_doctor_id():
+    return 'UMSD' + re.sub('-', '', str(uuid.uuid4()))[:8].upper()
+
 @login_required
 @doctor_bp.route('/dashboard', methods=['GET', 'POST'])
 def index():
+    global doctor_data
     doctor_data = mongo.db.users.find_one({'umsId': session['umsId']})
+    doctor_details = mongo.db.doctorDetails.find_one({'umsId': session['umsId']})
+    doctor_data = {**doctor_data, **doctor_details} if doctor_details else doctor_data
     doctor_data['phoneNumber'] = doctor_data.get('phoneNumber', [None])[0]
+    print(doctor_data) #for debugging
     return render_template('doctor/dashboard.html', doctor_data=doctor_data)
 
 @doctor_bp.route('/profile', methods=['GET', 'POST'])
@@ -29,7 +36,11 @@ def profile():
     """Handle doctor profile view and updates."""
     global doctor_data
     doctor_data = mongo.db.users.find_one({'umsId': session['umsId']})
+    doctor_details = mongo.db.doctorDetails.find_one({'umsId': session['umsId']})
+    print(doctor_details)
+    doctor_data = {**doctor_data, **doctor_details} if doctor_details else doctor_data
     doctor_data['phoneNumber'] = doctor_data.get('phoneNumber', [None])[0]
+    print(doctor_data)
     if request.method == 'POST':
         if request.form.get('form_type') == 'update_profile':
             return update_profile()
@@ -38,6 +49,8 @@ def profile():
 def update_profile():
     """Update doctor profile information."""
     doctor_data = mongo.db.users.find_one({'umsId': session['umsId']})
+    doctor_details = mongo.db.doctorDetails.find_one({'umsId': session['umsId']})
+    doctor_data = {**doctor_data, **doctor_details} if doctor_details else doctor_data
     # Get the updated data from the form
     doctor_data['name'] = request.form.get('name')
     doctor_data['email'] = request.form.get('email')
@@ -60,8 +73,57 @@ def update_profile():
         flash('Profile updated successfully', 'success')
     return redirect(url_for('doctor.profile'))
 
-def generate_doctor_id():
-    return 'UMSD' + re.sub('-', '', str(uuid.uuid4()))[:8].upper()
+@doctor_bp.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    if request.method == 'POST':
+        doctor_data = {
+            'name': request.form.get('name', 'not specified'),
+            'email': request.form.get('email', 'not specified'),
+            'phoneNumber': request.form.get('phoneNumber', 'not specified'),
+            'updatedAt': datetime.now() 
+        }
+        print("debugger flag")
+        print(doctor_data)
+        mongo.db.users.update_one({'umsId': session['umsId']}, {'$set': doctor_data})
+
+        # Update the doctor's profile in the doctors collection
+        mongo.db.doctors.update_one({'umsId': session['umsId']}, {'$set': {
+            'medicalId': request.form.get('medicalId', 'not specified'),
+            'specialization':request.form.get('specialization', 'not specified'),
+            'updatedAt': doctor_data['updatedAt']
+        }})
+
+        # Update the doctor's profile in the doctorDetails collection
+        update_data = {
+            'status_reason': request.form.get('status_reason', 'not specified'),
+            'medicalId': request.form.get('medicalId', 'not specified test'),
+            'specialization': request.form.get('specialization', 'not specified'),
+            'qualification': request.form.get('qualification', 'not specified'),
+            'doctor_status': request.form.get('status', 'not specified'),
+            'dob': request.form.get('dob', 'not specified'),
+            'address': request.form.get('address', 'not specified'),
+            'updatedAt': datetime.now()
+        }
+        mongo.db.doctorDetails.update_one({'umsId': session['umsId']}, {'$set': update_data}, upsert=True)
+        
+        # Update the doctor's email and updatedAt in the users collection
+        mongo.db.users.update_one({'umsId': session['umsId']}, {'$set': {
+            'email': doctor_data.get('email', 'not specified'),
+            'updatedAt': doctor_data.get('updatedAt', 'not specified')
+        }})
+        # Update the doctor's email and updatedAt in the login collection
+        mongo.db.login.update_one({'umsId': session['umsId']}, {'$set': {
+            'email': doctor_data.get('email', 'not specified'),
+            'updatedAt': doctor_data.get('updatedAt', 'not specified')
+        }})
+        flash('Profile updated successfully', 'success')
+        return redirect(url_for('doctor.profile'))
+
+    doctor_data = mongo.db.users.find_one({'umsId': session['umsId']})
+    doctor_details = mongo.db.doctorDetails.find_one({'umsId': session['umsId']})
+    doctor_data = {**doctor_data, **doctor_details} if doctor_details else doctor_data
+    return render_template('doctor/profile-edit.html', doctor_data=doctor_data)
 
 @doctor_bp.route('/inbox')
 def inbox():
@@ -70,14 +132,6 @@ def inbox():
     doctor_id = session['doctor']
     messages = mongo.db.messages.find({'receiver': doctor_id})
     return render_template('doctor/inbox.html', messages=messages)
-
-@doctor_bp.route('/edit_profile', methods=['GET', 'POST'])
-@login_required
-def edit_profile():
-    if request.method == 'POST':
-        # Update doctor profile logic here
-        pass
-    return render_template('doctor/edit_profile.html')
 
 @doctor_bp.route('/compose', methods=['GET', 'POST'])
 @login_required

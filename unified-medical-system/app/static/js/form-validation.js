@@ -67,6 +67,48 @@ function validatePassword() {
     }
 }
 
+function validateSpecialization() {
+  const specializationInput = document.getElementById('specialization');
+  const specializationError = document.getElementById('specializationError');
+  const specializationValue = specializationInput.value.trim();
+
+  if (specializationValue.length < 3) {
+    specializationError.textContent = 'Specialization must be at least 3 characters.';
+    return false;
+  } else {
+    specializationError.textContent = '';
+    return true;
+  }
+}
+
+function validateMedicalId() {
+  const medicalIdInput = document.getElementById('medicalId');
+  const medicalIdError = document.getElementById('medicalIdError');
+  const medicalIdValue = medicalIdInput.value.trim();
+
+  if (medicalIdValue.length < 3) {
+    medicalIdError.textContent = 'Medical ID must be at least 3 characters.';
+    return false;
+  } else {
+    medicalIdError.textContent = '';
+    return true;
+  }
+}
+
+function validateQualification() {
+  const qualificationInput = document.getElementById('qualification');
+  const qualificationError = document.getElementById('qualificationError');
+  const qualificationValue = qualificationInput.value.trim();
+
+  if (qualificationValue.length < 3) {
+    qualificationError.textContent = 'Qualification must be at least 3 characters.';
+    return false;
+  } else {
+    qualificationError.textContent = '';
+    return true;
+  }
+}
+
 // Event listener for keypress on form
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('registerForm');
@@ -80,13 +122,19 @@ document.addEventListener('DOMContentLoaded', function() {
             validatePhoneNumber();
         } else if (event.target.matches('#password') || event.target.matches('#confirm_password')) {
             validatePassword();
+        } else if (event.target.matches('#specialization')) {
+          validateSpecialization();
+        } else if (event.target.matches('#medicalId')) {
+          validateMedicalId();
+        } else if (event.target.matches('#qualification')) {
+          validateQualification();
         }
         // Add more conditions for other fields as needed
     });
 
     // Optional: Final submit validation
     form.addEventListener('submit', function(event) {
-        if (!validateName() || !validateEmail() || !validatePhoneNumber() || !validatePassword()) {
+        if (!validateName() || !validateEmail() || !validatePhoneNumber() || !validatePassword() || !validateSpecialization() || !validateMedicalId() || !validateQualification()) {
             event.preventDefault(); // Prevent form submission if validation fails
             // Optionally, display a general error message if needed
         }

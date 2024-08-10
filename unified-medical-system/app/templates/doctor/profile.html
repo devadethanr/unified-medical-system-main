@@ -34,90 +34,109 @@
                <img src="{{ url_for('static', filename='images/logo.png') }}" class="img-fluid" alt="">
                <span>UMS</span>
                </a>
-               <div class="iq-menu-bt-sidebar">
-                  <div class="iq-menu-bt align-self-center">
-                     <div class="wrapper-menu">
-                        <div class="main-circle"><i class="ri-more-fill"></i></div>
-                           <div class="hover-circle"><i class="ri-more-2-fill"></i></div>
-                     </div>
+               <div class="iq-menu-bt align-self-center">
+                  <div class="wrapper-menu">
+                     <div class="main-circle"><i class="ri-more-fill"></i></div>
+                     <div class="hover-circle"><i class="ri-more-2-fill"></i></div>
                   </div>
                </div>
             </div>
             <div id="sidebar-scrollbar">
                <nav class="iq-sidebar-menu">
-                  <ul class="iq-menu">
-                     <li class="iq-menu-title"><i class="ri-subtract-line"></i><span>Dashboard</span></li>
+                  <ul id="iq-sidebar-toggle" class="iq-menu">
+                     <li class="active">
+                        <a href="{{ url_for('doctor.index') }}" class="iq-waves-effect"><i class="ri-home-4-line"></i><span>Dashboard</span></a>
+                     </li>
                      <li>
-                        <a href="{{ url_for('doctor.index') }}" class="iq-waves-effect"><i class="ri-hospital-fill"></i><span>Doctor Dashboard</span></a>
+                        <a href="{{ url_for('doctor.profile') }}" class="iq-waves-effect"><i class="ri-profile-line"></i><span>Profile</span></a>
+                     </li>
+                     <li>
+                        <a href="{{ url_for('doctor.edit_profile') }}" class="iq-waves-effect"><i class="ri-edit-line"></i><span>Edit Profile</span></a>
+                     </li>
+                     <li>
+                        <a href="{{ url_for('doctor.appointments') }}" class="iq-waves-effect"><i class="ri-calendar-line"></i><span>Appointments</span></a>
+                     </li>
+                     <li>
+                        <a href="{{ url_for('doctor.inbox') }}" class="iq-waves-effect"><i class="ri-mail-line"></i><span>Inbox</span></a>
                      </li>
                   </ul>
                </nav>
-               <div class="p-3"></div>
             </div>
          </div>
-         <!-- Page Content  -->
-         <div id="content-page" class="content-page">
-            <!-- TOP Nav Bar -->
-            <div class="iq-top-navbar">
-               <div class="iq-navbar-custom">
-                  <div class="iq-sidebar-logo">
-                     <div class="top-logo">
-                        <a href="{{ url_for('doctor.index') }}" class="logo">
-                        <img src="{{ url_for('static', filename='images/logo.png') }}" class="img-fluid" alt="">
-                        <span>UMS</span>
-                        </a>
+         <!-- TOP Nav Bar -->
+         <div class="iq-top-navbar">
+            <div class="iq-navbar-custom">
+               <nav class="navbar navbar-expand-lg navbar-light p-0">
+                  <div class="iq-menu-bt align-self-center">
+                     <div class="wrapper-menu">
+                        <div class="main-circle"><i class="ri-more-fill"></i></div>
+                        <div class="hover-circle"><i class="ri-more-2-fill"></i></div>
                      </div>
                   </div>
-                  <nav class="navbar navbar-expand-lg navbar-light p-0">
-                     <div class="iq-search-bar">
-                        <form action="#" class="searchbox">
-                           <input type="text" class="text search-input" placeholder="Type here to search...">
-                           <a class="search-link" href="#"><i class="ri-search-line"></i></a>
-                        </form>
-                     </div>
-                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" href="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                     <i class="ri-menu-3-line"></i>
-                     </button>
-                     <div class="iq-menu-bt align-self-center">
-                        <div class="wrapper-menu">
-                           <div class="main-circle"><i class="ri-more-fill"></i></div>
-                           <div class="hover-circle"><i class="ri-more-2-fill"></i></div>
+                  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                     <ul class="navbar-nav ms-auto navbar-list">
+                        <li class="nav-item iq-full-screen">
+                           <a href="#" class="iq-waves-effect" id="btnFullscreen"><i class="ri-fullscreen-line"></i></a>
+                        </li>
+                     </ul>
+                  </div>
+                  <ul class="navbar-list">
+                     <li class="nav-item">
+                        <div class="iq-breadcrumb">
+                           <a href="{{ url_for('doctor.index') }}" class="breadcrumb-item"><i class="ri-home-4-line"></i>Dashboard</a>
+                           <a href="{{ url_for('doctor.profile') }}" class="breadcrumb-item active">Profile</a>
                         </div>
-                     </div>
-                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                           <li class="nav-item iq-full-screen">
-                              <a href="#" class="iq-waves-effect" id="btnFullscreen"><i class="ri-fullscreen-line"></i></a>
-                           </li>
-                        </ul>
-                     </div>
-                     <ul class="navbar-list">
-                        <li>
-                           <a href="#" class="search-toggle iq-waves-effect d-flex align-items-center">
-                              <img src="{{ url_for('static', filename='images/user/1.jpg') }}" class="img-fluid rounded" alt="user">
-                              <div class="caption">
-                                 <h6 class="mb-0 line-height">{{ doctor_data.name }}</h6>
-                                 <span class="font-size-12">Available</span>
-                              </div>
-                           </a>
-                           <div class="iq-sub-dropdown iq-user-dropdown">
-                              <div class="iq-card shadow-none m-0">
-                                 <div class="iq-card-body p-0 ">
-                                    <div class="bg-primary p-3">
-                                       <h5 class="mb-0 text-white line-height">Hello {{ doctor_data.name }}</h5>
-                                       <span class="text-white font-size-12">Available</span>
+                     <li>
+                        <a href="#" class="search-toggle iq-waves-effect d-flex align-items-center">
+                           <img src="{{ url_for('static', filename='images/user/1.jpg') }}" class="img-fluid rounded" alt="user">
+                           <div class="caption">
+                              <h6 class="mb-0 line-height">{{ doctor_data.name }}</h6>
+                              <span class="font-size-12">Available</span>
+                           </div>
+                        </a>
+                        <div class="iq-sub-dropdown iq-user-dropdown">
+                           <div class="iq-card shadow-none m-0">
+                              <div class="iq-card-body p-0 ">
+                                 <div class="bg-primary p-3">
+                                    <h5 class="mb-0 text-white line-height">Hello {{ doctor_data.name }}</h5>
+                                    <span class="text-white font-size-12">Available</span>
+                                 </div>
+                                 <a href="{{ url_for('doctor.profile') }}" class="iq-sub-card iq-bg-primary-hover">
+                                    <div class="media align-items-center">
+                                       <div class="rounded iq-card-icon iq-bg-primary">
+                                          <i class="ri-file-user-line"></i>
+                                       </div>
+                                       <div class="media-body ms-3">
+                                          <h6 class="mb-0 ">My Profile</h6>
+                                          <p class="mb-0 font-size-12">View personal profile details.</p>
+                                       </div>
                                     </div>
-                                    <div class="d-inline-block w-100 text-center p-3">
-                                       <a class="bg-primary iq-sign-btn" href="{{ url_for('auth.logout') }}" role="button">Sign out<i class="ri-login-box-line ms-2"></i></a>
+                                 </a>
+                                 <a href="{{ url_for('doctor.edit_profile') }}" class="iq-sub-card iq-bg-primary-hover">
+                                    <div class="media align-items-center">
+                                       <div class="rounded iq-card-icon iq-bg-primary">
+                                          <i class="ri-profile-line"></i>
+                                       </div>
+                                       <div class="media-body ms-3">
+                                          <h6 class="mb-0 ">Edit Profile</h6>
+                                          <p class="mb-0 font-size-12">Modify your personal details.</p>
+                                       </div>
                                     </div>
+                                 </a>
+                                 <div class="d-inline-block w-100 text-center p-3">
+                                    <a class="btn btn-primary iq-sign-btn" href="{{ url_for('auth.logout') }}" role="button">Sign out<i class="ri-login-box-line ms-2"></i></a>
                                  </div>
                               </div>
                            </div>
-                        </li>
-                     </ul>
-                  </nav>
-               </div>
+                        </div>
+                     </li>
+                  </ul>
+               </nav>
             </div>
-            <!-- TOP Nav Bar END -->
+         </div>
+         <!-- TOP Nav Bar END -->
+         <!-- Page Content  -->
+         <div id="content-page" class="content-page">
             <div class="container-fluid">
                <div class="row">
                   <div class="col-lg-4">
@@ -129,25 +148,26 @@
                               <div class="docter-profile text-center">
                                  <img src="{{ url_for('static', filename='images/user/11.png') }}" alt="profile-img" class="avatar-130 img-fluid">
                               </div>
-                              <div class="text-center mt-3 ps-3 pe-3">
+                              <div class="text-center mt-3 pl-3 pr-3">
                                  <h4><b>{{ doctor_data.name }}</b></h4>
-                                 <p>Doctor</p>
-                                 <p class="mb-0">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Delectus repudiandae eveniet harum.</p>
+                                 <p>{{ doctor_data.specialization }}</p>
+                                 <p class="mb-0">{{ doctor_data.qualification }}</p>
+                                 <p class="mb-0 text-danger"><b>Last Updated: {{ doctor_data.updatedAt.strftime('%Y-%m-%d %H:%M:%S') }}</b></p>
                               </div>
                               <hr>
                               <ul class="doctoe-sedual d-flex align-items-center justify-content-between p-0 m-0">
                                  <li class="text-center">
-                                    <h3 class="counter">4500</h3>
-                                    <span>Operations</span>
-                                  </li>
-                                  <li class="text-center">
-                                    <h3 class="counter">100</h3>
-                                    <span>Hospital</span>
-                                  </li>
-                                  <li class="text-center">
-                                    <h3 class="counter">10000</h3>
-                                    <span>Patients</span>
-                                  </li>
+                                    <h3 class="counter">{{ doctor_data.total_appointments }}</h3>
+                                    <span>Total Appointments</span>
+                                 </li>
+                                 <li class="text-center">
+                                    <h3 class="text-primary">{{ doctor_data.hospital_name }}</h3>
+                                    <span>Hospital Name</span>
+                                 </li>
+                                 <li class="text-center">
+                                    <h3 class="counter">{{ doctor_data.today_appointments }}</h3>
+                                    <span>Today's Appointments</span>
+                                 </li>
                               </ul>
                            </div>
                         </div>
@@ -161,20 +181,20 @@
                         <div class="iq-card-body">
                            <div class="about-info m-0 p-0">
                               <div class="row">
-                                 <div class="col-4">First Name:</div>
-                                 <div class="col-8">{{ doctor_data.name.split()[0] }}</div>
-                                 <div class="col-4">Last Name:</div>
-                                 <div class="col-8">{{ doctor_data.name.split()[-1] }}</div>
-                                 <div class="col-4">Age:</div>
-                                 <div class="col-8">27</div>
-                                 <div class="col-4">Position:</div>
-                                 <div class="col-8">Senior Doctor</div>
-                                 <div class="col-4">Email:</div>
-                                 <div class="col-8"><a href="mailto:{{ doctor_data.email }}"> {{ doctor_data.email }} </a></div>
-                                 <div class="col-4">Phone:</div>
-                                 <div class="col-8"><a href="tel:{{ doctor_data.phoneNumber[0] }}">{{ doctor_data.phoneNumber[0] }}</a></div>
-                                 <div class="col-4">Location:</div>
-                                 <div class="col-8">USA</div>
+                                 <div class="col-4 text-primary"><b><i class="ri-user-line"></i> First Name:</b></div>
+                                 <div class="col-8 text-primary"><b>{{ doctor_data.name.split()[0] }}</b></div>
+                                 <div class="col-4 text-primary"><b><i class="ri-user-line"></i> Last Name:</b></div>
+                                 <div class="col-8 text-primary"><b>{{ doctor_data.name.split()[-1] }}</b></div>
+                                 <div class="col-4 text-success"><b><i class="ri-mail-line"></i> Email:</b></div>
+                                 <div class="col-8 text-success"><b><a href="mailto:{{ doctor_data.email }}">{{ doctor_data.email }}</a></b></div>
+                                 <div class="col-4 text-success"><b><i class="ri-phone-line"></i> Phone:</b></div>
+                                 <div class="col-8 text-success"><b><a href="tel:{{ doctor_data.phoneNumber }}">{{ doctor_data.phoneNumber }}</a></b></div>
+                                 <div class="col-4 text-warning"><b><i class="ri-file-text-line"></i> Specialization:</b></div>
+                                 <div class="col-8 text-warning"><b>{{ doctor_data.specialization }}</b></div>
+                                 <div class="col-4 text-warning"><b><i class="ri-id-card-line"></i> Medical ID:</b></div>
+                                 <div class="col-8 text-warning"><b>{{ doctor_data.medicalId }}</b></div>
+                                 <div class="col-4 text-warning"><b><i class="ri-certificate-line"></i> Qualification:</b></div>
+                                 <div class="col-8 text-warning"><b>{{ doctor_data.qualification }}</b></div>
                               </div>
                            </div>
                         </div>
@@ -191,32 +211,20 @@
                               </div>
                               <div class="iq-card-body">
                                  <ul class="speciality-list m-0 p-0">
+                                    {% for specialization in doctor_data.specialization.split(',') %}
                                     <li class="d-flex mb-4 align-items-center">
                                        <div class="user-img img-fluid"><a href="#" class="iq-bg-primary"><i class="ri-award-fill"></i></a></div>
                                        <div class="media-support-info ms-3">
-                                          <h6>professional</h6>
-                                          <p class="mb-0">Certified Skin Treatment</p>
+                                          <h6>{{ specialization.strip() }}</h6>
+                                          <p class="mb-0">{{ specialization.strip() }}</p>
                                        </div>
                                     </li>
-                                    <li class="d-flex mb-4 align-items-center">
-                                       <div class="user-img img-fluid"><a href="#" class="iq-bg-warning"><i class="ri-award-fill"></i></a></div>
-                                       <div class="media-support-info ms-3">
-                                          <h6>Certified</h6>
-                                          <p class="mb-0">Cold Laser Operation</p>
-                                       </div>
-                                    </li>
-                                    <li class="d-flex mb-4 align-items-center">
-                                       <div class="user-img img-fluid"><a href="#" class="iq-bg-info"><i class="ri-award-fill"></i></a></div>
-                                       <div class="media-support-info ms-3">
-                                          <h6>Medication Laser</h6>
-                                          <p class="mb-0">Hair Lose Product</p>
-                                       </div>
-                                    </li>
+                                    {% endfor %}
                                  </ul>
                               </div>
                            </div>
                         </div>
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                            <div class="iq-card">
                               <div class="iq-card-header d-flex justify-content-between">
                                  <div class="iq-header-title">
@@ -228,25 +236,15 @@
                                     <table class="table mb-0 table-borderless">
                                      <thead>
                                          <tr>
-                                             <th scope="col">Year</th>
                                              <th scope="col">Degree</th>
-                                             <th scope="col">Institute</th>
-                                             <th scope="col">Result</th>
                                          </tr>
                                      </thead>
                                      <tbody>
+                                         {% for education in doctor_data.qualification.split(',') %}
                                          <tr>
-                                             <td>2010</td>
-                                             <td>MBBS, M.D</td>
-                                             <td>University of Wyoming</td>
-                                             <td><span class="badge badge-success">Distinction</span></td>
+                                             <td class="badge badge-outline-success">{{ education.split(',')[0] }}</td>
                                          </tr>
-                                         <tr>
-                                             <td>2014</td>
-                                             <td>M.D. of Medicine</td>
-                                             <td>Netherland Medical College</td>
-                                             <td><span class="badge badge-success">Distinction</span></td>
-                                         </tr>
+                                         {% endfor %}
                                      </tbody>
                                     </table>
                                  </div>
@@ -302,6 +300,7 @@
                <div class="container-fluid">
                   <div class="row">
                      <div class="col-lg-6">
+  
                      </div>
                      <div class="col-lg-6 text-end">
                         Copyright <span id="copyright"> 

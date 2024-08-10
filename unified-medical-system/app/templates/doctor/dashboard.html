@@ -148,7 +148,7 @@
                            <a href="#" class="search-toggle iq-waves-effect d-flex align-items-center">
                               <img src="{{ url_for('static', filename='images/user/1.jpg') }}" class="img-fluid rounded" alt="user">
                               <div class="caption">
-                                 <h6 class="mb-0 line-height">{{ current_user.username }}</h6>
+                                 <h6 class="mb-0 line-height">{{ doctor_data.name }}</h6>
                                  <span class="font-size-12">Available</span>
                               </div>
                            </a>
@@ -156,7 +156,7 @@
                               <div class="iq-card shadow-none m-0">
                                  <div class="iq-card-body p-0 ">
                                     <div class="bg-primary p-3">
-                                       <h5 class="mb-0 text-white line-height">Hello {{ current_user.username }}</h5>
+                                       <h5 class="mb-0 text-white line-height">Hello {{doctor_data.name }}</h5>
                                        <span class="text-white font-size-12">Available</span>
                                     </div>
                                     <a href="{{ url_for('doctor.profile') }}" class="iq-sub-card iq-bg-primary-hover">
@@ -249,7 +249,7 @@
                                  <img src="{{ url_for('static', filename='images/user/11.png') }}" alt="profile-img" class="avatar-130 img-fluid">
                               </div>
                               <div class="text-center mt-3">
-                                 <h4><b>{{ current_user.username }}</b></h4>
+                                 <h4><b>{{ doctor_data.name }}</b></h4>
                                  <p>Doctor</p>
                                  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In in arcu turpis. Nunc</p>
                                  <a href="#" class="btn btn-primary">Assign</a>

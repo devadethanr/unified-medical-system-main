@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+   <head>
+      <!-- Required meta tags -->
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <title>UMS - Doctor Profile Edit</title>
+      <!-- Favicon -->
+      <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
+      <!-- Bootstrap CSS -->
+      <link id="bootstrap-css" rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+      <!-- Typography CSS -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/typography.css') }}">
+      <!-- Style CSS -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+      <!-- Style-Rtl CSS -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/style-rtl.css') }}">
+      <!-- Responsive CSS -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCwrIvSVrnX091MAxkWIDLQ-K3gc1Z4VLY&libraries=places"></script>
+      <script>
+        function clearForm() {
+            if (window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.href);
+            }
+        }
+    </script>
+   </head>
+   <body>
+      <!-- Wrapper Start -->
+      <div class="wrapper">
+         <!-- Sidebar  -->
+         <div class="iq-sidebar">
+            <div class="iq-sidebar-logo d-flex justify-content-between">
+               <a href="{{ url_for('doctor.index') }}">
+               <img src="{{ url_for('static', filename='images/logo.png') }}" class="img-fluid" alt="">
+               <span>UMS</span>
+               </a>
+               <div class="iq-menu-bt-sidebar">
+                  <div class="iq-menu-bt align-self-center">
+                     <div class="wrapper-menu">
+                        <div class="main-circle"><i class="ri-more-fill"></i></div>
+                           <div class="hover-circle"><i class="ri-more-2-fill"></i></div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div id="sidebar-scrollbar">
+               <nav class="iq-sidebar-menu">
+                  <ul id="iq-sidebar-toggle" class="iq-menu">
+                     <li class="active">
+                        <a href="{{ url_for('doctor.index') }}" class="iq-waves-effect"><i class="ri-home-4-line"></i><span>Dashboard</span></a>
+                     </li>
+                     <li>
+                        <a href="{{ url_for('doctor.profile') }}" class="iq-waves-effect"><i class="ri-profile-line"></i><span>Profile</span></a>
+                     </li>
+                  </ul>
+               </nav>
+               <div class="p-3"></div>
+            </div>
+         </div>
+         <!-- Page Content  -->
+         <div id="content-page" class="content-page">
+            <!-- TOP Nav Bar -->
+            <div class="iq-top-navbar">
+               <div class="iq-navbar-custom">
+                <nav class="navbar navbar-expand-lg navbar-light p-0">
+                    <div class="iq-search-bar">
+                       <form action="#" class="searchbox">
+                          <input type="text" class="text search-input" placeholder="Type here to search...">
+                          <a class="search-link" href="#"><i class="ri-search-line"></i></a>
+                       </form>
+                    </div>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" href="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <i class="ri-menu-3-line"></i>
+                    </button>
+                    <div class="iq-menu-bt align-self-center">
+                       <div class="wrapper-menu">
+                          <div class="main-circle"><i class="ri-more-fill"></i></div>
+                          <div class="hover-circle"><i class="ri-more-2-fill"></i></div>
+                       </div>
+                    </div>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                          <li class="nav-item iq-full-screen">
+                             <a href="#" class="iq-waves-effect" id="btnFullscreen"><i class="ri-fullscreen-line"></i></a>
+                          </li>
+                       </ul>
+                    </div>
+                    <ul class="navbar-list">
+                       <li>
+                          <a href="#" class="search-toggle iq-waves-effect d-flex align-items-center">
+                             <img src="{{ url_for('static', filename='images/user/1.jpg') }}" class="img-fluid rounded" alt="user">
+                             <div class="caption">
+                                <h6 class="mb-0 line-height">{{ doctor_data.name }}</h6>
+                                <span class="font-size-12">Available</span>
+                             </div>
+                          </a>
+                          <div class="iq-sub-dropdown iq-user-dropdown">
+                             <div class="iq-card shadow-none m-0">
+                                <div class="iq-card-body p-0 ">
+                                   <div class="bg-primary p-3">
+                                      <h5 class="mb-0 text-white line-height">Hello {{ doctor_data.name }}</h5>
+                                      <span class="text-white font-size-12">Available</span>
+                                   </div>
+                                   <div class="d-inline-block w-100 text-center p-3">
+                                      <a class="bg-primary iq-sign-btn" href="{{ url_for('auth.logout') }}" role="button">Sign out<i class="ri-login-box-line ms-2"></i></a>
+                                   </div>
+                                </div>
+                             </div>
+                          </div>
+                       </li>
+                    </ul>
+                 </nav>
+               </div>
+            </div>
+            <!-- TOP Nav Bar END -->
+            <div class="container-fluid">
+               <div class="row">
+                  <div class="col-lg-12">
+                     <div class="iq-card">
+                        <div class="iq-card-body p-0">
+                           <div class="iq-edit-list">
+                              <ul class="iq-edit-profile nav nav-pills list-inline mb-0 flex-md-row flex-column">
+                                 <li class="col-md-3 p-0">
+                                    <a class="nav-link active" data-bs-toggle="pill" href="#personal-information">
+                                    Personal Information
+                                    </a>
+                                 </li>
+                                 <li class="col-md-3 p-0">
+                                    <a class="nav-link" data-bs-toggle="pill" href="#chang-pwd">
+                                    Change Password
+                                    </a>
+                                 </li>
+                                 <li class="col-md-3 p-0">
+                                    <a class="nav-link" data-bs-toggle="pill" href="#emailandsms">
+                                    Hospital Information
+                                    </a>
+                                 </li>
+                                 <li class="col-md-3 p-0">
+                                    <a class="nav-link" data-bs-toggle="pill" href="#manage-contact">
+                                    Manage Contact
+                                    </a>
+                                 </li>
+                              </ul>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="col-lg-12">
+                     <div class="iq-edit-list-data">
+                        <div class="tab-content">
+                           <div class="tab-pane fade active show" id="personal-information" role="tabpanel">
+                              <div class="iq-card">
+                                 <div class="iq-card-header d-flex justify-content-between">
+                                    <div class="iq-header-title">
+                                       <h4 class="card-title">Personal Information</h4>
+                                    </div>
+                                 </div>
+                                 <div class="iq-card-body">
+                                    <form id="profileForm" method="POST" action="{{ url_for('doctor.edit_profile') }}" novalidate>
+                                       <div class="form-group row align-items-center">
+                                          <div class="col-md-12">
+                                             <div class="profile-img-edit">
+                                                <img class="profile-pic" src="{{ url_for('static', filename='images/user/11.png') }}" alt="profile-pic">
+                                                <div class="p-image">
+                                                   <i class="ri-pencil-line upload-button"></i>
+                                                   <input class="file-upload" type="file" accept="image/*" required>
+                                                </div>
+                                             </div>
+                                          </div>
+                                       </div>
+                                       <div class="row align-items-center">
+                                        <div class="form-group col-sm-6">
+                                            <label for="status">Status:</label>
+                                            <select class="form-control my-2" id="status" name="status" required>
+                                              <option value="active" class="text-success" {% if doctor_data.status == 'active' %}selected{% endif %}>Active</option>
+                                              <option value="inactive" class="text-danger" {% if doctor_data.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                                              <option value="busy" class="text-warning" {% if doctor_data.status == 'busy' %}selected{% endif %}>Busy</option>
+                                              <option value="do_not_disturb" class="text-secondary" {% if doctor_data.status == 'do_not_disturb' %}selected{% endif %}>Do Not Disturb</option>
+                                            </select>
+                                          </div>
+                                          <div class="form-group col-sm-6">
+                                            <label for="availability">Reason if any:</label>
+                                            <input type="text" class="form-control my-2" id="availability" name="availability" value="{{ doctor_data.availability or '' }}" placeholder="Optional" required>
+                                          </div>
+                                          <div class="form-group col-sm-12">
+                                             <label for="update-carefully" style="font-weight: bold; font-style: italic; color: red;">Update Carefully:</label>
+                                             <p style="font-weight: bold; font-style: italic; color: red;">Please update the following fields carefully:</p>
+                                          </div>
+                                          <div class="form-group col-sm-6">
+                                             <label for="name">Name:</label>
+                                             <input type="text" class="form-control my-2" id="name" name="name" value="{{ doctor_data.name }}" required placeholder="Full Name">
+                                             <span class="text-danger" id="nameError"></span>
+                                          </div>
+                                          <div class="form-group col-sm-6">
+                                             <label for="email">Email:</label>
+                                             <input type="email" class="form-control my-2" id="email" name="email" value="{{ doctor_data.email }}" required placeholder="example@example.com" oninput="validateEmail()">
+                                             <span class="text-danger" id="emailError"></span>
+                                          </div>
+                                          <div class="form-group col-sm-6">
+                                             <label for="phoneNumber">Phone Number:</label>
+                                             <input type="tel" class="form-control my-2" id="phoneNumber" name="phoneNumber" value="{{ doctor_data.phoneNumber }}" required placeholder="123-456-7890" oninput="validatePhoneNumber()">
+                                             <span class="text-danger" id="phoneNumberError"></span>
+                                          </div>
+                                          <div class="form-group col-sm-6">
+                                             <label class="d-block">Gender:</label>
+                                             <div class="custom-control custom-radio d-inline-flex me-3">
+                                                <input type="radio" id="customRadio6" name="customRadio1" class="custom-control-input" value="Male" {% if doctor_data.gender == 'Male' %}checked{% endif %}>
+                                                <label class="custom-control-label" for="customRadio6"> Male </label>
+                                             </div>
+                                             <div class="custom-control custom-radio d-inline-flex me-3">
+                                                <input type="radio" id="customRadio7" name="customRadio1" class="custom-control-input" value="Female" {% if doctor_data.gender == 'Female' %}checked{% endif %}>
+                                                <label class="custom-control-label" for="customRadio7"> Female </label>
+                                             </div>
+                                             <div class="custom-control custom-radio d-inline-flex me-3">
+                                                <input type="radio" id="customRadio8" name="customRadio1" class="custom-control-input" value="Other" {% if doctor_data.gender == 'Other' %}checked{% endif %}>
+                                                <label class="custom-control-label" for="customRadio8"> Other </label>
+                                             </div>
+                                          </div>
+                                          <div class="form-group col-sm-6">
+                                             <label for="dob">Date Of Birth:</label>
+                                             <input  class="form-control my-2" id="dob" value="{{ doctor_data.dob or '' }}" placeholder="YYYY-MM-DD" required>
+                                             <script>
+                                                $(function() {
+                                                    $('#dob').datepicker({
+                                                        format: 'yyyy-mm-dd',
+                                                        autoclose: true
+                                                    });
+                                                });
+                                             </script>
+                                          </div>
+                                          <div class="form-group col-sm-6">
+                                             <label for="maritalStatus">Marital Status:</label>
+                                             <select class="form-control my-2" id="maritalStatus" name="maritalStatus" required>
+                                                <option value="">Select</option>
+                                                <option value="Single" {% if doctor_data.maritalStatus == 'Single' %}selected{% endif %}>Single</option>
+                                                <option value="Married" {% if doctor_data.maritalStatus == 'Married' %}selected{% endif %}>Married</option>
+                                                <option value="Widowed" {% if doctor_data.maritalStatus == 'Widowed' %}selected{% endif %}>Widowed</option>
+                                                <option value="Divorced" {% if doctor_data.maritalStatus == 'Divorced' %}selected{% endif %}>Divorced</option>
+                                                <option value="Separated" {% if doctor_data.maritalStatus == 'Separated' %}selected{% endif %}>Separated</option>
+                                             </select>
+                                          </div>
+                                          <div class="form-group col-sm-12">
+                                            <label for="address">Doctor Address:</label>
+                                            <span id="addressError" class="text-danger"></span>
+                                            <input type="text" class="form-control my-2" id="address" name="address" value="{{ doctor_data.address }}" placeholder="{{ doctor_data.address }}" required>
+                                          </div>
+                                          <div class="form-group col-sm-6">
+                                            <label for="specialization">Specialization:</label>
+                                            <input type="text" class="form-control my-2" id="specialization" name="specialization" value="{{ doctor_data.specialization }}" placeholder="{{ doctor_data.specialization }}" required>
+                                          </div>
+                                          <div class="form-group col-sm-6">
+                                            <label for="medicalId">Medical ID:</label>
+                                            <input type="text" class="form-control my-2" id="medicalId" name="medicalId" value="{{ doctor_data.medicalId }}" placeholder="{{ doctor_data.medicalId }}" required>
+                                          </div>
+                                          <div class="form-group col-sm-6">
+                                            <label for="qualification">Qualification:</label>
+                                            <input type="text" class="form-control my-2" id="qualification" name="qualification" value="{{ doctor_data.qualification }}" placeholder="{{ doctor_data.qualification }}" required>
+                                          </div>
+                                          <div class="form-group col-sm-6">
+                                            <label for="photo">Photo:</label>
+                                            <input type="file" class="form-control my-2" id="photo" name="photo" required>
+                                          </div>
+                                       </div>
+                                       
+                                       <button type="submit" class="btn btn-primary me-2 mt-3">Submit</button>
+                                       <button type="reset" class="btn iq-bg-danger mt-3">cancel</button>
+                                    </form>
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="tab-pane fade" id="chang-pwd" role="tabpanel">
+                              <div class="iq-card">
+                                 <div class="iq-card-header d-flex justify-content-between">
+                                    <div class="iq-header-title">
+                                       <h4 class="card-title">Change Password</h4>
+                                    </div>
+                                 </div>
+                                 <div class="iq-card-body">
+                                    <form>
+                                       <div class="form-group">
+                                          <label for="cpass">Current Password:</label>
+                                          <a href="javascripe:void();" class="float-end">Forgot Password</a>
+                                          <input type="Password" class="form-control my-2" id="cpass" value="">
+                                       </div>
+                                       <div class="form-group">
+                                          <label for="npass">New Password:</label>
+                                          <input type="Password" class="form-control my-2" id="npass" value="">
+                                       </div>
+                                       <div class="form-group">
+                                          <label for="vpass">Verify Password:</label>
+                                          <input type="Password" class="form-control my-2" id="vpass" value="">
+                                       </div>
+                                       <button type="submit" class="btn btn-primary me-2">Submit</button>
+                                       <button type="reset" class="btn iq-bg-danger">cancel</button>
+                                    </form>
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="tab-pane fade" id="emailandsms" role="tabpanel">
+                              <div class="iq-card">
+                                 <div class="iq-card-header d-flex justify-content-between">
+                                    <div class="iq-header-title">
+                                       <h4 class="card-title">Email and SMS</h4>
+                                    </div>
+                                 </div>
+                                 <div class="iq-card-body">
+                                    <form>
+                                       <div class="form-group">
+                                          <div class="row align-items-center">
+                                             <div class="col-md-3">
+                                                <label for="emailnotification">Email Notification:</label>
+                                             </div>
+                                             <div class="col-md-9">
+                                                <div class="custom-control custom-switch">
+                                                   <input type="checkbox" class="custom-control-input" id="emailnotification" checked="">
+                                                   <label class="custom-control-label" for="emailnotification"></label>
+                                                </div>
+                                             </div>
+                                          </div>
+                                       </div>
+                                       <div class="form-group">
+                                          <div class="row align-items-center">
+                                             <div class="col-md-3">
+                                                <label for="smsnotification">SMS Notification:</label>
+                                             </div>
+                                             <div class="col-md-9">
+                                                <div class="custom-control custom-switch">
+                                                   <input type="checkbox" class="custom-control-input" id="smsnotification" checked="">
+                                                   <label class="custom-control-label" for="smsnotification"></label>
+                                                </div>
+                                             </div>
+                                          </div>
+                                       </div>
+                                       <div class="form-group">
+                                          <div class="row align-items-center">
+                                             <div class="col-md-3">
+                                                <label for="npass">When To Email</label>
+                                             </div>
+                                             <div class="col-md-9">
+                                                <div class="custom-control custom-checkbox">
+                                                   <input type="checkbox" class="custom-control-input" id="email01">
+                                                   <label class="custom-control-label" for="email01">You have new notifications.</label>
+                                                </div>
+                                                <div class="custom-control custom-checkbox">
+                                                   <input type="checkbox" class="custom-control-input" id="email02">
+                                                   <label class="custom-control-label" for="email02">You're sent a direct message</label>
+                                                </div>
+                                                <div class="custom-control custom-checkbox">
+                                                   <input type="checkbox" class="custom-control-input" id="email03" checked="">
+                                                   <label class="custom-control-label" for="email03">Someone adds you as a connection</label>
+                                                </div>
+                                             </div>
+                                          </div>   
+                                       </div>
+                                       <div class="form-group">
+                                          <div class="row align-items-center">
+                                             <div class="col-md-3">
+                                                <label for="npass">When To Escalate Emails</label>
+                                             </div>
+                                             <div class="col-md-9">
+                                                <div class="custom-control custom-checkbox">
+                                                   <input type="checkbox" class="custom-control-input" id="email04">
+                                                   <label class="custom-control-label" for="email04"> Upon new order.</label>
+                                                </div>
+                                                <div class="custom-control custom-checkbox">
+                                                   <input type="checkbox" class="custom-control-input" id="email05">
+                                                   <label class="custom-control-label" for="email05"> New membership approval</label>
+                                                </div>
+                                                <div class="custom-control custom-checkbox">
+                                                   <input type="checkbox" class="custom-control-input" id="email06" checked="">
+                                                   <label class="custom-control-label" for="email06"> Member registration</label>
+                                                </div>
+                                             </div>
+                                          </div>
+                                       </div>
+                                       <button type="submit" class="btn btn-primary me-2">Submit</button>
+                                       <button type="reset" class="btn iq-bg-danger">cancel</button>
+                                    </form>
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="tab-pane fade" id="manage-contact" role="tabpanel">
+                              <div class="iq-card">
+                                 <div class="iq-card-header d-flex justify-content-between">
+                                    <div class="iq-header-title">
+                                       <h4 class="card-title">Manage Contact</h4>
+                                    </div>
+                                 </div>
+                                 <div class="iq-card-body">
+                                    <form>
+                                       <div class="form-group">
+                                          <label for="cno">Contact Number:</label>
+                                          <input type="text" class="form-control my-2" id="cno" value="001 2536 123 458">
+                                       </div>
+                                       <div class="form-group">
+                                          <label for="email">Email:</label>
+                                          <input type="text" class="form-control my-2" id="email" value="Binijone@demo.com">
+                                       </div>
+                                       <button type="submit" class="btn btn-primary me-2">Submit</button>
+                                       <button type="reset" class="btn iq-bg-danger">cancel</button>
+                                    </form>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <!-- Footer -->
+            <footer class="bg-white iq-footer">
+               <div class="container-fluid">
+                  <div class="row">
+                     <div class="col-lg-6">
+                        <ul class="list-inline mb-0">
+                     </div>
+                     <div class="col-lg-6 text-end">
+                        Copyright <span id="copyright"> 
+<script>document.getElementById('copyright').appendChild(document.createTextNode(new Date().getFullYear()))</script>
+</span> <a href="#">UMS</a> All Rights Reserved.
+                     </div>
+                  </div>
+               </div>
+            </footer>
+            <!-- Footer END -->
+         </div>
+      </div>
+      <!-- Wrapper END -->
+      <!-- Optional JavaScript -->
+      <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+      <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+      <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+      <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+      <!-- Appear JavaScript -->
+      <script src="{{ url_for('static', filename='js/jquery.appear.js') }}"></script>
+      <!-- Countdown JavaScript -->
+      <script src="{{ url_for('static', filename='js/countdown.min.js') }}"></script>
+      <!-- Counterup JavaScript -->
+      <script src="{{ url_for('static', filename='js/waypoints.min.js') }}"></script>
+      <script src="{{ url_for('static', filename='js/jquery.counterup.min.js') }}"></script>
+      <!-- Wow JavaScript -->
+      <script src="{{ url_for('static', filename='js/wow.min.js') }}"></script>
+      <!-- Apexcharts JavaScript -->
+      <script src="{{ url_for('static', filename='js/apexcharts.js') }}"></script>
+      <!-- Swiper Slider JavaScript -->
+      <script src="{{ url_for('static', filename='js/swiper-bundle.min.js') }}"></script>
+      <!-- Select2 JavaScript -->
+      <script src="{{ url_for('static', filename='js/select2.min.js') }}"></script>
+      <!-- Owl Carousel JavaScript -->
+      <script src="{{ url_for('static', filename='js/owl.carousel.min.js') }}"></script>
+      <!-- Magnific Popup JavaScript -->
+      <script src="{{ url_for('static', filename='js/jquery.magnific-popup.min.js') }}"></script>
+      <!-- Smooth Scrollbar JavaScript -->
+      <script src="{{ url_for('static', filename='js/smooth-scrollbar.js') }}"></script>
+      <!-- lottie JavaScript -->
+      <script src="{{ url_for('static', filename='js/lottie.js') }}"></script>
+      <!-- Chart Custom JavaScript -->
+      <script src="{{ url_for('static', filename='js/chart-custom.js') }}"></script>
+      <!-- Custom JavaScript -->
+      <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+      <!-- Form Validation JavaScript -->
+      <script src="{{ url_for('static', filename='js/form-validation.js') }}"></script>
+      <!-- ... existing code ... -->
+<script>
+    function initAutocomplete() {
+      var input = document.getElementById('address');
+      var autocomplete = new google.maps.places.Autocomplete(input);
+      autocomplete.setFields(['address_components', 'geometry', 'name']);
+    }
+  
+    // Initialize autocomplete when the page loads
+    google.maps.event.addDomListener(window, 'load', initAutocomplete);
+  
+    function validateAddress() {
+      const addressInput = document.getElementById('address');
+      const addressError = document.getElementById('addressError');
+      const addressValue = addressInput.value.trim();
+  
+      if (addressValue === '') {
+        addressError.textContent = 'Address is required.';
+        return false;
+      } else {
+        addressError.textContent = '';
+        return true;
+      }
+    }
+  </script>
+   </body>
+</html>
