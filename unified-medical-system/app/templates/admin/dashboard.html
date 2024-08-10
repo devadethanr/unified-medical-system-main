@@ -504,6 +504,60 @@
                         </div>
                      </div>
                   </div>
+                  <div class="row">
+                     <div class="col-md-6 col-lg-3">
+                        <div class="iq-card">
+                           <div class="iq-card-body iq-bg-danger rounded-4">
+                              <div class="d-flex align-items-center justify-content-between">
+                                 <div class="rounded-circle iq-card-icon bg-danger"><i class="ri-group-fill"></i></div>
+                                 <div class="text-end">
+                                    <h2 class="mb-0"><span class="counter">{{ global_admin_data['new_doctors_24h'] }}</span></h2>
+                                    <h5 class="">New Doctors (24h)</h5>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="col-md-6 col-lg-3">
+                        <div class="iq-card">
+                           <div class="iq-card-body iq-bg-info rounded-4">
+                              <div class="d-flex align-items-center justify-content-between">
+                                 <div class="rounded-circle iq-card-icon bg-info"><i class="ri-hospital-line"></i></div>
+                                 <div class="text-end">
+                                    <h2 class="mb-0"><span class="counter">{{ global_admin_data['new_hospitals_24h'] }}</span></h2>
+                                    <h5 class="">New Hospitals (24h)</h5>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="col-md-6 col-lg-3">
+                        <div class="iq-card">
+                           <div class="iq-card-body iq-bg-warning rounded-4">
+                              <div class="d-flex align-items-center justify-content-between">
+                                 <div class="rounded-circle iq-card-icon bg-warning"><i class="ri-women-fill"></i></div>
+                                 <div class="text-end">
+                                    <h2 class="mb-0"><span class="counter">{{ global_admin_data['new_patients_24h'] }}</span></h2>
+                                    <h5 class="">New Patients (24h)</h5>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="col-md-6 col-lg-3">
+                        <div class="iq-card">
+                           <div class="iq-card-body iq-bg-primary rounded-4">
+                              <div class="d-flex align-items-center justify-content-between">
+                                 <div class="rounded-circle iq-card-icon bg-primary"><i class="ri-user-fill"></i></div>
+                                 <div class="text-end">
+                                    <h2 class="mb-0"><span class="counter">{{ global_admin_data['new_appointments_24h'] }}</span></h2>
+                                    <h5 class="">New Appointments (24h)</h5>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
                </div>
                <div class="col-sm-12">
                   <div class="iq-card">
@@ -535,161 +589,59 @@
                      <div id="home-servey-chart"></div>
                   </div>
                </div>
-
-               <div class="col-md-12 col-lg-8">
+               <div class="col-md-12">
                   <div class="row">
-                     <div class="col-md-12 col-lg-6">
-                        <div class="row">
-                           <div class="col-md-6 col-lg-12">
-                              <div class="iq-card">
-                                 <div class="iq-card-body">
-                                    <div class="iq-info-box d-flex align-items-center p-3">
-                                       <div class="info-image me-3">
-                                          <img src="images/page-img/30.png" class="img-fluid" alt="image-box">
-                                       </div>
-                                       <div class="info-text">
-                                          <h3>120</h3>
-                                          <span>Total Appointments</span>
-                                       </div>
-                                    </div>
-                                 </div>
-                              </div>
-                           </div>
-                           <div class="col-md-6 col-lg-12">
-                              <div class="iq-card">
-                                 <div class="iq-card-body">
-                                    <div class="iq-info-box d-flex align-items-center p-3">
-                                       <div class="info-image me-3">
-                                          <img src="images/page-img/31.png" class="img-fluid" alt="image-box">
-                                       </div>
-                                       <div class="info-text">
-                                          <h3>5000</h3>
-                                          <span>Completed Appointments</span>
-                                       </div>
-                                    </div>
-                                 </div>
-                              </div>
-                           </div>
-                           <div class="col-md-6 col-lg-12">
-                              <div class="iq-card">
-                                 <div class="iq-card-body">
-                                    <div class="iq-info-box d-flex align-items-center p-3">
-                                       <div class="info-image me-3">
-                                          <img src="images/page-img/32.png" class="img-fluid" alt="image-box">
-                                       </div>
-                                       <div class="info-text">
-                                          <h3>1500</h3>
-                                          <span>Cancelled Appointments</span>
-                                       </div>
-                                    </div>
-                                 </div>
-                              </div>
-                           </div>
-                           <div class="col-md-6 col-lg-12">
-                              <div class="iq-card">
-                                 <div class="iq-card-body">
-                                    <div class="iq-info-box d-flex align-items-center p-3">
-                                       <div class="info-image me-3">
-                                          <img src="images/page-img/33.png" class="img-fluid" alt="image-box">
-                                       </div>
-                                       <div class="info-text">
-                                          <h3>500</h3>
-                                          <span>Followup Appointments</span>
-                                       </div>
-                                    </div>
-                                 </div>
-                              </div>
-                           </div>
-                        </div>
-                     </div>
-                     <div class="col-md-12 col-lg-6">
+                     <div class="col-md-6">
                         <div class="iq-card">
                            <div class="iq-card-header d-flex justify-content-between">
                               <div class="iq-header-title">
-                                 <h4 class="card-title">Recent Activity</h4>
-                              </div>
-                              <div class="iq-card-header-toolbar d-flex align-items-center">
-                                 <div class="dropdown">
-                                    <span class="dropdown-toggle text-primary" id="dropdownMenuButton4"
-                                       data-bs-toggle="dropdown">
-                                       View All
-                                    </span>
-                                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton4">
-                                       <a class="dropdown-item" href="#"><i class="ri-eye-fill me-2"></i>View</a>
-                                       <a class="dropdown-item" href="#"><i
-                                             class="ri-delete-bin-6-fill me-2"></i>Delete</a>
-                                       <a class="dropdown-item" href="#"><i class="ri-pencil-fill me-2"></i>Edit</a>
-                                       <a class="dropdown-item" href="#"><i class="ri-printer-fill me-2"></i>Print</a>
-                                       <a class="dropdown-item" href="#"><i
-                                             class="ri-file-download-fill me-2"></i>Download</a>
-                                    </div>
-                                 </div>
+                                 <h4 class="card-title">Total Accident Report</h4>
                               </div>
                            </div>
                            <div class="iq-card-body">
-                              <ul class="iq-timeline">
-                                 <li>
-                                    <div class="timeline-dots-fill bg-danger"></div>
-                                    <h6 class="float-start mb-2 text-dark"><i class="ri-user-fill"></i> 18 min ago</h6>
-                                    <small class="float-end mt-1">Away</small>
-                                    <div class="d-inline-block w-100">
-                                       <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque scelerisque
-                                       </p>
-                                    </div>
-                                 </li>
-                              </ul>
+                              <div class="row">
+                                 <div class="col-sm-6">
+                                    <h3>$40K</h3>
+                                 </div>
+                              </div>
+                              <div id="chart-7"></div>
+                              <div class="row text-center mt-3">
+                                 <div class="col-sm-6">
+                                    <h6 class="text-truncate d-block">Last Month</h6>
+                                    <p class="m-0">358</p>
+                                 </div>
+                                 <div class="col-sm-6">
+                                    <h6 class="text-truncate d-block">Current Month</h6>
+                                    <p class="m-0">194</p>
+                                 </div>
+                              </div>
                            </div>
                         </div>
                      </div>
-                  </div>
-               </div>
-               <div class="col-md-12 col-lg-4">
-                  <div class="iq-card">
-                     <div class="iq-card-header d-flex justify-content-between">
-                        <div class="iq-header-title">
-                           <h4 class="card-title">Total Accident Report</h4>
-                        </div>
-                     </div>
-                     <div class="iq-card-body">
-                        <div class="row">
-                           <div class="col-sm-6">
-                              <h3>$40K</h3>
+                     <div class="col-md-6">
+                        <div class="iq-card">
+                           <div class="iq-card-header d-flex justify-content-between">
+                              <div class="iq-header-title">
+                                 <h4 class="card-title">Total Death Report</h4>
+                              </div>
                            </div>
-                        </div>
-                        <div id="chart-7"></div>
-                        <div class="row text-center mt-3">
-                           <div class="col-sm-6">
-                              <h6 class="text-truncate d-block">Last Month</h6>
-                              <p class="m-0">358</p>
-                           </div>
-                           <div class="col-sm-6">
-                              <h6 class="text-truncate d-block">Current Month</h6>
-                              <p class="m-0">194</p>
-                           </div>
-                        </div>
-                     </div>
-                  </div>
-                  <div class="iq-card">
-                     <div class="iq-card-header d-flex justify-content-between">
-                        <div class="iq-header-title">
-                           <h4 class="card-title">Total Death Report</h4>
-                        </div>
-                     </div>
-                     <div class="iq-card-body">
-                        <div class="row">
-                           <div class="col-sm-6">
-                              <h3>$20K</h3>
-                           </div>
-                        </div>
-                        <div id="chart-8"></div>
-                        <div class="row text-center mt-3">  
-                           <div class="col-sm-6">
-                              <h6 class="text-truncate d-block">Last Month</h6>
-                              <p class="m-0">220</p>
-                           </div>
-                           <div class="col-sm-6">
-                              <h6 class="text-truncate d-block">Current Month</h6>
-                              <p class="m-0">120</p>
+                           <div class="iq-card-body">
+                              <div class="row">
+                                 <div class="col-sm-6">
+                                    <h3>$20K</h3>
+                                 </div>
+                              </div>
+                              <div id="chart-8"></div>
+                              <div class="row text-center mt-3">  
+                                 <div class="col-sm-6">
+                                    <h6 class="text-truncate d-block">Last Month</h6>
+                                    <p class="m-0">220</p>
+                                 </div>
+                                 <div class="col-sm-6">
+                                    <h6 class="text-truncate d-block">Current Month</h6>
+                                    <p class="m-0">120</p>
+                                 </div>
+                              </div>
                            </div>
                         </div>
                      </div>

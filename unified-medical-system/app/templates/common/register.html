@@ -1,158 +1,115 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unified Registration - UMS</title>
-    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            margin: 0;
-            font-family: 'Arial', sans-serif;
+            background-color: #000;
             overflow: hidden;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            background-color: cyan; /* Cyan background */
         }
         .blob {
-            position: absolute;
+            position: fixed;
             top: 50%;
             left: 50%;
-            width: 150px; /* Smaller blob */
-            height: 150px;
-            background: rgba(0, 0, 0, 0.5); /* Black blob */
-            border-radius: 50%;
-            filter: blur(30px);
-            animation: moveBlob 10s ease-in-out infinite;
-            z-index: 1;
-        }
-        .large-blob {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 400px; /* Larger blob */
-            height: 400px;
-            background: rgba(0, 100, 0, 0.5); /* Dark green blob */
+            transform: translate(-50%, -50%);
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(180deg, rgba(0,255,255,0.2) 0%, rgba(0,255,255,0) 100%);
             border-radius: 50%;
             filter: blur(50px);
-            animation: moveLargeBlob 15s ease-in-out infinite;
-            z-index: 0;
+            animation: blobAnimation 10s infinite alternate;
+            z-index: -1;
         }
-        @keyframes moveBlob {
-            0% {
-                transform: translate(-50%, -50%) translateX(0) translateY(0);
-            }
-            25% {
-                transform: translate(-50%, -50%) translateX(100px) translateY(-50px);
-            }
-            50% {
-                transform: translate(-50%, -50%) translateX(-100px) translateY(50px);
-            }
-            75% {
-                transform: translate(-50%, -50%) translateX(50px) translateY(100px);
-            }
-            100% {
-                transform: translate(-50%, -50%) translateX(0) translateY(0);
-            }
+        @keyframes blobAnimation {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            100% { transform: translate(-50%, -50%) scale(1.2); }
         }
-        @keyframes moveLargeBlob {
-            0% {
-                transform: translate(-50%, -50%) translateX(0) translateY(0);
-            }
-            25% {
-                transform: translate(-50%, -50%) translateX(200px) translateY(-100px);
-            }
-            50% {
-                transform: translate(-50%, -50%) translateX(-200px) translateY(100px);
-            }
-            75% {
-                transform: translate(-50%, -50%) translateX(100px) translateY(200px);
-            }
-            100% {
-                transform: translate(-50%, -50%) translateX(0) translateY(0);
-            }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
         }
-        .card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-            text-align: center;
-            color: white;
-            width: 95%;
-            max-width: 800px; /* Increased max-width for a wider card */
-            position: relative;
-            z-index: 2;
-        }
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 20px;
-        }
-        p {
-            font-size: 1.2em;
-            margin-bottom: 30px;
-        }
-        .btn {
-            margin: 10px;
-            border-radius: 25px;
-            padding: 15px 20px; /* Reduced padding to make the button less wider */
-            font-size: 1em;
-            transition: background 0.3s;
-        }
-        .btn-primary {
-            background-color: #007bff;
-        }
-        .btn-success {
-            background-color: #28a745;
-        }
-        .btn-info {
-            background-color: #17a2b8;
-        }
-        .btn:hover {
-            filter: brightness(1.1);
-        }
-        /* New animation class */
-        .loading {
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex items-center justify-center">
+    <div class="blob"></div>
 
-<div class="large-blob"></div>
-<div class="blob"></div>
+    <div class="card lg:card-side bg-base-100 shadow-xl max-w-4xl w-full backdrop-blur-sm bg-opacity-30">
+        <figure class="lg:w-1/2 p-8 hidden lg:flex lg:justify-center lg:items-center">
+            <div class="skeleton w-64 h-64 rounded-full"></div>
+        </figure>
+        <div class="card-body lg:w-1/2">
+            <h2 class="card-title text-3xl font-bold mb-2 text-cyan-300">
+                <div class="skeleton h-10 w-3/4"></div>
+            </h2>
+            <p class="text-cyan-100 mb-6">
+                <div class="skeleton h-4 w-full"></div>
+            </p>
+            
+            <div class="form-control mt-4">
+                <div class="skeleton h-12 w-full"></div>
+            </div>
+            
+            <div class="form-control mt-4">
+                <div class="skeleton h-12 w-full"></div>
+            </div>
+            
+            <div class="form-control mt-4">
+                <div class="skeleton h-12 w-full"></div>
+            </div>
+        </div>
+    </div>
 
-<div class="card">
-    <h1>Welcome to Unified Medical System</h1>
-    <p>Please select your user type to register:</p>
-    <a href="{{ url_for('patient.register') }}" class="btn btn-primary">Patient Registration</a>
-    <a href="{{ url_for('hospital.register') }}" class="btn btn-success">Hospital Registration</a>
-    <a href="{{ url_for('doctor.register') }}" class="btn btn-info">Doctor Registration</a>
-</div>
+    <script>
+        // Simulate content loading
+        setTimeout(() => {
+            document.querySelector('.card').innerHTML = `
+                <figure class="lg:w-1/2 p-8 hidden lg:flex lg:justify-center lg:items-center">
+                    <img src="{{ url_for('static', filename='images/logo-white.png') }}" alt="UMS Logo" class="float-animation max-w-xs" />
+                </figure>
+                <div class="card-body lg:w-1/2">
+                    <h2 class="card-title text-3xl font-bold mb-2 text-cyan-300">Welcome to Unified Medical System</h2>
+                    <p class="text-cyan-100 mb-6">Please select your user type to register:</p>
+                    
+                    <div class="form-control mt-4">
+                        <a href="{{ url_for('patient.register') }}" class="btn btn-primary bg-cyan-600 hover:bg-cyan-700 border-none">Patient Registration</a>
+                    </div>
+                    
+                    <div class="form-control mt-4">
+                        <a href="{{ url_for('hospital.register') }}" class="btn btn-success bg-green-600 hover:bg-green-700 border-none">Hospital Registration</a>
+                    </div>
+                    
+                    <div class="form-control mt-4">
+                        <a href="{{ url_for('doctor.register') }}" class="btn btn-info bg-blue-600 hover:bg-blue-700 border-none">Doctor Registration</a>
+                    </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
-<script>
-    document.querySelectorAll('.btn').forEach(button => {
-        button.addEventListener('click', function(event) {
-            event.preventDefault(); // Prevent default link behavior
-            this.classList.add('loading'); // Add loading class
-            setTimeout(() => {
-                window.location.href = this.href; // Redirect after 2 seconds
-            }, 2000);
-        });
-    });
-</script>
+                    <div class="text-center mt-6">
+                        <a href="{{ url_for('auth.password') }}" class="link link-hover text-cyan-400">Forgot password?</a>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <span class="text-cyan-200">Already have an account?</span>
+                        <a href="{{ url_for('auth.login') }}" class="link link-primary ml-1 text-cyan-400">Log in</a>
+                    </div>
+                </div>
+            `;
+
+            document.querySelectorAll('.btn').forEach(button => {
+                button.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    this.classList.add('loading');
+                    setTimeout(() => {
+                        window.location.href = this.href;
+                    }, 2000);
+                });
+            });
+        }, 2000); // Simulate 2 seconds loading time
+    </script>
 </body>
 </html>

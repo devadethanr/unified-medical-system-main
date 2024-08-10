@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash,
 from flask_login import login_required
 from app import mongo
 from app.models import User
-from datetime import datetime
+from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.routes.auth import login
 
@@ -14,7 +14,11 @@ admin_bp = Blueprint('admin', __name__)
 global_admin_data = {
     'patients_count': mongo.db.patients.count_documents({}),
     'doctors_count': mongo.db.doctors.count_documents({}),
-    'hospitals_count': mongo.db.hospitals.count_documents({})
+    'hospitals_count': mongo.db.hospitals.count_documents({}),
+    'new_hospitals_24h': mongo.db.hospitals.count_documents({'createdAt': {'$gte': datetime.now() - timedelta(hours=24)}}),
+    'new_doctors_24h': mongo.db.doctors.count_documents({'createdAt': {'$gte': datetime.now() - timedelta(hours=24)}}),
+    'new_patients_24h': mongo.db.patients.count_documents({'createdAt': {'$gte': datetime.now() - timedelta(hours=24)}}),
+    'new_appointments_24h': mongo.db.appointments.count_documents({'createdAt': {'$gte': datetime.now() - timedelta(hours=24)}}),
 }
 
 #admin dashboard

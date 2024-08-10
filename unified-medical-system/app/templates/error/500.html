@@ -1,11 +1,77 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>500 Internal Server Error</title>
-</head>
-<body>
-    <h1>500 - Internal Server Error</h1>
-    <p>Sorry, something went wrong on our end. Please try again later.</p>
-</body>
+<!doctype html>
+<html lang="en" dir="ltr">
+    <head>
+      <!-- Required meta tags -->
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <title>UMS - Internal Server Error</title>
+      <!-- Favicon -->
+      <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
+      <!-- Bootstrap CSS -->
+      <link id="bootstrap-css" rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+      <!-- Typography CSS -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/typography.css') }}">
+      <!-- Style CSS -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+      <!-- Style-Rtl CSS -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/style-rtl.css') }}">
+      <!-- Responsive CSS -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+   </head>
+    <body>
+        <!-- loader Start -->
+        <div id="loading">
+            <div id="loading-center">
+            </div>
+        </div>
+        <!-- loader END -->
+        <!-- Wrapper Start -->
+            <div class="container-fluid py-0">
+                <div class="row no-gutters">
+                    <div class="col-sm-12 text-center">
+                        <div class="iq-error error-500 pb-5">
+                          <h1 class="text-primary">500</h1>
+                            <h2 class="mb-0">Oops! This Page is Not Working.</h2>
+                            <p>The requested is Internal Server Error.</p>
+                            <div class="mt-3">
+                                <a class="btn btn-primary" href="{{ url_for('auth.login') }}"><i class="ri-home-4-line"></i>Back to Home</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <!-- Wrapper END -->
+        <!-- Optional JavaScript -->
+      <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+      <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+      <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+      <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+      <!-- Appear JavaScript -->
+      <script src="{{ url_for('static', filename='js/jquery.appear.js') }}"></script>
+      <!-- Countdown JavaScript -->
+      <script src="{{ url_for('static', filename='js/countdown.min.js') }}"></script>
+      <!-- Counterup JavaScript -->
+      <script src="{{ url_for('static', filename='js/waypoints.min.js') }}"></script>
+      <script src="{{ url_for('static', filename='js/jquery.counterup.min.js') }}"></script>
+      <!-- Wow JavaScript -->
+      <script src="{{ url_for('static', filename='js/wow.min.js') }}"></script>
+      <!-- Apexcharts JavaScript -->
+      <script src="{{ url_for('static', filename='js/apexcharts.js') }}"></script>
+      <!-- Swiper Slider JavaScript -->
+      <script src="{{ url_for('static', filename='js/swiper-bundle.min.js') }}"></script>
+      <!-- Select2 JavaScript -->
+      <script src="{{ url_for('static', filename='js/select2.min.js') }}"></script>
+      <!-- Owl Carousel JavaScript -->
+      <script src="{{ url_for('static', filename='js/owl.carousel.min.js') }}"></script>
+      <!-- Magnific Popup JavaScript -->
+      <script src="{{ url_for('static', filename='js/jquery.magnific-popup.min.js') }}"></script>
+      <!-- Smooth Scrollbar JavaScript -->
+      <script src="{{ url_for('static', filename='js/smooth-scrollbar.js') }}"></script>
+      <!-- lottie JavaScript -->
+      <script src="{{ url_for('static', filename='js/lottie.js') }}"></script>
+      <!-- Chart Custom JavaScript -->
+      <script src="{{ url_for('static', filename='js/chart-custom.js') }}"></script>
+      <!-- Custom JavaScript -->
+      <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+    </body>
 </html>

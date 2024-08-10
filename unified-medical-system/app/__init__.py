@@ -43,6 +43,7 @@ def create_app(config_class='config.DevelopmentConfig'):
     Mail(app)
     
     # Configure Google OAuth
+    oauth.init_app(app)
     oauth.register(
         name='google',
         client_id=GOOGLE_CLIENT_ID,
@@ -52,12 +53,10 @@ def create_app(config_class='config.DevelopmentConfig'):
         access_token_url='https://accounts.google.com/o/oauth2/token',
         access_token_params=None,
         refresh_token_url=None,
-        redirect_uri='http://127.0.0.1:5000/auth/google_authorized',
+        redirect_uri='http://127.0.0.1:8000/auth/google_authorized',
         client_kwargs={'scope': 'openid email profile'}
     )
-    
     oauth.init_app(app)
-    
     # Error handlers
     @app.errorhandler(404)
     def page_not_found(e):
