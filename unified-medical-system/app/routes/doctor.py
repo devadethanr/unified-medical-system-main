@@ -44,6 +44,8 @@ def profile():
     if request.method == 'POST':
         if request.form.get('form_type') == 'update_profile':
             return update_profile()
+    if 'specialization' not in doctor_data:
+        return render_template('doctor/update_profile.html', doctor_data=doctor_data)
     return render_template('doctor/profile.html', doctor_data=doctor_data)
 
 def update_profile():

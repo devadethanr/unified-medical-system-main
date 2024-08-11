@@ -232,22 +232,17 @@
                                  </div>
                               </div>
                               <div class="iq-card-body">
-                                 <div class="table-responsive">
-                                    <table class="table mb-0 table-borderless">
-                                     <thead>
-                                         <tr>
-                                             <th scope="col">Degree</th>
-                                         </tr>
-                                     </thead>
-                                     <tbody>
-                                         {% for education in doctor_data.qualification.split(',') %}
-                                         <tr>
-                                             <td class="badge badge-outline-success">{{ education.split(',')[0] }}</td>
-                                         </tr>
-                                         {% endfor %}
-                                     </tbody>
-                                    </table>
-                                 </div>
+                                 <ul class="speciality-list m-0 p-0">
+                                    {% for education in doctor_data.qualification.split(',') %}
+                                    <li class="d-flex mb-4 align-items-center">
+                                       <div class="user-img img-fluid"><a href="#" class="iq-bg-primary"><i class="ri-award-fill"></i></a></div>
+                                       <div class="media-support-info ms-3">
+                                          <h6>{{ education.strip() }}</h6>
+                                          <p class="mb-0">{{ education.strip() }}</p>
+                                       </div>
+                                    </li>
+                                    {% endfor %}
+                                 </ul>
                               </div>
                            </div>
                         </div>

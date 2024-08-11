@@ -1,0 +1,255 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .navbar, .drawer-side, footer {
+            background-color: #e6e6fa; /* Light pastel purple */
+        }
+        .drawer-content {
+            background-color: #ffffff;
+        }
+        /* Custom scrollbar styles */
+        .custom-scrollbar {
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(155, 155, 155, 0.5) transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: rgba(155, 155, 155, 0.5);
+            border-radius: 20px;
+            border: transparent;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="drawer lg:drawer-open">
+        <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
+        <div class="drawer-content flex flex-col">
+            <!-- Navbar -->
+            <div class="navbar bg-purple-100">
+                <div class="flex-none lg:hidden">
+                    <label for="my-drawer-2" class="btn btn-square btn-ghost">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </label>
+                </div> 
+                <div class="flex-1">
+                    <a class="btn btn-ghost normal-case text-xl">Hospital Dashboard</a>
+                </div>
+                <div class="flex-none">
+                    <button class="btn btn-ghost btn-circle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    </button>
+                    <button class="btn btn-ghost btn-circle">
+                        <div class="indicator">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                            <span class="badge badge-xs badge-primary indicator-item"></span>
+                        </div>
+                    </button>
+                    <button onclick="hospitalInfoModal.showModal()" class="btn btn-ghost normal-case text-xl">Hospital Name</button>
+                </div>
+            </div>
+            <!-- Page content here -->
+            <div class="p-4">
+                <h1 class="text-2xl font-bold mb-4">Welcome to Hospital Dashboard</h1>
+                <!-- Dashboard content -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="card bg-blue-100 shadow-xl">
+                        <div class="card-body">
+                            <h2 class="card-title">Hospital Profile</h2>
+                            <p>View and edit your hospital profile</p>
+                            <div class="card-actions justify-end">
+                                <button class="btn btn-primary" onclick="hospital_profile.showModal()">View Profile</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card bg-green-100 shadow-xl">
+                        <div class="card-body">
+                            <h2 class="card-title">Assign Doctors</h2>
+                            <p>Assign doctors to your hospital</p>
+                            <div class="card-actions justify-end">
+                                <button class="btn btn-primary" onclick="assign_doctors.showModal()">Assign Doctors</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card bg-yellow-100 shadow-xl">
+                        <div class="card-body">
+                            <h2 class="card-title">Appointments</h2>
+                            <p>Manage appointments for your doctors</p>
+                            <div class="card-actions justify-end">
+                                <button class="btn btn-primary" onclick="manage_appointments.showModal()">Manage Appointments</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+                    <div class="card bg-red-100 shadow-xl">
+                        <div class="card-body">
+                            <h2 class="card-title">New Patients</h2>
+                            <p class="text-2xl font-bold">25</p>
+                        </div>
+                    </div>
+                    <div class="card bg-indigo-100 shadow-xl">
+                        <div class="card-body">
+                            <h2 class="card-title">Total Appointments</h2>
+                            <p class="text-2xl font-bold">150</p>
+                        </div>
+                    </div>
+                    <div class="card bg-pink-100 shadow-xl">
+                        <div class="card-body">
+                            <h2 class="card-title">Available Doctors</h2>
+                            <p class="text-2xl font-bold">10</p>
+                        </div>
+                    </div>
+                    <div class="card bg-orange-100 shadow-xl">
+                        <div class="card-body">
+                            <h2 class="card-title">Pending Approvals</h2>
+                            <p class="text-2xl font-bold">5</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 p-4 bg-white shadow-xl rounded-lg">
+                    <h2 class="text-2xl font-bold mb-4">Daily Statistics</h2>
+                    <canvas id="dailyStatsChart"></canvas>
+                </div>
+            </div>
+        </div> 
+        <div class="drawer-side">
+            <label for="my-drawer-2" class="drawer-overlay"></label> 
+            <div class="flex flex-col h-full bg-purple-100">
+                <div class="p-4">
+                    <img src="{{ url_for('static', filename='images/logo-white.png') }}" alt="UMS Logo" class="logo w-16 h-16 mx-auto">
+                </div>
+                <ul class="menu p-4 w-64 flex-grow custom-scrollbar">
+                    <li><a class="btn btn-outline mb-2">Dashboard</a></li>
+                    <li><a class="btn btn-outline mb-2">Hospital Profile</a></li>
+                    <li><a class="btn btn-outline mb-2">Doctors</a></li>
+                    <li><a class="btn btn-outline mb-2">Appointments</a></li>
+                    <li><a class="btn btn-outline mb-2">Reports</a></li>
+                    <li><a class="btn btn-outline mb-2">Settings</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <dialog id="hospital_profile" class="modal">
+        <form method="dialog" class="modal-box">
+            <h3 class="font-bold text-lg">Hospital Profile</h3>
+            <p class="py-4">Here you can view and edit your hospital profile.</p>
+            <!-- Add form fields for hospital profile -->
+            <div class="modal-action">
+                <button class="btn">Close</button>
+                <button class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog id="assign_doctors" class="modal">
+        <form method="dialog" class="modal-box">
+            <h3 class="font-bold text-lg">Assign Doctors</h3>
+            <p class="py-4">Search for doctors by UMS ID and assign them to your hospital.</p>
+            <input type="text" placeholder="Enter Doctor UMS ID" class="input input-bordered w-full max-w-xs" />
+            <div class="modal-action">
+                <button class="btn">Close</button>
+                <button class="btn btn-primary">Assign Doctor</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog id="manage_appointments" class="modal">
+        <form method="dialog" class="modal-box">
+            <h3 class="font-bold text-lg">Manage Appointments</h3>
+            <p class="py-4">View and manage appointments for your doctors.</p>
+            <!-- Add tabs for current, today, and history appointments -->
+            <div class="tabs">
+                <a class="tab tab-lifted">Current</a> 
+                <a class="tab tab-lifted tab-active">Today</a> 
+                <a class="tab tab-lifted">History</a>
+            </div>
+            <!-- Add a table or list of appointments -->
+            <div class="modal-action">
+                <button class="btn">Close</button>
+                <button class="btn btn-primary">Update Appointments</button>
+            </div>
+        </form>
+    </dialog>
+
+    <footer class="footer footer-center p-4 bg-purple-100 text-base-content">
+        <div>
+            <p>Copyright © 2023 - UMS</p>
+        </div>
+    </footer>
+
+    <div id="content" class="hidden">
+        <!-- Your existing content here -->
+    </div>
+    <div id="skeleton" class="p-4">
+        <div class="skeleton h-8 w-3/4 mb-4"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="skeleton h-32"></div>
+            <div class="skeleton h-32"></div>
+            <div class="skeleton h-32"></div>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.getElementById('skeleton').classList.add('hidden');
+                document.getElementById('content').classList.remove('hidden');
+            }, 1000);
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('dailyStatsChart').getContext('2d');
+            
+            // Dummy data for the past week
+            const labels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            const consultationData = [12, 19, 15, 17, 14, 8, 10];
+            const appointmentData = [15, 22, 18, 20, 17, 10, 13];
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Daily Consultations',
+                        data: consultationData,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }, {
+                        label: 'Daily Appointments',
+                        data: appointmentData,
+                        borderColor: 'rgb(255, 99, 132)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

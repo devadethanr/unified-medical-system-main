@@ -1,1 +1,203 @@
+{% extends "hospital/base.html" %}
 
+{% block title %}Hospital Dashboard{% endblock %}
+
+{% block page_title %}Hospital Dashboard{% endblock %}
+
+{% block extra_head %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="p-4">
+    <h1 class="text-2xl font-bold mb-4">Welcome to Hospital Dashboard</h1>
+    <!-- Dashboard content -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="card bg-blue-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Hospital Profile</h2>
+                <p>View and edit your hospital profile</p>
+                <div class="card-actions justify-end">
+                    <button class="btn btn-primary" onclick="hospital_profile.showModal()">View Profile</button>
+                </div>
+            </div>
+        </div>
+        <div class="card bg-green-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Assign Doctors</h2>
+                <p>Assign doctors to your hospital</p>
+                <div class="card-actions justify-end">
+                    <button class="btn btn-primary" onclick="assign_doctors.showModal()">Assign Doctors</button>
+                </div>
+            </div>
+        </div>
+        <div class="card bg-yellow-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Appointments</h2>
+                <p>Manage appointments for your doctors</p>
+                <div class="card-actions justify-end">
+                    <button class="btn btn-primary" onclick="manage_appointments.showModal()">Manage Appointments</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+        <div class="card bg-red-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">New Patients</h2>
+                <p class="text-2xl font-bold">25</p>
+            </div>
+        </div>
+        <div class="card bg-indigo-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Total Appointments</h2>
+                <p class="text-2xl font-bold">150</p>
+            </div>
+        </div>
+        <div class="card bg-pink-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Available Doctors</h2>
+                <p class="text-2xl font-bold">10</p>
+            </div>
+        </div>
+        <div class="card bg-orange-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Pending Approvals</h2>
+                <p class="text-2xl font-bold">5</p>
+            </div>
+        </div>
+    </div>
+    <div class="mt-8 p-4 bg-white shadow-xl rounded-lg">
+        <h2 class="text-2xl font-bold mb-4">Daily Statistics</h2>
+        <canvas id="dailyStatsChart"></canvas>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_body %}
+<!-- Modals -->
+<dialog id="hospital_profile" class="modal">
+    <form method="dialog" class="modal-box">
+        <h3 class="font-bold text-lg">Hospital Details</h3>
+        <p class="py-4"></p>
+        <!-- Add form fields for hospital profile -->
+        <div class="modal-body grid grid-cols-2 gap-4">
+            <div class="col-span-1">
+                <p>UMS ID:</p>
+                <p>License Number:</p>
+                <p>Created At:</p>
+                <p>Updated At:</p>
+                <p>Status:</p>
+                <p>Name:</p>
+                <p>Email:</p>
+                <p>Phone Number:</p>
+                <p>State:</p>
+                <p>Address:</p>
+            </div>
+            <div class="col-span-1">
+                <p>{{ hospital_data.umsId }}</p>
+                <p>{{ hospital_data.licenseNumber }}</p>
+                <p>{{ hospital_data.createdAt }}</p>
+                <p>{{ hospital_data.updatedAt }}</p>
+                <p>{{ hospital_data.status }}</p>
+                <p>{{ hospital_data.name }}</p>
+                <p>{{ hospital_data.email }}</p>
+                <p>{{ hospital_data.phoneNumber }}</p>
+                <p>{{ hospital_data.state }}</p>
+                <p>{{ hospital_data.address }}</p>
+            </div>
+        </div>
+        <div class="modal-action">
+            <button class="btn btn-primary">Close</button>
+        </div>
+    </form>
+</dialog>
+
+<dialog id="assign_doctors" class="modal">
+    <form method="dialog" class="modal-box">
+        <h3 class="font-bold text-lg">Assign Doctors</h3>
+        <p class="py-4">Search for doctors by UMS ID and assign them to your hospital.</p>
+        <input type="text" placeholder="Enter Doctor UMS ID" class="input input-bordered w-full max-w-xs" />
+        <div class="modal-action">
+            <button class="btn">Close</button>
+            <button class="btn btn-primary">Assign Doctor</button>
+        </div>
+    </form>
+</dialog>
+
+<dialog id="manage_appointments" class="modal">
+    <form method="dialog" class="modal-box">
+        <h3 class="font-bold text-lg">Manage Appointments</h3>
+        <p class="py-4">View and manage appointments for your doctors.</p>
+        <!-- Add tabs for current, today, and history appointments -->
+        <div class="tabs">
+            <a class="tab tab-lifted">Current</a> 
+            <a class="tab tab-lifted tab-active">Today</a> 
+            <a class="tab tab-lifted">History</a>
+        </div>
+        <!-- Add a table or list of appointments -->
+        <div class="modal-action">
+            <button class="btn">Close</button>
+            <button class="btn btn-primary">Update Appointments</button>
+        </div>
+    </form>
+</dialog>
+
+<div id="content" class="hidden">
+    <!-- Your existing content here -->
+</div>
+<div id="skeleton" class="p-4">
+    <div class="skeleton h-8 w-3/4 mb-4"></div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="skeleton h-32"></div>
+        <div class="skeleton h-32"></div>
+        <div class="skeleton h-32"></div>
+    </div>
+</div>
+
+<script>
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            document.getElementById('skeleton').classList.add('hidden');
+            document.getElementById('content').classList.remove('hidden');
+        }, 1000);
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('dailyStatsChart').getContext('2d');
+        
+        // Dummy data for the past week
+        const labels = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        const consultationData = [12, 19, 15, 17, 14, 8, 10];
+        const appointmentData = [15, 22, 18, 20, 17, 10, 13];
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Daily Consultations',
+                    data: consultationData,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }, {
+                    label: 'Daily Appointments',
+                    data: appointmentData,
+                    borderColor: 'rgb(255, 99, 132)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

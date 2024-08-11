@@ -1,0 +1,38 @@
+{% extends "hospital/base.html" %}
+
+{% block title %}Hospital Dashboard{% endblock %}
+
+{% block page_title %}Hospital Dashboard{% endblock %}
+
+{% block extra_head %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="p-4">
+    <h1 class="text-2xl font-bold mb-4">Hospital Profile</h1>
+    <!-- Profile content -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="card bg-blue-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Hospital Information</h2>
+                <p>View and edit your hospital's information</p>
+                <div class="card-actions justify-end">
+                    <button class="btn btn-primary" onclick="edit_profile.showModal()">Edit Profile</button>
+                </div>
+            </div>
+        </div>
+        <div class="card bg-green-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Staff Management</h2>
+                <p>Manage your hospital's staff</p>
+                <div class="card-actions justify-end">
+                    <button class="btn btn-primary" onclick="manage_staff.showModal()">Manage Staff</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

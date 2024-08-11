@@ -1,4 +1,5 @@
 // form-validation.js
+
 function validateName() {
     const nameInput = document.getElementById('name');
     const nameError = document.getElementById('nameError');
@@ -81,17 +82,18 @@ function validateSpecialization() {
 }
 
 function validateMedicalId() {
-  const medicalIdInput = document.getElementById('medicalId');
-  const medicalIdError = document.getElementById('medicalIdError');
-  const medicalIdValue = medicalIdInput.value.trim();
+   const medicalIdInput = document.getElementById('medicalId');
+   const medicalIdError = document.getElementById('medicalIdError');
+   const medicalIdValue = medicalIdInput.value.trim();
 
-  if (medicalIdValue.length < 3) {
-    medicalIdError.textContent = 'Medical ID must be at least 3 characters.';
-    return false;
-  } else {
-    medicalIdError.textContent = '';
-    return true;
-  }
+   const licensePattern = /^[A-Z]{2}-\d{2}-\d{4}-\d{7}$/;
+   if (!licensePattern.test(medicalIdValue)) {
+      medicalIdError.textContent = 'Invalid medical ID format. Please use XX-YY-ZZZZ-NNNNNNN';
+      return false;
+   } else {
+      medicalIdError.textContent = '';
+      return true;
+   }
 }
 
 function validateQualification() {
@@ -108,35 +110,59 @@ function validateQualification() {
   }
 }
 
+function validateAddress() {
+   const addressInput = document.getElementById('address');
+   const addressError = document.getElementById('addressError');
+   const addressValue = addressInput.value.trim();
+
+   if (addressValue.length < 5) {
+      addressError.textContent = 'Address must be at least 5 characters long.';
+      return false;
+   } else {
+      addressError.textContent = '';
+      return true;
+   }
+}
+
 // Event listener for keypress on form
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('registerForm');
+    const form = document.getElementById('profileForm');
 
-    form.addEventListener('keyup', function(event) {
-        if (event.target.matches('#name')) {
-            validateName();
-        } else if (event.target.matches('#email')) {
-            validateEmail();
-        } else if (event.target.matches('#phoneNumber')) {
-            validatePhoneNumber();
-        } else if (event.target.matches('#password') || event.target.matches('#confirm_password')) {
-            validatePassword();
-        } else if (event.target.matches('#specialization')) {
-          validateSpecialization();
-        } else if (event.target.matches('#medicalId')) {
-          validateMedicalId();
-        } else if (event.target.matches('#qualification')) {
-          validateQualification();
-        }
-        // Add more conditions for other fields as needed
-    });
+    if (form) {
+      form.addEventListener('input', function(event) {
+         switch(event.target.id) {
+            case 'name':
+               validateName();
+               break;
+            case 'email':
+               validateEmail();
+               break;
+            case 'phoneNumber':
+               validatePhoneNumber();
+               break;
+            case 'specialization':
+               validateSpecialization();
+               break;
+            case 'medicalId':
+               validateMedicalId();
+               break;
+            case 'qualification':
+               validateQualification();
+               break;
+            case 'address':
+               validateAddress();
+               break;
+         }
+      });
 
-    // Optional: Final submit validation
-    form.addEventListener('submit', function(event) {
-        if (!validateName() || !validateEmail() || !validatePhoneNumber() || !validatePassword() || !validateSpecialization() || !validateMedicalId() || !validateQualification()) {
+      // Final submit validation
+      form.addEventListener('submit', function(event) {
+         if (!validateName() || !validateEmail() || !validatePhoneNumber() || 
+             !validateSpecialization() || !validateMedicalId() || !validateQualification() || 
+             !validateAddress()) {
             event.preventDefault(); // Prevent form submission if validation fails
-            // Optionally, display a general error message if needed
-        }
-        // Add more validations for other fields before submitting
-    });
+            alert('Please correct the errors in the form before submitting.');
+         }
+      });
+   }
 });

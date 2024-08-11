@@ -1,17 +1,33 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from calendar import c
+from flask import Blueprint, render_template, request, flash, redirect, url_for, session
 from app import mongo
 from werkzeug.security import generate_password_hash
 from flask_login import login_user, logout_user, login_required
+from app import login_manager, mongo
+from app.models import User
 from datetime import datetime
 import re, uuid
-
+from app.models import User
 
 hospital_bp = Blueprint('hospital', __name__)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(user_id)
 
 @hospital_bp.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
-    return render_template('hospital/dashboard.html')
+    global hospital_data
+    hospital_data = mongo.db.hospitals.find_one({'umsId': session['umsId']})
+    hospital_details = mongo.db.users.find_one({'umsId': session['umsId']})
+    hospital_data = {**hospital_data, **hospital_details} if hospital_details else hospital_data
+    hospital_data['phoneNumber'] = hospital_data.get('phoneNumber', [None])[0]
+    print(hospital_data) #for debugging
+    if not hospital_data:
+        flash('Hospital not found', 'error')
+        return redirect(url_for('auth.login'))
+    return render_template('hospital/dashboard.html', hospital_data=hospital_data)
 
 def generate_hospital_id():
     return 'UMSH' + re.sub('-', '', str(uuid.uuid4()))[:8].upper()
@@ -85,3 +101,15 @@ def register():
         flash('Registration successful. Please wait for approval.', 'success')
         return redirect(url_for('auth.login'))
     return render_template('hospital/register.html')
+
+@hospital_bp.route('/profile', methods=['GET'])
+@login_required
+def profile():
+    # if current_user.rolesId != 2:
+    #     abort(403)
+    # hospital = mongo.db.hospitals.find_one({'umsId': current_user.umsId})
+    # if hospital:
+    #     return render_template('hospital/profile.html', hospital=hospital)
+    # else:
+    #     abort(404)
+    return render_template('hospital/profile.html')
