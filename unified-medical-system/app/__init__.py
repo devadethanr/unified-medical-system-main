@@ -57,6 +57,9 @@ def create_app(config_class='config.DevelopmentConfig'):
         client_kwargs={'scope': 'openid email profile'}
     )
     oauth.init_app(app)
+    @app.route('/')
+    def index():
+        return render_template('common/index.html')
     # Error handlers
     @app.errorhandler(404)
     def page_not_found(e):

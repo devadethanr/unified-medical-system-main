@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unified Medical System</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .glow-on-hover:hover {
+            box-shadow: 0 0 15px #4fd1c5;
+            transition: box-shadow 0.3s ease-in-out;
+        }
+        .hero-content {
+            animation: fadeIn 1.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .feature-card {
+            transition: transform 0.3s ease-in-out;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+
+        #custom-cursor {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 25px 10px rgba(0, 255, 255, 0.4);
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s ease;
+        }
+
+        body {
+            cursor: none;
+        }
+
+        a, button, input, .btn {
+            cursor: none;
+        }
+
+        a:hover, button:hover, input:hover, .btn:hover {
+            cursor: none;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card-body {
+            background: transparent;
+        }
+
+        .input, .textarea {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .input::placeholder, .textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-primary {
+            background: rgba(79, 209, 197, 0.8);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: rgba(79, 209, 197, 1);
+        }
+    </style>
+</head>
+<body class="bg-black text-white">
+    <div class="navbar bg-base-100 sticky top-0 z-50">
+        <div class="navbar-start">
+            <div class="dropdown">
+                <label tabindex="0" class="btn btn-ghost lg:hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
+                </label>
+                <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+                    <li><a href="#" class="glow-on-hover">Home</a></li>
+                    <li><a href="#about" class="glow-on-hover">About</a></li>
+                    <li><a href="#key-features" class="glow-on-hover">Services</a></li>
+                    <li><a href="#contact" class="glow-on-hover">Contact</a></li>
+                </ul>
+            </div>
+            <a class="btn btn-ghost normal-case text-xl">UMS</a>
+        </div>
+        <div class="navbar-center hidden lg:flex">
+            <ul class="menu menu-horizontal px-1">
+                <li><a href="#" class="glow-on-hover">Home</a></li>
+                <li><a href="#key-features" class="glow-on-hover">Services</a></li>
+                <li><a href="#about" class="glow-on-hover">About</a></li>
+                <li><a href="#contact" class="glow-on-hover">Contact</a></li>
+            </ul>
+        </div>
+        <div class="navbar-end">
+            <a href="/auth/login" class="btn btn-primary glow-on-hover mr-2">Login</a>
+            <a href="/auth/register" class="btn btn-secondary glow-on-hover">Sign Up</a>
+        </div>
+    </div>
+
+    <div class="hero min-h-screen bg-base-200">
+        <div class="hero-content flex-col lg:flex-row-reverse">
+            <div class="text-center lg:text-left lg:w-1/2">
+                <h1 class="text-5xl font-bold">Unified Medical System</h1>
+                <p class="py-6">Empowering healthcare in India through integration, innovation, and early disease detection. Join us in revolutionizing healthcare delivery and improving public health outcomes.</p>
+                <div class="flex flex-col sm:flex-row justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-4">
+                    <button class="btn btn-primary glow-on-hover">Get Started</button>
+                    <button class="btn btn-secondary glow-on-hover">Learn More</button>
+                </div>
+            </div>
+            <div class="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100 lg:w-1/2">
+                <div class="card-body">
+                    <h2 class="text-2xl font-bold mb-4">Sign up for UMS</h2>
+                    <form id="signup-form">
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">Email</span>
+                            </label>
+                            <input type="email" placeholder="Your email" class="input input-bordered" required />
+                        </div>
+                        <div class="form-control mt-6">
+                            <button class="btn btn-primary">Create an account</button>
+                        </div>
+                        <div class="text-center mt-4">
+                            <p class="text-sm">By signing up, you agree to our <a href="#" class="link">Terms of Service</a> and <a href="#" class="link">Privacy Policy</a>.</p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="key-features" class="container mx-auto px-4 py-16">
+        <h2 class="text-3xl font-bold mb-8 text-center">Key Features</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="card bg-base-100 shadow-xl feature-card">
+                <div class="card-body">
+                    <h2 class="card-title">Early Disease Detection</h2>
+                    <p>Advanced machine learning algorithms for real-time analysis of patient symptoms to detect potential outbreaks.</p>
+                </div>
+            </div>
+            <div class="card bg-base-100 shadow-xl feature-card">
+                <div class="card-body">
+                    <h2 class="card-title">Seamless Data Transfer</h2>
+                    <p>Secure and efficient health data exchange between healthcare providers for better patient care.</p>
+                </div>
+            </div>
+            <div class="card bg-base-100 shadow-xl feature-card">
+                <div class="card-body">
+                    <h2 class="card-title">AI-powered Chatbot</h2>
+                    <p>24/7 patient support with basic medical guidance and system navigation assistance.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-base-300 py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-8 text-center">Who Can Benefit?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="card bg-base-100 shadow-xl feature-card">
+                    <div class="card-body">
+                        <h3 class="card-title">Patients</h3>
+                        <ul class="list-disc list-inside">
+                            <li>Book appointments</li>
+                            <li>Access medical records</li>
+                            <li>Log symptoms</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card bg-base-100 shadow-xl feature-card">
+                    <div class="card-body">
+                        <h3 class="card-title">Doctors</h3>
+                        <ul class="list-disc list-inside">
+                            <li>Manage patient records</li>
+                            <li>View outbreak information</li>
+                            <li>Exchange data securely</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card bg-base-100 shadow-xl feature-card">
+                    <div class="card-body">
+                        <h3 class="card-title">Hospitals</h3>
+                        <ul class="list-disc list-inside">
+                            <li>Manage appointments</li>
+                            <li>Access analytics</li>
+                            <li>View outbreak data</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card bg-base-100 shadow-xl feature-card">
+                    <div class="card-body">
+                        <h3 class="card-title">Health Officials</h3>
+                        <ul class="list-disc list-inside">
+                            <li>Monitor outbreaks</li>
+                            <li>Access health data</li>
+                            <li>Make informed decisions</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="about" class="container mx-auto px-4 py-16">
+        <h2 class="text-3xl font-bold mb-8 text-center">About Unified Medical System</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+                <p class="mb-4">The Unified Medical System (UMS) is a comprehensive healthcare solution designed for India. It integrates various aspects of healthcare management, including data sharing, appointment booking, medical record access, and patient support.</p>
+                <p>Our system utilizes cutting-edge machine learning technology to detect potential outbreaks of viral diseases and pandemics at an early stage. By analyzing patient symptoms collected from various regions, UMS aims to improve public health outcomes across India.</p>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold mb-4">Our Mission</h3>
+                <ul class="list-disc list-inside">
+                    <li>Facilitate efficient healthcare delivery</li>
+                    <li>Enable data-driven disease surveillance</li>
+                    <li>Empower patients with easy access to their health information</li>
+                    <li>Improve patient education through an AI-powered chatbot interface</li>
+                    <li>Foster collaboration between healthcare providers, patients, and health officials</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="contact" class="hero min-h-screen bg-base-200">
+        <div class="hero-content flex-col lg:flex-row-reverse">
+            <div class="text-center lg:text-left lg:w-1/2">
+                <h1 class="text-5xl font-bold">Get in Touch</h1>
+                <p class="py-6">Have questions about the Unified Medical System? We're here to help. Reach out to us and our team will get back to you as soon as possible.</p>
+            </div>
+            <div class="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100 lg:w-1/2">
+                <div class="card-body">
+                    <h2 class="text-2xl font-bold mb-4">Contact Us</h2>
+                    <form>
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">Name</span>
+                            </label>
+                            <input type="text" placeholder="Your name" class="input input-bordered" required />
+                        </div>
+                        <div class="form-control mt-4">
+                            <label class="label">
+                                <span class="label-text">Email</span>
+                            </label>
+                            <input type="email" placeholder="Your email" class="input input-bordered" required />
+                        </div>
+                        <div class="form-control mt-4">
+                            <label class="label">
+                                <span class="label-text">Message</span>
+                            </label>
+                            <textarea placeholder="Your message" class="textarea textarea-bordered h-24" required></textarea>
+                        </div>
+                        <div class="form-control mt-6">
+                            <button class="btn btn-primary">Send Message</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer footer-center p-10 bg-base-200 text-base-content rounded">
+        <div class="grid grid-flow-col gap-4">
+            <a class="link link-hover">About us</a> 
+            <a class="link link-hover">Contact</a> 
+            <a class="link link-hover">Privacy Policy</a>
+        </div> 
+        <div>
+            <p>Copyright © 2023 - All rights reserved by Unified Medical System</p>
+        </div>
+    </footer>
+    <div id="custom-cursor"></div>
+    <script>
+        const cursor = document.getElementById('custom-cursor');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX - 15 + 'px';
+            cursor.style.top = e.clientY - 15 + 'px';
+        });
+
+        document.addEventListener('mousedown', () => {
+            cursor.style.transform = 'scale(0.8)';
+        });
+
+        document.addEventListener('mouseup', () => {
+            cursor.style.transform = 'scale(1)';
+        });
+
+        document.querySelectorAll('a, button, input, .btn').forEach(elem => {
+            elem.addEventListener('mouseenter', () => {
+                cursor.style.transform = 'scale(1.5)';
+                cursor.style.backgroundColor = 'rgba(0, 255, 255, 0.3)';
+                cursor.style.boxShadow = '0 0 30px 15px rgba(0, 255, 255, 0.5)';
+            });
+            elem.addEventListener('mouseleave', () => {
+                cursor.style.transform = 'scale(1)';
+                cursor.style.backgroundColor = 'rgba(0, 255, 255, 0.2)';
+                cursor.style.boxShadow = '0 0 25px 10px rgba(0, 255, 255, 0.4)';
+            });
+        });
+
+        // Sign up form submission
+        document.getElementById('signup-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = this.querySelector('input[type="email"]').value;
+            window.location.href = `/auth/register?email=${encodeURIComponent(email)}`;
+        });
+    </script>
+</body>
+</html>

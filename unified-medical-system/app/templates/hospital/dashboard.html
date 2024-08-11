@@ -1,16 +1,19 @@
 {% extends "hospital/base.html" %}
 
-{% block title %}Hospital Dashboard{% endblock %}
+{% block title %} Hospital Dashboard {% endblock %}
 
-{% block page_title %}Hospital Dashboard{% endblock %}
+{% block page_title %}{{ hospital_data.name }}{% endblock %}
 
 {% block extra_head %}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/autocomplete.js/dist/autocomplete.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
 {% endblock %}
 
 {% block content %}
 <div class="p-4">
-    <h1 class="text-2xl font-bold mb-4">Welcome to Hospital Dashboard</h1>
+    <h1 class="text-2xl font-bold mb-4">Welcome</h1></h1>
     <!-- Dashboard content -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div class="card bg-blue-100 shadow-xl">
@@ -82,28 +85,46 @@
         <p class="py-4"></p>
         <!-- Add form fields for hospital profile -->
         <div class="modal-body grid grid-cols-2 gap-4">
-            <div class="col-span-1">
-                <p>UMS ID:</p>
-                <p>License Number:</p>
-                <p>Created At:</p>
-                <p>Updated At:</p>
-                <p>Status:</p>
-                <p>Name:</p>
-                <p>Email:</p>
-                <p>Phone Number:</p>
-                <p>State:</p>
-                <p>Address:</p>
+            <div class="col-span-1 bg-gray-100 p-2 rounded">
+                <p class="text-gray-700">UMS ID:</p>
+                <hr class="my-2 border-t border-gray-200">
+                <p class="text-gray-700">License Number:</p>
+                <hr class="my-2 border-t border-gray-200">
+                <p class="text-gray-700">Created At:</p>
+                <hr class="my-2 border-t border-gray-200">
+                <p class="text-gray-700">Updated At:</p>
+                <hr class="my-2 border-t border-gray-200">
+                <p class="text-gray-700">Status:</p>
+                <hr class="my-2 border-t border-gray-200">
+                <p class="text-gray-700">Name:</p>
+                <hr class="my-2 border-t border-gray-200">
+                <p class="text-gray-700">Email:</p>
+                <hr class="my-2 border-t border-gray-200">
+                <p class="text-gray-700">Phone Number:</p>
+                <hr class="my-2 border-t border-gray-200">
+                <p class="text-gray-700">State:</p>
+                <hr class="my-2 border-t border-gray-200">
+                <p class="text-gray-700">Address:</p>
             </div>
-            <div class="col-span-1">
+            <div class="col-span-1 bg-gray-100 p-2 rounded">
                 <p>{{ hospital_data.umsId }}</p>
+                <hr class="my-2 border-t border-gray-200">
                 <p>{{ hospital_data.licenseNumber }}</p>
+                <hr class="my-2 border-t border-gray-200">
                 <p>{{ hospital_data.createdAt }}</p>
+                <hr class="my-2 border-t border-gray-200">
                 <p>{{ hospital_data.updatedAt }}</p>
+                <hr class="my-2 border-t border-gray-200">
                 <p>{{ hospital_data.status }}</p>
+                <hr class="my-2 border-t border-gray-200">
                 <p>{{ hospital_data.name }}</p>
+                <hr class="my-2 border-t border-gray-200">
                 <p>{{ hospital_data.email }}</p>
+                <hr class="my-2 border-t border-gray-200">
                 <p>{{ hospital_data.phoneNumber }}</p>
+                <hr class="my-2 border-t border-gray-200">
                 <p>{{ hospital_data.state }}</p>
+                <hr class="my-2 border-t border-gray-200">
                 <p>{{ hospital_data.address }}</p>
             </div>
         </div>
@@ -117,10 +138,19 @@
     <form method="dialog" class="modal-box">
         <h3 class="font-bold text-lg">Assign Doctors</h3>
         <p class="py-4">Search for doctors by UMS ID and assign them to your hospital.</p>
-        <input type="text" placeholder="Enter Doctor UMS ID" class="input input-bordered w-full max-w-xs" />
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Doctor UMS ID</span>
+            </label>
+            <div class="relative">
+                <input type="text" id="doctorSearch" placeholder="Enter Doctor UMS ID" class="input input-bordered w-full" />
+                <ul id="doctorSuggestions" class="menu bg-base-100 w-full mt-1 rounded-box shadow-lg absolute z-10 max-h-60 overflow-auto hidden"></ul>
+            </div>
+        </div>
+        <div id="searchError" class="mt-2 text-red-500 hidden"></div>
         <div class="modal-action">
             <button class="btn">Close</button>
-            <button class="btn btn-primary">Assign Doctor</button>
+            <button id="assignDoctorBtn" class="btn btn-primary" disabled>Assign Doctor</button>
         </div>
     </form>
 </dialog>
@@ -200,4 +230,130 @@
         });
     });
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM fully loaded and parsed');
+        const doctorSearch = document.getElementById('doctorSearch');
+        const doctorSuggestions = document.getElementById('doctorSuggestions');
+        const assignDoctorBtn = document.getElementById('assignDoctorBtn');
+        const searchError = document.getElementById('searchError');
+        let selectedDoctorId = null;
+    
+        function showError(message) {
+            searchError.textContent = message;
+            searchError.classList.remove('hidden');
+        }
+    
+        function hideError() {
+            searchError.textContent = '';
+            searchError.classList.add('hidden');
+        }
+    
+        function showSuggestions(suggestions) {
+            console.log('Showing suggestions:', suggestions);
+            doctorSuggestions.innerHTML = '';
+            if (suggestions.length === 0) {
+                doctorSuggestions.classList.add('hidden');
+                showError('No doctors found');
+                return;
+            }
+            hideError();
+            suggestions.forEach(doctor => {
+                const li = document.createElement('li');
+                li.innerHTML = `<a class="block px-4 py-2 hover:bg-gray-100">${doctor.umsId} - ${doctor.name}</a>`;
+                li.addEventListener('click', () => {
+                    doctorSearch.value = doctor.umsId;
+                    selectedDoctorId = doctor.umsId;
+                    doctorSuggestions.classList.add('hidden');
+                    assignDoctorBtn.disabled = false;
+                });
+                doctorSuggestions.appendChild(li);
+            });
+            doctorSuggestions.classList.remove('hidden');
+        }
+    
+        function searchDoctors(searchTerm) {
+            console.log('Searching for doctors with term:', searchTerm);
+            fetch(`/hospital/search_doctors?term=${searchTerm}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Received data:', data);
+                    showSuggestions(data);
+                    if (data.length === 1 && data[0].umsId.toLowerCase() === searchTerm.toLowerCase()) {
+                        selectedDoctorId = data[0].umsId;
+                        assignDoctorBtn.disabled = false;
+                    } else {
+                        selectedDoctorId = null;
+                        assignDoctorBtn.disabled = true;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showError('An error occurred while searching for doctors. Please try again.');
+                });
+        }
+    
+        doctorSearch.addEventListener('input', function() {
+            const searchTerm = this.value.trim();
+            console.log('Input changed:', searchTerm);
+            if (searchTerm.length < 3) {
+                doctorSuggestions.classList.add('hidden');
+                assignDoctorBtn.disabled = true;
+                selectedDoctorId = null;
+                hideError();
+                return;
+            }
+            searchDoctors(searchTerm);
+        });
+    
+        document.addEventListener('click', function(e) {
+            if (!doctorSearch.contains(e.target) && !doctorSuggestions.contains(e.target)) {
+                doctorSuggestions.classList.add('hidden');
+            }
+        });
+    
+        assignDoctorBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Assign button clicked, selectedDoctorId:', selectedDoctorId);
+            if (selectedDoctorId) {
+                fetch('/api/assign_doctor', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ doctorId: selectedDoctorId }),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Assignment response:', data);
+                    if (data.success) {
+                        alert('Doctor assigned successfully!');
+                        doctorSearch.value = '';
+                        selectedDoctorId = null;
+                        assignDoctorBtn.disabled = true;
+                        hideError();
+                    } else {
+                        showError('Failed to assign doctor. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showError('An error occurred during assignment. Please try again.');
+                });
+            }
+        });
+    
+        console.log('Script initialization complete');
+    });
+    </script>
 {% endblock %}

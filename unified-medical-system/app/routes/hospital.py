@@ -1,5 +1,5 @@
 from calendar import c
-from flask import Blueprint, render_template, request, flash, redirect, url_for, session
+from flask import Blueprint, render_template, request, flash, redirect, url_for, session, jsonify
 from app import mongo
 from werkzeug.security import generate_password_hash
 from flask_login import login_user, logout_user, login_required
@@ -113,3 +113,40 @@ def profile():
     # else:
     #     abort(404)
     return render_template('hospital/profile.html')
+
+@hospital_bp.route('/search_doctors', methods=['GET'])
+@login_required
+def search_doctors():
+    search_term = request.args.get('term', '')
+    doctors = mongo.db.doctors.find({
+        'umsId': {'$regex': f'^{re.escape(search_term)}', '$options': 'i'},
+        'status': 'active'
+    }, {'umsId': 1, 'name': 1, '_id': 0}).limit(10)
+
+    return jsonify(list(doctors))
+
+@hospital_bp.route('/api/assign_doctor', methods=['POST'])
+@login_required
+def assign_doctor():
+    data = request.json
+    doctor_id = data.get('doctorId')
+    hospital_id = session['umsId']
+
+    if not doctor_id:
+        return jsonify({'success': False, 'message': 'Doctor ID is required'}), 400
+
+    # Check if the doctor exists and is active
+    doctor = mongo.db.doctors.find_one({'umsId': doctor_id, 'status': 'active'})
+    if not doctor:
+        return jsonify({'success': False, 'message': 'Doctor not found or not active'}), 404
+
+    # Assign the doctor to the hospital
+    result = mongo.db.hospitals.update_one(
+        {'umsId': hospital_id},
+        {'$addToSet': {'assignedDoctors': doctor_id}}
+    )
+
+    if result.modified_count > 0:
+        return jsonify({'success': True, 'message': 'Doctor assigned successfully'})
+    else:
+        return jsonify({'success': False, 'message': 'Failed to assign doctor or doctor already assigned'}), 400

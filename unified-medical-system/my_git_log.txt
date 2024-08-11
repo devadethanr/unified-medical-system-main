@@ -1,0 +1,35 @@
+* 25cdca4 - devadethanr, 3 hours ago : hospital dashboard
+* b1c5125 - devadethanr, 21 hours ago : daisy ui integraion
+* 47f21b7 - devadethanr, 2 days ago : profile page
+* de88b5b - devadethanr, 3 days ago : d profile
+* 4a302c8 - devadethanr, 4 days ago : created todo
+* 7683705 - devadethanr, 5 days ago : patient dashboard
+* ce93cb0 - devadethanr, 7 days ago : views for doctor
+* 6e734a7 - devadethanr, 7 days ago : doctor approval from admin side
+* db39f77 - devadethanr, 9 days ago : commiting common register page
+* 243f414 - devadethanr, 12 days ago : small
+* 7441334 - devadethanr, 2 weeks ago : Remove .env file from Git tracking
+* 8fc3a44 - devadethanr, 2 weeks ago : .gitignore
+* 93f2b5a - devadethanr, 2 weeks ago : hospital reg
+* 20795dc - devadethanr, 2 weeks ago : env change
+* a2d5646 - devadethanr, 2 weeks ago : api/doctors/awaiting-response
+* 63f0a08 - devadethanr, 3 weeks ago : patient profile and UI change from admin end
+* a8ff991 - devadethanr, 3 weeks ago : updated requirments
+* ef67029 - devadethanr, 2 weeks ago : .env
+* fca7aee - devadethanr, 3 weeks ago : commit from linx - 20:50
+* d2fac51 - devadethanr, 3 weeks ago : p full profile from admin page
+* 0053294 - devadethanr, 3 weeks ago : college
+* 3369651 - devadethanr, 3 weeks ago : added password recovery pages and working logic completed
+* bd619e8 - devadethanr, 3 weeks ago : admin approval page at end
+* b95866d - devadethanr, 3 weeks ago : modals
+* 3a8369d - devadethanr, 3 weeks ago : pdatamodal
+* e874704 - devadethanr, 3 weeks ago : updated edit page
+* f9c7c10 - devadethanr, 3 weeks ago : changes
+* 1d7e09f - devadethanr, 3 weeks ago : profile view
+* 7752d39 - devadethanr, 4 weeks ago : commit
+* 867c057 - devadethanr, 4 weeks ago : update auth.py
+* 4eaeade - devadethanr, 4 weeks ago : p
+* 7f80cbe - devadethanr, 4 weeks ago : login , register and session for patients
+* af2debd - devadethanr, 5 weeks ago : Changes and google auth
+* 3db5257 - devadethanr, 5 weeks ago : patient registration, validation complete, login working but change user,username
+* 898a9fa - devadethanr, 5 weeks ago : Initial commit
