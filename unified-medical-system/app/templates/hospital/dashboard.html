@@ -232,7 +232,6 @@
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOM fully loaded and parsed');
         const doctorSearch = document.getElementById('doctorSearch');
         const doctorSuggestions = document.getElementById('doctorSuggestions');
         const assignDoctorBtn = document.getElementById('assignDoctorBtn');
@@ -248,9 +247,7 @@
             searchError.textContent = '';
             searchError.classList.add('hidden');
         }
-    
         function showSuggestions(suggestions) {
-            console.log('Showing suggestions:', suggestions);
             doctorSuggestions.innerHTML = '';
             if (suggestions.length === 0) {
                 doctorSuggestions.classList.add('hidden');
@@ -260,7 +257,10 @@
             hideError();
             suggestions.forEach(doctor => {
                 const li = document.createElement('li');
-                li.innerHTML = `<a class="block px-4 py-2 hover:bg-gray-100">${doctor.umsId} - ${doctor.name}</a>`;
+                li.innerHTML = `
+                    <a class="block px-4 py-2 hover:bg-gray-100">
+                        <div>${doctor.umsId} - ${doctor.name}</div>
+                    </a>`;
                 li.addEventListener('click', () => {
                     doctorSearch.value = doctor.umsId;
                     selectedDoctorId = doctor.umsId;
@@ -273,7 +273,6 @@
         }
     
         function searchDoctors(searchTerm) {
-            console.log('Searching for doctors with term:', searchTerm);
             fetch(`/hospital/search_doctors?term=${searchTerm}`)
                 .then(response => {
                     if (!response.ok) {
@@ -282,7 +281,6 @@
                     return response.json();
                 })
                 .then(data => {
-                    console.log('Received data:', data);
                     showSuggestions(data);
                     if (data.length === 1 && data[0].umsId.toLowerCase() === searchTerm.toLowerCase()) {
                         selectedDoctorId = data[0].umsId;
@@ -321,7 +319,7 @@
             e.preventDefault();
             console.log('Assign button clicked, selectedDoctorId:', selectedDoctorId);
             if (selectedDoctorId) {
-                fetch('/api/assign_doctor', {
+                fetch('/hospital/assign_doctor', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

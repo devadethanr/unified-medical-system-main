@@ -6,8 +6,9 @@ from flask_login import login_user, logout_user, login_required
 from app import login_manager, mongo
 from app.models import User
 from datetime import datetime
-import re, uuid
+import re, uuid, json
 from app.models import User
+from bson import json_util
 
 hospital_bp = Blueprint('hospital', __name__)
 
@@ -15,19 +16,22 @@ hospital_bp = Blueprint('hospital', __name__)
 def load_user(user_id):
     return User.get(user_id)
 
-@hospital_bp.route('/', methods=['GET', 'POST'])
-@login_required
-def index():
-    global hospital_data
+def get_hospital_data():
     hospital_data = mongo.db.hospitals.find_one({'umsId': session['umsId']})
     hospital_details = mongo.db.users.find_one({'umsId': session['umsId']})
     hospital_data = {**hospital_data, **hospital_details} if hospital_details else hospital_data
     hospital_data['phoneNumber'] = hospital_data.get('phoneNumber', [None])[0]
-    print(hospital_data) #for debugging
+    return hospital_data
+
+@hospital_bp.route('/', methods=['GET', 'POST'])
+@login_required
+def index():
+    hospital_data = get_hospital_data()
     if not hospital_data:
         flash('Hospital not found', 'error')
         return redirect(url_for('auth.login'))
     return render_template('hospital/dashboard.html', hospital_data=hospital_data)
+
 
 def generate_hospital_id():
     return 'UMSH' + re.sub('-', '', str(uuid.uuid4()))[:8].upper()
@@ -114,18 +118,26 @@ def profile():
     #     abort(404)
     return render_template('hospital/profile.html')
 
+
 @hospital_bp.route('/search_doctors', methods=['GET'])
 @login_required
 def search_doctors():
     search_term = request.args.get('term', '')
-    doctors = mongo.db.doctors.find({
-        'umsId': {'$regex': f'^{re.escape(search_term)}', '$options': 'i'},
-        'status': 'active'
-    }, {'umsId': 1, 'name': 1, '_id': 0}).limit(10)
-
-    return jsonify(list(doctors))
-
-@hospital_bp.route('/api/assign_doctor', methods=['POST'])
+    if search_term:
+        doctors = mongo.db.users.find({
+            'umsId': {'$regex': f'^{re.escape(search_term)}', '$options': 'i'},
+            'status': 'active',
+            'rolesId': 3
+        }, {
+            'umsId': 1,
+            'name': 1
+        }).limit(5)
+        doctors_list = list(doctors)
+        return json.loads(json_util.dumps(doctors_list))
+    else:
+        return jsonify({'error': 'No search term provided'}), 400
+    
+@hospital_bp.route('/assign_doctor', methods=['POST'])
 @login_required
 def assign_doctor():
     data = request.json
@@ -140,13 +152,29 @@ def assign_doctor():
     if not doctor:
         return jsonify({'success': False, 'message': 'Doctor not found or not active'}), 404
 
-    # Assign the doctor to the hospital
-    result = mongo.db.hospitals.update_one(
-        {'umsId': hospital_id},
-        {'$addToSet': {'assignedDoctors': doctor_id}}
-    )
+    try:
+        # Update or insert into the hospital_details collection
+        hospital_details_result = mongo.db.hospitalDetails.update_one(
+            {'umsId': hospital_id},
+            {'$addToSet': {'assignedDoctors': doctor_id}},
+            upsert=True
+        )
 
-    if result.modified_count > 0:
-        return jsonify({'success': True, 'message': 'Doctor assigned successfully'})
-    else:
-        return jsonify({'success': False, 'message': 'Failed to assign doctor or doctor already assigned'}), 400
+        # Update the doctorDetails collection
+        doctor_details_result = mongo.db.doctorDetails.update_one(
+            {'umsId': doctor_id},
+            {'$addToSet': {'assignedHospitals': hospital_id}},
+            upsert=True
+        )
+
+        if (hospital_details_result.modified_count > 0 or 
+            hospital_details_result.upserted_id or
+            doctor_details_result.modified_count > 0 or
+            doctor_details_result.upserted_id):
+            return jsonify({'success': True, 'message': 'Doctor assigned successfully'})
+        else:
+            return jsonify({'success': False, 'message': 'Doctor already assigned or hospital not found'}), 400
+
+    except Exception as e:
+        print(f"Error assigning doctor: {str(e)}")
+        return jsonify({'success': False, 'message': 'An error occurred while assigning the doctor'}), 500
