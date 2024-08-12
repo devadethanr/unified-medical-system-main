@@ -1,0 +1,220 @@
+{% extends "hospital/base.html" %}
+
+{% block title %}Appointments{% endblock %}
+
+{% block page_title %}Appointments{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+<script src="https://cdn.tailwindcss.com"></script>
+{% endblock %}
+
+{% block content %}
+<div class="p-4">
+    <div class="overflow-x-auto">
+        <table id="appointmentsTable" class="table table-zebra table-bordered w-full">
+            <thead>
+                <tr>
+                    <th class="border">Appointment ID</th>
+                    <th class="border">Patient Name</th>
+                    <th class="border">Doctor Name</th>
+                    <th class="border">Date</th>
+                    <th class="border">Time</th>
+                    <th class="border">Reason</th>
+                    <th class="border">Status</th>
+                    <th class="border">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<dialog id="edit_modal" class="modal">
+    <div class="modal-box">
+        <h3 class="font-bold text-lg">Edit Appointment</h3>
+        <form id="edit_form">
+            <input type="hidden" id="edit_appointment_id">
+            <div class="form-control">
+                <label class="label" for="edit_doctor">
+                    <span class="label-text">Assign Doctor</span>
+                </label>
+                <select id="edit_doctor" class="select select-bordered w-full">
+                    <option value="">Select a doctor</option>
+                </select>
+            </div>
+            <div class="modal-action">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="button" class="btn" onclick="edit_modal.close()">Close</button>
+            </div>
+        </form>
+    </div>
+</dialog>
+
+<!-- Confirm Cancel Modal -->
+<dialog id="cancel_modal" class="modal">
+    <div class="modal-box">
+        <h3 class="font-bold text-lg">Confirm Cancellation</h3>
+        <p class="py-4">Are you sure you want to cancel this appointment?</p>
+        <div class="modal-action">
+            <button id="confirm_cancel" class="btn btn-warning">Yes, Cancel</button>
+            <button class="btn" onclick="cancel_modal.close()">No, Keep</button>
+        </div>
+    </div>
+</dialog>
+
+<!-- Alert Modal -->
+<dialog id="alert_modal" class="modal">
+    <div class="modal-box">
+        <h3 class="font-bold text-lg">Alert</h3>
+        <p id="alert_message" class="py-4"></p>
+        <div class="modal-action">
+            <button class="btn" onclick="alert_modal.close()">Close</button>
+        </div>
+    </div>
+</dialog>
+
+<div id="loading-overlay" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center">
+    <div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
+</div>
+{% endblock %}
+
+{% block extra_body %}
+<script>
+$(document).ready(function() {
+    var appointments = JSON.parse({{ appointments|tojson|safe }});
+    var assignedDoctors = JSON.parse({{ assigned_doctors|tojson|safe }});
+    
+    var table = $('#appointmentsTable').DataTable({
+        data: appointments,
+        columns: [
+            { data: '_id' },
+            { data: 'patientName' },
+            { data: 'doctorName' },
+            { data: 'appointmentDate' },
+            { 
+                data: 'appointmentTime',
+                render: function(data, type, row) {
+                    return data || 'Not specified';
+                }
+            },
+            { data: 'reason' },
+            { data: 'status' },
+            {
+                data: null,
+                render: function(data, type, row) {
+                    return '<button class="btn btn-sm btn-primary edit-appointment" data-appointment-id="' + row._id + '">Edit</button> ' +
+                           '<button class="btn btn-sm btn-warning cancel-appointment" data-appointment-id="' + row._id + '">Cancel</button>';
+                }
+            }
+        ],
+        "drawCallback": function(settings) {
+            $(this).find('td, th').addClass('border');
+        }
+    });
+
+    // Populate doctor select in edit modal
+    assignedDoctors.forEach(function(doctor) {
+        $('#edit_doctor').append($('<option>', {
+            value: doctor.umsId,
+            text: doctor.name
+        }));
+    });
+
+    // Edit appointment
+    $('#appointmentsTable').on('click', '.edit-appointment', function() {
+        var appointmentId = $(this).data('appointment-id');
+        $('#edit_appointment_id').val(appointmentId);
+        edit_modal.showModal();
+    });
+
+    // Handle edit form submission
+    $('#edit_form').on('submit', function(e) {
+        e.preventDefault();
+        var appointmentId = $('#edit_appointment_id').val();
+        var doctorId = $('#edit_doctor').val();
+        
+        showLoading();
+        $.ajax({
+            url: '/hospital/update_appointment',
+            method: 'POST',
+            data: JSON.stringify({
+                appointmentId: appointmentId,
+                doctorId: doctorId
+            }),
+            contentType: 'application/json',
+            success: function(response) {
+                hideLoading();
+                if (response.success) {
+                    showAlert('Appointment updated successfully');
+                    table.ajax.reload();
+                } else {
+                    showAlert('Error: ' + response.message);
+                }
+                edit_modal.close();
+            },
+            error: function() {
+                hideLoading();
+                showAlert('An error occurred while updating the appointment');
+                edit_modal.close();
+            }
+        });
+    });
+
+    // Cancel appointment
+    $('#appointmentsTable').on('click', '.cancel-appointment', function() {
+        var appointmentId = $(this).data('appointment-id');
+        $('#confirm_cancel').data('appointment-id', appointmentId);
+        cancel_modal.showModal();
+    });
+
+    // Confirm cancel
+    $('#confirm_cancel').on('click', function() {
+        var appointmentId = $(this).data('appointment-id');
+        
+        showLoading();
+        $.ajax({
+            url: '/hospital/cancel_appointment',
+            method: 'POST',
+            data: JSON.stringify({
+                appointmentId: appointmentId
+            }),
+            contentType: 'application/json',
+            success: function(response) {
+                hideLoading();
+                if (response.success) {
+                    showAlert('Appointment cancelled successfully');
+                    table.ajax.reload();
+                } else {
+                    showAlert('Error: ' + response.message);
+                }
+                cancel_modal.close();
+            },
+            error: function() {
+                hideLoading();
+                showAlert('An error occurred while cancelling the appointment');
+                cancel_modal.close();
+            }
+        });
+    });
+
+    function showAlert(message) {
+        $('#alert_message').text(message);
+        alert_modal.showModal();
+    }
+
+    function showLoading() {
+        $('#loading-overlay').removeClass('hidden').addClass('flex');
+    }
+
+    function hideLoading() {
+        $('#loading-overlay').removeClass('flex').addClass('hidden');
+    }
+});
+</script>
+{% endblock %}

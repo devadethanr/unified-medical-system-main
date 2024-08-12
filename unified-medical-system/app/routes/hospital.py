@@ -9,6 +9,8 @@ from datetime import datetime
 import re, uuid, json
 from app.models import User
 from bson import json_util
+from bson.objectid import ObjectId
+from datetime import datetime
 
 hospital_bp = Blueprint('hospital', __name__)
 
@@ -251,3 +253,92 @@ def relieve_doctor():
     except Exception as e:
         print(f"Error relieving doctor: {str(e)}")
         return jsonify({'success': False, 'message': 'An error occurred while relieving the doctor'}), 500
+
+from bson import json_util
+
+@hospital_bp.route('/appointments', methods=['GET'])
+@login_required
+def appointments():
+    hospital_id = session['umsId']
+    appointments = list(mongo.db.appointments.find({
+        'hospitalId': hospital_id,
+        'status': {'$ne': 'deleted'}
+    }))
+
+    # Fetch patient and doctor names, and process the appointments
+    for appointment in appointments:
+        patient = mongo.db.users.find_one({'umsId': appointment.get('patientId')})
+        doctor = mongo.db.users.find_one({'umsId': appointment.get('doctorId')}) if 'doctorId' in appointment else None
+        appointment['patientName'] = patient['name'] if patient else 'Unknown'
+        appointment['doctorName'] = doctor['name'] if doctor else 'Not Assigned'
+        
+        # Convert ObjectId to string for JSON serialization
+        appointment['_id'] = str(appointment['_id'])
+        
+        # Convert datetime objects to string
+        if 'appointmentDate' in appointment:
+            appointment['appointmentDate'] = appointment['appointmentDate'].strftime('%Y-%m-%d')
+        
+        # Ensure all potential fields are included, even if they're not in the database
+        appointment.setdefault('appointmentTime', '')
+        appointment.setdefault('reason', '')
+        appointment.setdefault('status', '')
+
+    # Fetch assigned doctors
+    hospital_details = mongo.db.hospitalDetails.find_one({'umsId': hospital_id})
+    assigned_doctor_ids = hospital_details.get('assignedDoctors', []) if hospital_details else []
+    assigned_doctors = list(mongo.db.users.find({'umsId': {'$in': assigned_doctor_ids}}, {'umsId': 1, 'name': 1}))
+
+    return render_template('hospital/appointments.html', 
+                           appointments=json_util.dumps(appointments),
+                           assigned_doctors=json_util.dumps(assigned_doctors))
+
+@hospital_bp.route('/update_appointment', methods=['POST'])
+@login_required
+def update_appointment():
+    data = request.json
+    appointment_id = data.get('appointmentId')
+    doctor_id = data.get('doctorId')
+
+    if not appointment_id or not doctor_id:
+        return jsonify({'success': False, 'message': 'Missing required data'})
+
+    try:
+        result = mongo.db.appointments.update_one(
+            {'_id': ObjectId(appointment_id)},
+            {
+                '$set': {
+                    'doctorId': doctor_id,
+                    'updatedAt': datetime.now(),
+                    'status': 'Approved : ' + doctor_id
+                }
+            },
+            upsert=True
+        )
+        if result.modified_count > 0 or result.upserted_id:
+            return jsonify({'success': True, 'message': 'Appointment updated successfully'})
+        else:
+            return jsonify({'success': False, 'message': 'No appointment found with the given ID'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
+
+@hospital_bp.route('/cancel_appointment', methods=['POST'])
+@login_required
+def cancel_appointment():
+    data = request.json
+    appointment_id = data.get('appointmentId')
+
+    if not appointment_id:
+        return jsonify({'success': False, 'message': 'Missing appointment ID'})
+
+    try:
+        result = mongo.db.appointments.update_one(
+            {'_id': ObjectId(appointment_id)},
+            {'$set': {'status': 'deleted'}}
+        )
+        if result.modified_count > 0:
+            return jsonify({'success': True, 'message': 'Appointment cancelled successfully'})
+        else:
+            return jsonify({'success': False, 'message': 'No appointment found with the given ID'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
