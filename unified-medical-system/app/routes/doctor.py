@@ -19,6 +19,24 @@ def load_user(user_id):
 def generate_doctor_id():
     return 'UMSD' + re.sub('-', '', str(uuid.uuid4()))[:8].upper()
 
+def get_hospital_details(hospital_id):
+    """Fetch hospital details from hospitals and users collections."""
+    hospital_data = mongo.db.hospitals.find_one({'umsId': hospital_id})
+    hospital_user_data = mongo.db.users.find_one({'umsId': hospital_id})
+    if hospital_data and hospital_user_data:
+        return {**hospital_data, **hospital_user_data}
+    return None
+
+def get_assigned_hospitals(doctor_details):
+    """Get details of all assigned hospitals for a doctor."""
+    assigned_hospitals = []
+    if doctor_details and 'assignedHospitals' in doctor_details:
+        for hospital_id in doctor_details['assignedHospitals']:
+            hospital_info = get_hospital_details(hospital_id)
+            if hospital_info:
+                assigned_hospitals.append(hospital_info)
+    return assigned_hospitals
+
 @login_required
 @doctor_bp.route('/dashboard', methods=['GET', 'POST'])
 def index():
@@ -30,6 +48,7 @@ def index():
     print(doctor_data) #for debugging
     return render_template('doctor/dashboard.html', doctor_data=doctor_data)
 
+
 @doctor_bp.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
@@ -37,13 +56,11 @@ def profile():
     global doctor_data
     doctor_data = mongo.db.users.find_one({'umsId': session['umsId']})
     doctor_details = mongo.db.doctorDetails.find_one({'umsId': session['umsId']})
-    print(doctor_details)
+    
     doctor_data = {**doctor_data, **doctor_details} if doctor_details else doctor_data
     doctor_data['phoneNumber'] = doctor_data.get('phoneNumber', [None])[0]
-    print(doctor_data)
-    if request.method == 'POST':
-        if request.form.get('form_type') == 'update_profile':
-            return update_profile()
+    doctor_data['assigned_hospitals'] = get_assigned_hospitals(doctor_details)
+
     if 'specialization' not in doctor_data:
         return render_template('doctor/update_profile.html', doctor_data=doctor_data)
     return render_template('doctor/profile.html', doctor_data=doctor_data)
@@ -146,6 +163,7 @@ def compose():
 @doctor_bp.route('/hospital_details')
 @login_required
 def hospital_details():
+    
     return render_template('doctor/hospital_details.html')
 
 @doctor_bp.route('/edit_hospital', methods=['GET', 'POST'])

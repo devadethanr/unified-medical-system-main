@@ -1,0 +1,430 @@
+{% extends "patient/base.html" %}
+
+{% block title %}UMS - Patient Appointments{% endblock %}
+
+{% block page_title %}Appointments{% endblock %}
+
+{% block extra_head %}
+<style>
+    .modal-box {
+        max-width: 32rem;
+    }
+    .appointment-card {
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+    }
+    .appointment-card-general {
+        background-color: #e8f5e9; /* Pastel green */
+    }
+    .appointment-card-cardiology {
+        background-color: #fce4ec; /* Pastel pink */
+    }
+    .appointment-card-neurology {
+        background-color: #e3f2fd; /* Pastel blue */
+    }
+    .appointment-card-other {
+        background-color: #ffffff; /* White */
+    }
+    .appointment-details {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    .doctor-details {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+    .appointment-actions {
+        display: flex;
+        justify-content: flex-end;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-4">
+    <h1 class="text-2xl font-bold mb-4">Your Appointments</h1>
+    <button class="btn btn-primary mb-4" onclick="book_appointment_modal.showModal()">Book New Appointment</button>
+    
+    <div id="appointments-list" class="mt-4">
+        <!-- Appointments will be loaded dynamically -->
+    </div>
+</div>
+
+<!-- Book Appointment Modal -->
+<dialog id="book_appointment_modal" class="modal">
+    <form method="dialog" class="modal-box">
+        <h3 class="font-bold text-lg">Book an Appointment</h3>
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Hospital</span>
+            </label>
+            <input type="text" id="hospital-search" class="input input-bordered" placeholder="Search for a hospital">
+            <input type="hidden" id="selected-hospital-id">
+            <ul id="hospital-suggestions" class="menu bg-base-100 w-full mt-1 rounded-box shadow-lg absolute z-10 max-h-60 overflow-auto hidden"></ul>
+            <div id="searchError" class="text-red-500 mt-1 hidden"></div>
+        </div>
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Category</span>
+            </label>
+            <select id="category" class="select select-bordered">
+                <option value="">Select a category</option>
+                <option value="general">General</option>
+                <option value="cardiology">Cardiology</option>
+                <option value="neurology">Neurology</option>
+                <option value="orthopedics">Orthopedics</option>
+            </select>
+        </div>
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Appointment Date</span>
+            </label>
+            <input type="date" id="appointment-date" class="input input-bordered">
+        </div>
+        <div class="form-control">
+            <label class="label cursor-pointer">
+                <span class="label-text">Disabled Person</span>
+                <input type="checkbox" id="is-disabled" class="checkbox">
+            </label>
+        </div>
+        <div id="disability-id-container" class="form-control hidden">
+            <label class="label">
+                <span class="label-text">Disability Unique ID Number</span>
+            </label>
+            <input type="text" id="disability-id" class="input input-bordered">
+        </div>
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Reason for Appointment</span>
+            </label>
+            <textarea id="appointment-reason" class="textarea textarea-bordered" placeholder="Please describe the reason for your appointment"></textarea>
+        </div>
+        <div class="modal-action">
+            <button type="button" class="btn" onclick="book_appointment_modal.close()">Cancel</button>
+            <button type="button" id="bookAppointmentBtn" class="btn btn-primary" disabled>Book Appointment</button>
+        </div>
+    </form>
+</dialog>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Global functions
+function editAppointment(appointmentId) {
+    // Implement edit functionality
+    console.log('Edit appointment:', appointmentId);
+}
+
+function loadAppointments() {
+    fetch('/patient/get_appointments')
+        .then(response => response.json())
+        .then(appointments => {
+            const appointmentsList = document.getElementById('appointments-list');
+            appointmentsList.innerHTML = '';
+            appointments.forEach(appointment => {
+                const appointmentElement = document.createElement('div');
+                appointmentElement.className = `appointment-card appointment-card-${getCategoryClass(appointment.category)}`;
+                
+                // Dummy doctor details
+                const doctorName = "Dr. John Doe";
+                const doctorUmsId = "UMSD123456";
+                const updatedTime = new Date().toLocaleString();
+
+                appointmentElement.innerHTML = `
+                    <div class="appointment-details">
+                        <div>
+                            <h3 class="text-xl font-bold mb-2">${appointment.category}</h3>
+                            <p>Hospital: ${appointment.hospitalName}</p>
+                            <p>Date: ${new Date(appointment.appointmentDate).toLocaleDateString()}</p>
+                            <p>Status: ${appointment.status}</p>
+                            <p>Reason: ${appointment.reason || 'Not specified'}</p>
+                            <p class="text-xs text-gray-500 mt-2">Appointment ID: ${appointment._id}</p>
+                        </div>
+                        <div class="doctor-details">
+                            <p><strong>Assigned Doctor:</strong></p>
+                            <p>${doctorName}</p>
+                            <p>UMS ID: ${doctorUmsId}</p>
+                            <p>Last Updated: ${updatedTime}</p>
+                        </div>
+                    </div>
+                    <div class="appointment-actions">
+                        <button class="btn btn-sm btn-outline mr-2" onclick="editAppointment('${appointment._id}')">Edit</button>
+                        <button class="btn btn-sm btn-outline btn-error" onclick="revokeAppointment('${appointment._id}')">Revoke</button>
+                    </div>
+                `;
+                appointmentsList.appendChild(appointmentElement);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading appointments:', error);
+        });
+}
+
+function revokeAppointment(appointmentId) {
+    if (confirm('Are you sure you want to revoke this appointment?')) {
+        fetch(`/patient/revoke_appointment/${appointmentId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Appointment revoked successfully');
+                loadAppointments(); // Reload the appointments list
+            } else {
+                alert('Failed to revoke appointment: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while revoking the appointment');
+        });
+    }
+}
+
+function getCategoryClass(category) {
+    switch (category.toLowerCase()) {
+        case 'general':
+            return 'general';
+        case 'cardiology':
+            return 'cardiology';
+        case 'neurology':
+            return 'neurology';
+        default:
+            return 'other';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const hospitalSearch = document.getElementById('hospital-search');
+    const hospitalSuggestions = document.getElementById('hospital-suggestions');
+    const selectedHospitalId = document.getElementById('selected-hospital-id');
+    const isDisabledCheckbox = document.getElementById('is-disabled');
+    const disabilityIdContainer = document.getElementById('disability-id-container');
+    const disabilityIdInput = document.getElementById('disability-id');
+    const bookAppointmentBtn = document.getElementById('bookAppointmentBtn');
+    const searchError = document.getElementById('searchError');
+    const appointmentDateInput = document.getElementById('appointment-date');
+
+    // Set minimum date for appointment to today
+    const today = new Date().toISOString().split('T')[0];
+    appointmentDateInput.setAttribute('min', today);
+
+    function showError(message) {
+        searchError.textContent = message;
+        searchError.classList.remove('hidden');
+    }
+
+    function hideError() {
+        searchError.textContent = '';
+        searchError.classList.add('hidden');
+    }
+
+    function showSuggestions(suggestions) {
+        hospitalSuggestions.innerHTML = '';
+        if (suggestions.length === 0) {
+            hospitalSuggestions.classList.add('hidden');
+            showError('No hospitals found');
+            return;
+        }
+        hideError();
+        suggestions.forEach(hospital => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <a class="block px-4 py-2 hover:bg-gray-100">
+                    <div>${hospital.name} (${hospital.umsId})</div>
+                </a>`;
+            li.addEventListener('click', () => {
+                hospitalSearch.value = hospital.name;
+                selectedHospitalId.value = hospital.umsId;
+                hospitalSuggestions.classList.add('hidden');
+                bookAppointmentBtn.disabled = false;
+            });
+            hospitalSuggestions.appendChild(li);
+        });
+        hospitalSuggestions.classList.remove('hidden');
+    }
+
+    function searchHospitals(searchTerm) {
+        fetch(`/patient/search_hospitals?term=${searchTerm}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                showSuggestions(data);
+                if (data.length === 1 && data[0].name.toLowerCase() === searchTerm.toLowerCase()) {
+                    selectedHospitalId.value = data[0].umsId;
+                    bookAppointmentBtn.disabled = false;
+                } else {
+                    selectedHospitalId.value = '';
+                    bookAppointmentBtn.disabled = true;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showError('An error occurred while searching for hospitals. Please try again.');
+            });
+    }
+
+    hospitalSearch.addEventListener('input', function() {
+        const searchTerm = this.value.trim();
+        if (searchTerm.length < 3) {
+            hospitalSuggestions.classList.add('hidden');
+            bookAppointmentBtn.disabled = true;
+            selectedHospitalId.value = '';
+            hideError();
+            return;
+        }
+        searchHospitals(searchTerm);
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!hospitalSearch.contains(e.target) && !hospitalSuggestions.contains(e.target)) {
+            hospitalSuggestions.classList.add('hidden');
+        }
+    });
+
+    // Prevent manual input in hospital search
+    hospitalSearch.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+        }
+    });
+
+    isDisabledCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            disabilityIdContainer.classList.remove('hidden');
+        } else {
+            disabilityIdContainer.classList.add('hidden');
+            disabilityIdInput.value = '';
+            hideDisabilityIdError();
+        }
+    });
+
+    function validateDisabilityId(disabilityId) {
+        // Updated regex to match XXXX-XXXX-XXXX-XXXX format
+        const disabilityIdRegex = /^\d{4}-\d{4}-\d{4}-\d{4}$/;
+        return disabilityIdRegex.test(disabilityId);
+    }
+
+    function showDisabilityIdError(message) {
+        const errorElement = document.getElementById('disability-id-error');
+        if (errorElement) {
+            errorElement.textContent = message;
+        } else {
+            const newErrorElement = document.createElement('div');
+            newErrorElement.className = 'text-red-500 mt-1';
+            newErrorElement.id = 'disability-id-error';
+            newErrorElement.textContent = message;
+            disabilityIdInput.parentNode.appendChild(newErrorElement);
+        }
+    }
+
+    function hideDisabilityIdError() {
+        const errorElement = document.getElementById('disability-id-error');
+        if (errorElement) {
+            errorElement.remove();
+        }
+    }
+
+    disabilityIdInput.addEventListener('input', function() {
+        hideDisabilityIdError();
+        if (this.value && !validateDisabilityId(this.value)) {
+            showDisabilityIdError('Please enter a valid disability ID (format: XXXX-XXXX-XXXX-XXXX)');
+        }
+    });
+
+    bookAppointmentBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const hospitalId = selectedHospitalId.value;
+        const category = document.getElementById('category').value;
+        const appointmentDate = appointmentDateInput.value;
+        const isDisabled = isDisabledCheckbox.checked;
+        const disabilityId = disabilityIdInput.value;
+        const reason = document.getElementById('appointment-reason').value.trim();
+
+        // Validation
+        if (!hospitalId) {
+            showError('Please select a hospital from the suggestions');
+            return;
+        }
+
+        if (!category) {
+            showError('Please select a category');
+            return;
+        }
+
+        if (!appointmentDate) {
+            showError('Please select an appointment date');
+            return;
+        }
+
+        if (isDisabled) {
+            if (!disabilityId) {
+                showDisabilityIdError('Please enter your Disability ID');
+                return;
+            }
+            if (!validateDisabilityId(disabilityId)) {
+                showDisabilityIdError('Please enter a valid Disability ID (format: XXXX-XXXX-XXXX-XXXX)');
+                return;
+            }
+        }
+
+        const appointmentData = {
+            hospitalId: hospitalId,
+            category: category,
+            appointmentDate: appointmentDate,
+            isDisabled: isDisabled,
+            disabilityId: isDisabled ? disabilityId : null,
+            reason: reason
+        };
+
+        fetch('/patient/book_appointment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(appointmentData),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                alert('Appointment booked successfully');
+                book_appointment_modal.close();
+                loadAppointments();
+            } else {
+                showError('Failed to book appointment: ' + data.message);
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            showError('An error occurred while booking the appointment');
+        });
+    });
+
+    // Check if the open_modal parameter is present in the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('open_modal') === 'True') {
+        book_appointment_modal.showModal();
+    }
+
+    loadAppointments();
+});
+</script>
+{% endblock %}

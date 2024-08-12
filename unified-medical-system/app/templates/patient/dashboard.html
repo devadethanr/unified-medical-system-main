@@ -1,414 +1,197 @@
-<!doctype html>
-<html lang="en" dir="ltr">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>UMS - Patient Dashboard</title>
-    <!-- Favicon -->
-    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-    <!-- Typography CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/typography.css') }}">
-    <!-- Style CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <!-- Responsive CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
-    <!-- Full calendar -->
-    <link href="{{ url_for('static', filename='fullcalendar/core/main.css') }}" rel='stylesheet' />
-    <link href="{{ url_for('static', filename='fullcalendar/daygrid/main.css') }}" rel='stylesheet' />
-    <link href="{{ url_for('static', filename='fullcalendar/timegrid/main.css') }}" rel='stylesheet' />
-    <link href="{{ url_for('static', filename='fullcalendar/list/main.css') }}" rel='stylesheet' />
-    <!-- Flatpickr CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/flatpickr.min.css') }}">
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
-</head>
-<body>
-    <!-- Wrapper Start -->
-    <div class="wrapper">
-        <!-- Sidebar -->
-        <div class="iq-sidebar">
-            <div class="iq-sidebar-logo">
-                <a href="{{ url_for('patient.index') }}">
-                    <img src="{{ url_for('static', filename='images/logo.png') }}" class="img-fluid" alt="UMS Logo">
-                    <span>UMS Patient</span>
-                </a>
-            </div>
-            <div id="sidebar-scrollbar">
-                <nav class="iq-sidebar-menu">
-                    <ul class="iq-menu">
-                        <li class="active">
-                            <a href="{{ url_for('patient.index') }}" class="iq-waves-effect"><i class="ri-hospital-fill"></i><span>Dashboard</span></a>
-                        </li>
-                        <li>
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#appointmentModal" class="iq-waves-effect"><i class="ri-calendar-event-fill"></i><span>Appointments</span></a>
-                        </li>
-                        <li>
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#medicalRecordsModal" class="iq-waves-effect"><i class="ri-file-list-fill"></i><span>Medical Records</span></a>
-                        </li>
-                        <li>
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#doctorsListModal" class="iq-waves-effect"><i class="ri-user-3-fill"></i><span>Doctors</span></a>
-                        </li>
-                        <li>
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#hospitalsListModal" class="iq-waves-effect"><i class="ri-hospital-line"></i><span>Hospitals</span></a>
-                        </li>
-                        <li>
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#supportModal" class="iq-waves-effect"><i class="ri-question-answer-fill"></i><span>Support</span></a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-        <!-- Sidebar END -->
+{% extends "patient/base.html" %}
 
-        <!-- Page Content -->
-        <div id="content-page" class="content-page">
-            <!-- TOP Nav Bar -->
-            <div class="iq-top-navbar">
-                <div class="iq-navbar-custom">
-                    <nav class="navbar navbar-expand-lg navbar-light p-0">
-                        <div class="iq-navbar-logo d-flex align-items-center justify-content-between">
-                            <i class="ri-menu-line wrapper-menu"></i>
-                            <a href="{{ url_for('patient.index') }}" class="header-logo">
-                                <img src="{{ url_for('static', filename='images/logo.png') }}" class="img-fluid rounded-normal" alt="logo" style="max-height: 50px;">
-                                <span>UMS Patient</span>
-                            </a>
-                        </div>
-                        <div class="navbar-breadcrumb">
-                            <h5 class="mb-0">Dashboard</h5>
-                        </div>
-                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                            <i class="ri-menu-3-line"></i>
-                        </button>
-                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                            <ul class="navbar-nav ml-auto navbar-list">
-                                <li class="nav-item">
-                                    <a href="#" class="search-toggle iq-waves-effect">
-                                        <i class="ri-notification-2-fill"></i>
-                                        <span class="bg-danger dots"></span>
-                                    </a>
-                                    <div class="iq-sub-dropdown">
-                                        <div class="iq-card shadow-none m-0">
-                                            <div class="iq-card-body p-0 ">
-                                                <div class="bg-primary p-3">
-                                                    <h5 class="mb-0 text-white">All Notifications</h5>
-                                                </div>
-                                                <!-- Notifications will be dynamically added here -->
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="nav-item dropdown">
-                                    <a href="#" class="search-toggle iq-waves-effect">
-                                        <i class="ri-mail-open-fill"></i>
-                                        <span class="bg-primary count-mail"></span>
-                                    </a>
-                                    <div class="iq-sub-dropdown">
-                                        <div class="iq-card shadow-none m-0">
-                                            <div class="iq-card-body p-0 ">
-                                                <div class="bg-primary p-3">
-                                                    <h5 class="mb-0 text-white">All Messages</h5>
-                                                </div>
-                                                <!-- Messages will be dynamically added here -->
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                        <ul class="navbar-list">
-                            <li>
-                                <a href="#" class="search-toggle iq-waves-effect d-flex align-items-center" data-toggle="modal" data-target="#userProfileModal">
-                                    <img src="{{ url_for('static', filename='images/user/1.jpg') }}" class="img-fluid rounded mr-3" alt="user">
-                                    <div class="caption">
-                                        <h6 class="mb-0 line-height">{{ patient_data.name }}</h6>
-                                        <span class="font-size-12">Patient</span>
-                                    </div>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-            </div>
-            <!-- TOP Nav Bar END -->
+{% block title %}UMS - Patient Dashboard{% endblock %}
 
-            <!-- Page Content -->
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="iq-card">
-                            <div class="iq-card-header d-flex justify-content-between">
-                                <div class="iq-header-title">
-                                    <h4 class="card-title">Welcome, {{ patient_data.name }}</h4>
-                                </div>
-                            </div>
-                            <div class="iq-card-body">
-                                <!-- Add patient-specific content here -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
+{% block page_title %}Patient Dashboard{% endblock %}
+
+{% block extra_head %}
+<style>
+    .card {
+        background: #f0f0ff;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+    }
+    .btn {
+        background-color: #e6e6fa !important;
+        color: #333333 !important;
+    }
+    .profile-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    .profile-table th,
+    .profile-table td {
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem;
+    }
+    .profile-table tr:nth-child(odd) {
+        background-color: #fce4ec; /* Pastel pink */
+    }
+    .profile-table tr:nth-child(even) {
+        background-color: #e8f5e9; /* Pastel green */
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Welcome, {{ patient_data.name }}</h1>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">Book Appointment</h2>
+            <p>Schedule an appointment with a healthcare provider</p>
+            <div class="card-actions justify-end">
+                <a href="{{ url_for('patient.appointments', open_modal=True) }}" class="btn">Book Now</a>
             </div>
         </div>
     </div>
-    <!-- Wrapper END -->
-
-    <!-- Appointment Modal -->
-    <div class="modal fade" id="appointmentModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Appointments</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <table id="appointmentsTable" class="table table-striped table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Time</th>
-                                <th>Doctor</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">Medical Records</h2>
+            <p>Access and manage your personal medical records</p>
+            <div class="card-actions justify-end">
+                <button class="btn" onclick="view_medical_records.showModal()">View Records</button>
             </div>
         </div>
     </div>
-
-    <!-- Medical Records Modal -->
-    <div class="modal fade" id="medicalRecordsModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Medical Records</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <table id="medicalRecordsTable" class="table table-striped table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Type</th>
-                                <th>Doctor</th>
-                                <th>Details</th>
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">Test Results</h2>
+            <p>Get your latest test results from the lab</p>
+            <div class="card-actions justify-end">
+                <button class="btn" onclick="view_test_results.showModal()">View Results</button>
             </div>
         </div>
     </div>
-
-    <!-- Doctors List Modal -->
-    <div class="modal fade" id="doctorsListModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Doctors List</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <table id="doctorsTable" class="table table-striped table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Specialization</th>
-                                <th>Contact</th>
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">Log Symptoms</h2>
+            <p>Log your symptoms for disease outbreak detection</p>
+            <div class="card-actions justify-end">
+                <button class="btn" onclick="log_symptoms.showModal()">Log Symptoms</button>
             </div>
         </div>
     </div>
-
-    <!-- Hospitals List Modal -->
-    <div class="modal fade" id="hospitalsListModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Hospitals List</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <table id="hospitalsTable" class="table table-striped table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Location</th>
-                                <th>Contact</th>
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
-            </div>
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">Support Chatbot</h2>
+            <p>Get basic medical guidance and schedule appointments</p>
+            <div class="card-actions justify-end">
+                <button class="btn" onclick="open_chatbot.showModal()">Open Chatbot</button>
+            </div>  
         </div>
     </div>
+</div>
+{% endblock %}
 
-    <!-- Support Modal -->
-    <div class="modal fade" id="supportModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Support Requests</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <table id="supportTable" class="table table-striped table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Subject</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
-            </div>
+{% block modals %}
+<dialog id="view_profile" class="modal">
+    <form method="dialog" class="modal-box">
+        <h3 class="font-bold text-lg mb-4">Patient Profile</h3>
+        <div class="overflow-x-auto">
+            <table class="profile-table">
+                <tbody>
+                    <tr>
+                        <th class="capitalize">Name</th>
+                        <td>{{ patient_data.name }}</td>
+                    </tr>
+                    <tr>
+                        <th class="capitalize">Email</th>
+                        <td>{{ patient_data.email }}</td>
+                    </tr>
+                    <tr>
+                        <th class="capitalize">Phone</th>
+                        <td>{{ patient_data.phoneNumber[0] }}</td>
+                    </tr>
+                    <tr>
+                        <th class="capitalize">Date of Birth</th>
+                        <td>{{ patient_data.dateOfBirth or 'Not set' }}</td>
+                    </tr>
+                    <tr>
+                        <th class="capitalize">Gender</th>
+                        <td>{{ patient_data.gender or 'Not set' }}</td>
+                    </tr>
+                    <tr>
+                        <th class="capitalize">State</th>
+                        <td>{{ patient_data.state }}</td>
+                    </tr>
+                    <tr>
+                        <th class="capitalize">UMS ID</th>
+                        <td>{{ patient_data.umsId }}</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-    </div>
-
-    <!-- User Profile Modal -->
-    <div class="modal fade" id="userProfileModal" tabindex="-1" role="dialog" aria-labelledby="userProfileModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="userProfileModalLabel">User Profile</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="text-center">
-                        <img src="{{ url_for('static', filename='images/user/1.jpg') }}" class="img-fluid rounded-circle mb-3" alt="user" style="max-width: 100px;">
-                        <h5>{{ patient_data.name }}</h5>
-                        <p>Patient</p>
-                    </div>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">
-                            <strong>Email:</strong> {{ patient_data.email }}
-                        </li>
-                        <li class="list-group-item">
-                            <strong>Phone:</strong> {{ patient_data.phoneNumber[0] if patient_data.phoneNumber else 'N/A' }}
-                        </li>
-                        <!-- Add more profile information as needed -->
-                    </ul>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <a href="{{ url_for('auth.logout') }}" class="btn btn-primary">Logout</a>
-                </div>
-            </div>
+        <div class="modal-action mt-4">
+            <button class="btn">Close</button>
+            <a href="{{ url_for('patient.profile') }}" class="btn btn-primary">View Full Profile</a>
         </div>
-    </div>
+    </form>
+</dialog>
 
-    <!-- Required Scripts -->
-    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/dataTables.bootstrap4.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='fullcalendar/core/main.js') }}"></script>
-    <script src="{{ url_for('static', filename='fullcalendar/daygrid/main.js') }}"></script>
-    <script src="{{ url_for('static', filename='fullcalendar/timegrid/main.js') }}"></script>
-    <script src="{{ url_for('static', filename='fullcalendar/list/main.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/flatpickr.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+<dialog id="edit_profile" class="modal">
+    <form method="POST" action="{{ url_for('patient.profile') }}" class="modal-box">
+        <h3 class="font-bold text-lg">Edit Profile</h3>
+        <input type="hidden" name="form_type" value="update_profile">
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Name</span>
+            </label>
+            <input type="text" name="name" value="{{ patient_data.name }}" class="input input-bordered" required>
+        </div>
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Email</span>
+            </label>
+            <input type="email" name="email" value="{{ patient_data.email }}" class="input input-bordered" required>
+        </div>
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Phone</span>
+            </label>
+            <input type="tel" name="phoneNumber" value="{{ patient_data.phoneNumber[0] }}" class="input input-bordered" required>
+        </div>
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Date of Birth</span>
+            </label>
+            <input type="date" name="dateOfBirth" value="{{ patient_data.dateOfBirth }}" class="input input-bordered">
+        </div>
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Gender</span>
+            </label>
+            <select name="gender" class="select select-bordered">
+                <option value="">Select Gender</option>
+                <option value="male" {% if patient_data.gender == 'male' %}selected{% endif %}>Male</option>
+                <option value="female" {% if patient_data.gender == 'female' %}selected{% endif %}>Female</option>
+                <option value="other" {% if patient_data.gender == 'other' %}selected{% endif %}>Other</option>
+            </select>
+        </div>
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">State</span>
+            </label>
+            <input type="text" name="state" value="{{ patient_data.state }}" class="input input-bordered" required>
+        </div>
+        <div class="modal-action">
+            <button type="button" class="btn" onclick="edit_profile.close()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+    </form>
+</dialog>
 
-    <script>
-    $(document).ready(function() {
-        // Appointments DataTable
-        $('#appointmentModal').on('shown.bs.modal', function() {
-            if (!$.fn.DataTable.isDataTable('#appointmentsTable')) {
-                $('#appointmentsTable').DataTable({
-                    "ajax": {
-                        "url": "{{ url_for('patient.api_appointments') }}",
-                        "dataSrc": ""
-                    },
-                    "columns": [
-                        { "data": "date" },
-                        { "data": "doctor" },
-                        { "data": "status" }
-                    ]
-                });
-            }
-        });
+<!-- Add other modals (book_appointment, view_medical_records, view_test_results, log_symptoms, open_chatbot) here -->
+{% endblock %}
 
-        // Medical Records DataTable
-        $('#medicalRecordsModal').on('shown.bs.modal', function() {
-            if (!$.fn.DataTable.isDataTable('#medicalRecordsTable')) {
-                $('#medicalRecordsTable').DataTable({
-                    "ajax": {
-                        "url": "{{ url_for('patient.api_medical_records') }}",
-                        "dataSrc": ""
-                    },
-                    "columns": [
-                        { "data": "date" },
-                        { "data": "doctor" },
-                        { "data": "diagnosis" }
-                    ]
-                });
-            }
-        });
-
-        // Doctors DataTable
-        $('#doctorsListModal').on('shown.bs.modal', function() {
-            if (!$.fn.DataTable.isDataTable('#doctorsTable')) {
-                $('#doctorsTable').DataTable({
-                    "ajax": {
-                        "url": "{{ url_for('patient.api_doctors') }}",
-                        "dataSrc": ""
-                    },
-                    "columns": [
-                        { "data": "name" },
-                        { "data": "specialization" },
-                        { "data": "contact" }
-                    ]
-                });
-            }
-        });
-
-        // Hospitals DataTable
-        $('#hospitalsListModal').on('shown.bs.modal', function() {
-            if (!$.fn.DataTable.isDataTable('#hospitalsTable')) {
-                $('#hospitalsTable').DataTable({
-                    "ajax": {
-                        "url": "{{ url_for('patient.api_hospitals') }}",
-                        "dataSrc": ""
-                    },
-                    "columns": [
-                        { "data": "name" },
-                        { "data": "location" },
-                        { "data": "contact" }
-                    ]
-                });
-            }
-        });
-
-        // Support DataTable
-        $('#supportModal').on('shown.bs.modal', function() {
-            if (!$.fn.DataTable.isDataTable('#supportTable')) {
-                $('#supportTable').DataTable({
-                    "ajax": {
-                        "url": "{{ url_for('patient.api_support_requests') }}",
-                        "dataSrc": ""
-                    },
-                    "columns": [
-                        { "data": "date" },
-                        { "data": "subject" },
-                        { "data": "status" }
-                    ]
-                });
-            }
-        });
-
-        // Initialize the user profile modal
-        $('#userProfileModal').on('show.bs.modal', function (event) {
-            // You can add any additional logic here if needed
-        });
-    });
-    </script>
-</body>
-</html>
+{% block scripts %}
+<script>
+    // Add any necessary JavaScript for modal interactions and data loading
+</script>
+{% endblock %}

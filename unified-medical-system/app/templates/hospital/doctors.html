@@ -1,0 +1,87 @@
+{% extends "hospital/base.html" %}
+
+{% block title %}Assigned Doctors{% endblock %}
+
+{% block page_title %}Assigned Doctors{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="p-4">
+    <div class="overflow-x-auto">
+        <table id="doctorsTable" class="table table-zebra table-bordered w-full">
+            <thead>
+                <tr>
+                    <th class="border">UMS ID</th>
+                    <th class="border">Name</th>
+                    <th class="border">Email</th>
+                    <th class="border">Phone</th>
+                    <th class="border">Specialization</th>
+                    <th class="border">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for doctor in doctors %}
+                <tr>
+                    <td class="border">{{ doctor.umsId }}</td>
+                    <td class="border">{{ doctor.name }}</td>
+                    <td class="border">{{ doctor.email }}</td>
+                    <td class="border">{{ doctor.phoneNumber }}</td>
+                    <td class="border">{{ doctor.specialization }}</td>
+                    <td class="border">
+                        <button class="btn btn-sm btn-primary assign-appointment" data-doctor-id="{{ doctor.umsId }}">Assign Appointment</button>
+                        <button class="btn btn-sm btn-warning relieve-doctor" data-doctor-id="{{ doctor.umsId }}">Relieve</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_body %}
+<script>
+$(document).ready(function() {
+    $('#doctorsTable').DataTable({
+        "drawCallback": function(settings) {
+            // Re-apply daisyUI classes after DataTables redraws the table
+            $(this).find('td, th').addClass('border');
+        }
+    });
+
+    $('.relieve-doctor').on('click', function() {
+        const doctorId = $(this).data('doctor-id');
+        if (confirm('Are you sure you want to relieve this doctor?')) {
+            $.ajax({
+                url: '{{ url_for("hospital.relieve_doctor") }}',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ doctorId: doctorId }),
+                success: function(response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload();
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while processing your request.');
+                }
+            });
+        }
+    });
+
+    $('.assign-appointment').on('click', function() {
+        const doctorId = $(this).data('doctor-id');
+        // Implement appointment assignment logic here
+        alert('Assign appointment to doctor ' + doctorId);
+    });
+});
+</script>
+{% endblock %}

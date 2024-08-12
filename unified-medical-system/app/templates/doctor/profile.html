@@ -150,6 +150,7 @@
                               </div>
                               <div class="text-center mt-3 pl-3 pr-3">
                                  <h4><b>{{ doctor_data.name }}</b></h4>
+                                 <p> <h4>{{ doctor_data.umsId }}</h4></p>
                                  <p>{{ doctor_data.specialization }}</p>
                                  <p class="mb-0">{{ doctor_data.qualification }}</p>
                                  <p class="mb-0 text-danger"><b>Last Updated: {{ doctor_data.updatedAt.strftime('%Y-%m-%d %H:%M:%S') }}</b></p>
@@ -181,20 +182,22 @@
                         <div class="iq-card-body">
                            <div class="about-info m-0 p-0">
                               <div class="row">
-                                 <div class="col-4 text-primary"><b><i class="ri-user-line"></i> First Name:</b></div>
-                                 <div class="col-8 text-primary"><b>{{ doctor_data.name.split()[0] }}</b></div>
-                                 <div class="col-4 text-primary"><b><i class="ri-user-line"></i> Last Name:</b></div>
-                                 <div class="col-8 text-primary"><b>{{ doctor_data.name.split()[-1] }}</b></div>
-                                 <div class="col-4 text-success"><b><i class="ri-mail-line"></i> Email:</b></div>
-                                 <div class="col-8 text-success"><b><a href="mailto:{{ doctor_data.email }}">{{ doctor_data.email }}</a></b></div>
-                                 <div class="col-4 text-success"><b><i class="ri-phone-line"></i> Phone:</b></div>
-                                 <div class="col-8 text-success"><b><a href="tel:{{ doctor_data.phoneNumber }}">{{ doctor_data.phoneNumber }}</a></b></div>
-                                 <div class="col-4 text-warning"><b><i class="ri-file-text-line"></i> Specialization:</b></div>
-                                 <div class="col-8 text-warning"><b>{{ doctor_data.specialization }}</b></div>
-                                 <div class="col-4 text-warning"><b><i class="ri-id-card-line"></i> Medical ID:</b></div>
-                                 <div class="col-8 text-warning"><b>{{ doctor_data.medicalId }}</b></div>
-                                 <div class="col-4 text-warning"><b><i class="ri-certificate-line"></i> Qualification:</b></div>
-                                 <div class="col-8 text-warning"><b>{{ doctor_data.qualification }}</b></div>
+                                 <div class="col-4 text-primary"><i class="ri-id-card-line"></i> UMS ID:</div>
+                                 <div class="col-8 text-primary">{{ doctor_data.umsId }}</div>
+                                 <div class="col-4 text-primary"><i class="ri-user-line"></i> First Name:</div>
+                                 <div class="col-8 text-primary">{{ doctor_data.name.split()[0] }}</div>
+                                 <div class="col-4 text-primary"><i class="ri-user-line"></i> Last Name:</div>
+                                 <div class="col-8 text-primary">{{ doctor_data.name.split()[-1] }}</div>
+                                 <div class="col-4 text-primary"><i class="ri-mail-line"></i> Email:</div>
+                                 <div class="col-8 text-primary"><a href="mailto:{{ doctor_data.email }}">{{ doctor_data.email }}</a></div>
+                                 <div class="col-4 text-primary"><i class="ri-phone-line"></i> Phone:</div>
+                                 <div class="col-8 text-primary"><span>{{ doctor_data.phoneNumber }}</span></div>
+                                 <div class="col-4 text-primary"><i class="ri-file-text-line"></i> Specialization:</div>
+                                 <div class="col-8 text-primary">{{ doctor_data.specialization }}</div>
+                                 <div class="col-4 text-primary"><i class="ri-id-card-line"></i> Medical ID:</div>
+                                 <div class="col-8 text-primary">{{ doctor_data.medicalId }}</div>
+                                 <div class="col-4 text-primary"><i class="ri-certificate-line"></i> Qualification:</div>
+                                 <div class="col-8 text-primary">{{ doctor_data.qualification }}</div>
                               </div>
                            </div>
                         </div>
@@ -280,6 +283,41 @@
                                              <td>Netherland Medical College</td>
                                              <td><span class="badge badge-success">excellence</span></td>
                                          </tr>
+                                     </tbody>
+                                    </table>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                        <div class="col-md-12">
+                           <div class="iq-card">
+                              <div class="iq-card-header d-flex justify-content-between">
+                                 <div class="iq-header-title">
+                                    <h4 class="card-title">Assigned Hospitals</h4>
+                                 </div>
+                              </div>
+                              <div class="iq-card-body">
+                                 <div class="table-responsive">
+                                    <table class="table mb-0 table-borderless">
+                                     <thead>
+                                         <tr>
+                                             <th scope="col">Hospital Name</th>
+                                             <th scope="col">UMS ID</th>
+                                             <th scope="col">Email</th>
+                                             <th scope="col">Phone</th>
+                                             <th scope="col">Address</th>
+                                         </tr>
+                                     </thead>
+                                     <tbody>
+                                         {% for hospital in doctor_data.assigned_hospitals %}
+                                         <tr>
+                                             <td>{{ hospital.name }}</td>
+                                             <td>{{ hospital.umsId }}</td>
+                                             <td>{{ hospital.email }}</td>
+                                             <td>{{ hospital.phoneNumber[0] if hospital.phoneNumber else 'N/A' }}</td>
+                                             <td>{{ hospital.address }}</td>
+                                         </tr>
+                                         {% endfor %}
                                      </tbody>
                                     </table>
                                  </div>

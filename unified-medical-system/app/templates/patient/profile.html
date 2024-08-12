@@ -1,0 +1,348 @@
+{% extends "patient/base.html" %}
+
+{% block title %}UMS - Patient Profile{% endblock %}
+
+{% block page_title %}Patient Profile{% endblock %}
+
+{% block extra_head %}
+<style>
+    .glassmorphism {
+        background: rgba(0, 128, 0, 0.05);
+        backdrop-filter: blur(10px);
+        border-radius: 10px;
+        border: 1px solid rgba(0, 128, 0, 0.1);
+        box-shadow: 0 4px 6px rgba(0, 128, 0, 0.1);
+        color: #333333;
+    }
+    .modal-box {
+        background: rgba(0, 128, 0, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(0, 128, 0, 0.1);
+        box-shadow: 0 4px 6px rgba(0, 128, 0, 0.1);
+        position: relative;
+        z-index: 9999;
+    }
+    .pac-container {
+        z-index: 10000 !important;
+    }
+    .modal::backdrop {
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+    .profile-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    .profile-table th,
+    .profile-table td {
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem;
+    }
+    .profile-table tr:nth-child(odd) {
+        background-color: #fce4ec; /* Pastel pink */
+    }
+    .profile-table tr:nth-child(even) {
+        background-color: #e8f5e9; /* Pastel green */
+    }
+</style>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCwrIvSVrnX091MAxkWIDLQ-K3gc1Z4VLY&libraries=places"></script>
+<script src="{{ url_for('static', filename='js/form-validation-patient.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-4">
+    <h1 class="text-2xl font-bold mb-4">{{ patient_data.name }}'s Profile</h1>
+    <div id="flash-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+       <b> <span class="block sm:inline" id="flash-message-text"></span></b>
+    </div>
+    <div class="glassmorphism p-6">
+        <div class="overflow-x-auto">
+            <table class="profile-table">
+                <tbody>
+                    {% for key, value in patient_data.items() %}
+                        {% if key not in ['_id', 'passwordHash', 'rolesId', 'updatedAt', 'createdAt', 'status'] %}
+                            <tr>
+                                <th class="capitalize">{{ key.replace('_', ' ') }}</th>
+                                <td>{{ value or 'Not set' }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                    {% if 'address' not in patient_data %}
+                        <tr>
+                            <th class="capitalize">Address</th>
+                            <td>Not set</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="mt-4">
+        <button class="btn btn-primary" onclick="openModal()">Edit Profile</button>
+        <button class="btn btn-secondary ml-2" onclick="openPasswordModal()">Change Password</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block modals %}
+<dialog id="edit_profile" class="modal">
+    <form method="POST" action="{{ url_for('patient.profile') }}" class="modal-box" id="profileForm">
+        <h3 class="font-bold text-lg">Edit Profile</h3>
+        <input type="hidden" name="form_type" value="update_profile">
+        {% for key, value in patient_data.items() %}
+            {% if key not in ['_id', 'passwordHash', 'rolesId', 'updatedAt', 'createdAt', 'umsId', 'status'] %}
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text capitalize">{{ key.replace('_', ' ') }}</span>
+                    </label>
+                    {% if key == 'gender' %}
+                        <select name="{{ key }}" class="select select-bordered" id="gender">
+                            <option value="">Select Gender</option>
+                            <option value="male" {% if value == 'male' %}selected{% endif %}>Male</option>
+                            <option value="female" {% if value == 'female' %}selected{% endif %}>Female</option>
+                            <option value="other" {% if value == 'other' %}selected{% endif %}>Other</option>
+                        </select>
+                        <span class="text-red-500 text-sm" id="genderError"></span>
+                    {% elif key == 'dateOfBirth' %}
+                        <input type="date" name="{{ key }}" value="{{ value }}" class="input input-bordered" id="dateOfBirth" max="{{ today_date }}">
+                        <span class="text-red-500 text-sm" id="dateOfBirthError"></span>
+                    {% elif key == 'state' %}
+                        <select name="{{ key }}" class="select select-bordered" required id="state">
+                            <option value="">Select State</option>
+                            <option value="AN" {% if value == 'AN' %}selected{% endif %}>Andaman and Nicobar Islands</option>
+                            <option value="AP" {% if value == 'AP' %}selected{% endif %}>Andhra Pradesh</option>
+                            <option value="AR" {% if value == 'AR' %}selected{% endif %}>Arunachal Pradesh</option>
+                            <option value="AS" {% if value == 'AS' %}selected{% endif %}>Assam</option>
+                            <option value="BR" {% if value == 'BR' %}selected{% endif %}>Bihar</option>
+                            <option value="CH" {% if value == 'CH' %}selected{% endif %}>Chandigarh</option>
+                            <option value="CT" {% if value == 'CT' %}selected{% endif %}>Chhattisgarh</option>
+                            <option value="DN" {% if value == 'DN' %}selected{% endif %}>Dadra and Nagar Haveli and Daman and Diu</option>
+                            <option value="DL" {% if value == 'DL' %}selected{% endif %}>Delhi</option>
+                            <option value="GA" {% if value == 'GA' %}selected{% endif %}>Goa</option>
+                            <option value="GJ" {% if value == 'GJ' %}selected{% endif %}>Gujarat</option>
+                            <option value="HR" {% if value == 'HR' %}selected{% endif %}>Haryana</option>
+                            <option value="HP" {% if value == 'HP' %}selected{% endif %}>Himachal Pradesh</option>
+                            <option value="JK" {% if value == 'JK' %}selected{% endif %}>Jammu and Kashmir</option>
+                            <option value="JH" {% if value == 'JH' %}selected{% endif %}>Jharkhand</option>
+                            <option value="KA" {% if value == 'KA' %}selected{% endif %}>Karnataka</option>
+                            <option value="KL" {% if value == 'KL' %}selected{% endif %}>Kerala</option>
+                            <option value="LA" {% if value == 'LA' %}selected{% endif %}>Ladakh</option>
+                            <option value="LD" {% if value == 'LD' %}selected{% endif %}>Lakshadweep</option>
+                            <option value="MP" {% if value == 'MP' %}selected{% endif %}>Madhya Pradesh</option>
+                            <option value="MH" {% if value == 'MH' %}selected{% endif %}>Maharashtra</option>
+                            <option value="MN" {% if value == 'MN' %}selected{% endif %}>Manipur</option>
+                            <option value="ML" {% if value == 'ML' %}selected{% endif %}>Meghalaya</option>
+                            <option value="MZ" {% if value == 'MZ' %}selected{% endif %}>Mizoram</option>
+                            <option value="NL" {% if value == 'NL' %}selected{% endif %}>Nagaland</option>
+                            <option value="OR" {% if value == 'OR' %}selected{% endif %}>Odisha</option>
+                            <option value="PY" {% if value == 'PY' %}selected{% endif %}>Puducherry</option>
+                            <option value="PB" {% if value == 'PB' %}selected{% endif %}>Punjab</option>
+                            <option value="RJ" {% if value == 'RJ' %}selected{% endif %}>Rajasthan</option>
+                            <option value="SK" {% if value == 'SK' %}selected{% endif %}>Sikkim</option>
+                            <option value="TN" {% if value == 'TN' %}selected{% endif %}>Tamil Nadu</option>
+                            <option value="TG" {% if value == 'TG' %}selected{% endif %}>Telangana</option>
+                            <option value="TR" {% if value == 'TR' %}selected{% endif %}>Tripura</option>
+                            <option value="UP" {% if value == 'UP' %}selected{% endif %}>Uttar Pradesh</option>
+                            <option value="UT" {% if value == 'UT' %}selected{% endif %}>Uttarakhand</option>
+                            <option value="WB" {% if value == 'WB' %}selected{% endif %}>West Bengal</option>
+                        </select>
+                        <span class="text-red-500 text-sm" id="stateError"></span>
+                    {% elif key == 'address' %}
+                        <input type="text" name="{{ key }}" id="address" value="{{ value|join(', ') if value is iterable and value is not string else value }}" class="input input-bordered">
+                        <span class="text-red-500 text-sm" id="addressError"></span>
+                    {% else %}
+                        <input type="{{ 'email' if key == 'email' else 'text' }}" name="{{ key }}" value="{{ value }}" class="input input-bordered" {% if key in ['name', 'email', 'phoneNumber'] %}required{% endif %} id="{{ key }}">
+                        <span class="text-red-500 text-sm" id="{{ key }}Error"></span>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endfor %}
+        <div class="modal-action">
+            <button type="button" class="btn" onclick="closeModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+    </form>
+</dialog>
+
+<dialog id="change_password" class="modal">
+    <form method="POST" action="{{ url_for('patient.change_password') }}" class="modal-box" id="passwordForm">
+        <h3 class="font-bold text-lg">Change Password</h3>
+        <input type="hidden" name="form_type" value="change_password">
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Current Password</span>
+            </label>
+            <input type="password" name="current_password" id="currentPassword" class="input input-bordered" required>
+            <span class="text-red-500 text-sm" id="currentPasswordError"></span>
+        </div>
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">New Password</span>
+            </label>
+            <input type="password" name="new_password" id="newPassword" class="input input-bordered" required>
+            <span class="text-red-500 text-sm" id="newPasswordError"></span>
+        </div>
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Confirm New Password</span>
+            </label>
+            <input type="password" name="confirm_password" id="confirmPassword" class="input input-bordered" required>
+            <span class="text-red-500 text-sm" id="confirmPasswordError"></span>
+        </div>
+        <div class="modal-action">
+            <button type="button" class="btn" onclick="closePasswordModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Change Password</button>
+        </div>
+    </form>
+</dialog>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/form-validation-patient.js') }}"></script>
+<script>
+    function initAutocomplete() {
+        var input = document.getElementById('address');
+        var autocomplete = new google.maps.places.Autocomplete(input, {
+            componentRestrictions: { country: "in" },
+            types: ['address']
+        });
+        autocomplete.setFields(['address_components', 'geometry', 'name']);
+        autocomplete.addListener('place_changed', function() {
+            var place = autocomplete.getPlace();
+            if (!place.geometry) {
+                return;
+            }
+        });
+    }
+
+    function openModal() {
+        var modal = document.getElementById('edit_profile');
+        modal.showModal();
+        initAutocomplete();
+    }
+
+    function closeModal() {
+        var modal = document.getElementById('edit_profile');
+        modal.close();
+    }
+
+    function openPasswordModal() {
+        var modal = document.getElementById('change_password');
+        modal.showModal();
+    }
+
+    function closePasswordModal() {
+        var modal = document.getElementById('change_password');
+        modal.close();
+    }
+
+    function validatePassword(password) {
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        return passwordRegex.test(password);
+    }
+
+    function showFlashMessage(message) {
+        const flashMessage = document.getElementById('flash-message');
+        const flashMessageText = document.getElementById('flash-message-text');
+        flashMessageText.textContent = message;
+        flashMessage.classList.remove('hidden');
+        setTimeout(() => {
+            flashMessage.classList.add('hidden');
+        }, 3000);
+    }
+
+    function validatePasswordForm() {
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const currentPasswordError = document.getElementById('currentPasswordError');
+        const newPasswordError = document.getElementById('newPasswordError');
+        const confirmPasswordError = document.getElementById('confirmPasswordError');
+
+        let isValid = true;
+
+        if (currentPassword.length === 0) {
+            currentPasswordError.textContent = 'Current password is required.';
+            isValid = false;
+        } else {
+            currentPasswordError.textContent = '';
+        }
+
+        if (!validatePassword(newPassword)) {
+            newPasswordError.textContent = 'Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.';
+            isValid = false;
+        } else {
+            newPasswordError.textContent = '';
+        }
+
+        if (newPassword !== confirmPassword) {
+            confirmPasswordError.textContent = 'Passwords do not match.';
+            isValid = false;
+        } else {
+            confirmPasswordError.textContent = '';
+        }
+
+        return isValid;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var editButton = document.querySelector('.btn-primary');
+        editButton.onclick = openModal;
+
+        var closeButton = document.querySelector('.modal-action .btn');
+        closeButton.onclick = closeModal;
+
+        // Set max date for date of birth
+        var dateOfBirthInput = document.getElementById('dateOfBirth');
+        var today = new Date().toISOString().split('T')[0];
+        dateOfBirthInput.setAttribute('max', today);
+
+        // Add event listener to validate date of birth
+        dateOfBirthInput.addEventListener('change', function() {
+            var selectedDate = new Date(this.value);
+            var currentDate = new Date();
+            
+            if (selectedDate > currentDate) {
+                this.value = '';
+                document.getElementById('dateOfBirthError').textContent = 'Date of birth cannot be in the future';
+            } else {
+                document.getElementById('dateOfBirthError').textContent = '';
+            }
+        });
+
+        const passwordForm = document.getElementById('passwordForm');
+
+        if (passwordForm) {
+            passwordForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                if (validatePasswordForm()) {
+                    const formData = new FormData(passwordForm);
+                    fetch(passwordForm.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showFlashMessage(data.message);
+                            closePasswordModal();
+                            passwordForm.reset();
+                        } else {
+                            showFlashMessage(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showFlashMessage('An error occurred. Please try again.');
+                    });
+                } else {
+                    showFlashMessage('Please correct the errors in the form before submitting.');
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

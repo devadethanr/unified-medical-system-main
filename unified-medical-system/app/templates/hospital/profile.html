@@ -1,15 +1,18 @@
 {% extends "hospital/base.html" %}
 
-{% block title %}Hospital Dashboard{% endblock %}
+{% block title %}Hospital Profile{% endblock %}
 
-{% block page_title %}Hospital Dashboard{% endblock %}
+{% block page_title %}Hospital Profile{% endblock %}
 
 {% block extra_head %}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCwrIvSVrnX091MAxkWIDLQ-K3gc1Z4VLY&libraries=places"></script>
+    <script src="{{ url_for('static', filename='js/form-validation-profile.js') }}"></script>
 {% endblock %}
 
 {% block content %}
-
 <div class="p-4">
     <h1 class="text-2xl font-bold mb-4">Hospital Profile</h1>
     <!-- Profile content -->
@@ -34,5 +37,121 @@
         </div>
     </div>
 </div>
-{% endblock %}
 
+<!-- Edit Profile Modal -->
+<dialog id="edit_profile" class="modal">
+    <form id="profileForm" method="POST" action="{{ url_for('hospital.update_profile') }}" class="modal-box">
+        <h3 class="font-bold text-lg">Edit Hospital Profile</h3>
+        <div class="form-control">
+            <label class="label" for="name">
+                <span class="label-text">Hospital Name</span>
+            </label>
+            <input type="text" id="name" name="name" class="input input-bordered" value="{{ hospital_data.name }}" required>
+            <span id="nameError" class="text-error"></span>
+        </div>
+        <div class="form-control">
+            <label class="label" for="email">
+                <span class="label-text">Email</span>
+            </label>
+            <input type="email" id="email" name="email" class="input input-bordered" value="{{ hospital_data.email }}" required>
+            <span id="emailError" class="text-error"></span>
+        </div>
+        <div class="form-control">
+            <label class="label" for="phoneNumber">
+                <span class="label-text">Phone Number</span>
+            </label>
+            <input type="tel" id="phoneNumber" name="phoneNumber" class="input input-bordered" value="{{ hospital_data.phoneNumber }}" required>
+            <span id="phoneNumberError" class="text-error"></span>
+        </div>
+        <div class="form-control">
+            <label class="label" for="state">
+                <span class="label-text">State</span>
+            </label>
+            <select class="input input-bordered" id="state" name="state" value="{{ hospital_data.state }}" required>
+               <option value="not selected" selected>Select State</option>
+               <option value="AN">Andaman and Nicobar Islands</option>
+               <option value="AP">Andhra Pradesh</option>
+               <option value="AR">Arunachal Pradesh</option>
+               <option value="AS">Assam</option>
+               <option value="BR">Bihar</option>
+               <option value="CH">Chandigarh</option>
+               <option value="CT">Chhattisgarh</option>
+               <option value="DN">Dadra and Nagar Haveli and Daman and Diu</option>
+               <option value="DL">Delhi</option>
+               <option value="GA">Goa</option>
+               <option value="GJ">Gujarat</option>
+               <option value="HR">Haryana</option>
+               <option value="HP">Himachal Pradesh</option>
+               <option value="JK">Jammu and Kashmir</option>
+               <option value="JH">Jharkhand</option>
+               <option value="KA">Karnataka</option>
+               <option value="KL">Kerala</option>
+               <option value="LA">Ladakh</option>
+               <option value="LD">Lakshadweep</option>
+               <option value="MP">Madhya Pradesh</option>
+               <option value="MH">Maharashtra</option>
+               <option value="MN">Manipur</option>
+               <option value="ML">Meghalaya</option>
+               <option value="MZ">Mizoram</option>
+               <option value="NL">Nagaland</option>
+               <option value="OR">Odisha</option>
+               <option value="PY">Puducherry</option>
+               <option value="PB">Punjab</option>
+               <option value="RJ">Rajasthan</option>
+               <option value="SK">Sikkim</option>
+               <option value="TN">Tamil Nadu</option>
+               <option value="TG">Telangana</option>
+               <option value="TR">Tripura</option>
+               <option value="UP">Uttar Pradesh</option>
+               <option value="UT">Uttarakhand</option>
+               <option value="WB">West Bengal</option>
+            </select>
+        </div>
+        <div class="form-control">
+            <label class="label" for="address">
+                <span class="label-text">Address</span>
+            </label>
+            <input type="text" id="address" name="address" class="input input-bordered" value="{{ hospital_data.address }}" required>
+            <span id="addressError" class="text-error"></span>
+        </div>
+        <div class="form-control">
+            <label class="label" for="licenseNumber">
+                <span class="label-text">License Number</span>
+            </label>
+            <input type="text" id="licenseNumber" name="licenseNumber" class="input input-bordered" value="{{ hospital_data.licenseNumber }}" required>
+            <span id="licenseError" class="text-error"></span>
+        </div>
+        <div class="modal-action">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <button type="button" class="btn" onclick="edit_profile.close()">Close</button>
+        </div>
+    </form>
+</dialog>
+
+<script>
+    function initAutocomplete() {
+        var input = document.getElementById('address');
+        var autocomplete = new google.maps.places.Autocomplete(input);
+        autocomplete.setFields(['address_components', 'geometry', 'name']);
+        
+        console.log('Autocomplete initialized'); // Debug log
+    }
+
+    function validateLicense(input) {
+        const licensePattern = /^[A-Z]{2}-\d{2}-\d{4}-\d{7}$/;
+        const errorSpan = document.getElementById('licenseError');
+        
+        if (licensePattern.test(input.value)) {
+            input.setCustomValidity('');
+            errorSpan.textContent = '';
+        } else {
+            input.setCustomValidity('Invalid license format');
+            errorSpan.textContent = 'Invalid license format. Please use XX-YY-ZZZZ-NNNNNNN';
+        }
+    }
+
+    document.getElementById('licenseNumber').addEventListener('input', function() {
+        validateLicense(this);
+    });
+</script>
+{% endblock %}

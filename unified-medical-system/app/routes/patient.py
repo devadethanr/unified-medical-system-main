@@ -2,8 +2,9 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash,
 from flask_login import login_required, current_user
 from app import mongo
 from datetime import datetime
-from werkzeug.security import generate_password_hash
-import re, uuid
+from werkzeug.security import generate_password_hash, check_password_hash
+import re, uuid, json
+from bson import json_util, ObjectId
 
 patient_bp = Blueprint('patient', __name__)
 
@@ -23,50 +24,40 @@ def profile():
     patient_data = mongo.db.patients.find_one({'umsId': current_user.umsId})
     user_data = mongo.db.users.find_one({'umsId': current_user.umsId})
     patient_data.update(user_data)
+    
     if request.method == 'POST':
-        if request.form.get('form_type') == 'update_profile':
-            return update_profile()
+        form_data = request.form.to_dict()
+        form_data.pop('form_type', None)
+        
+        # Handle list fields (e.g., phoneNumber)
+        for key, value in form_data.items():
+            if ',' in value:
+                form_data[key] = [item.strip() for item in value.split(',')]
+        
+        # Separate data for users and patients collections
+        user_update_data = {k: v for k, v in form_data.items() if k not in ['dateOfBirth', 'gender']}
+        patient_update_data = {k: v for k, v in form_data.items() if k in ['dateOfBirth', 'gender']}
+        # Update timestamps
+        current_time = datetime.now()
+        user_update_data['updatedAt'] = current_time
+        patient_update_data['updatedAt'] = current_time
+        # Update the databases
+        mongo.db.users.update_one({'umsId': current_user.umsId}, {'$set': user_update_data})
+        mongo.db.patients.update_one({'umsId': current_user.umsId}, {'$set': patient_update_data})
+        flash('Profile updated successfully', 'success')
+        return redirect(url_for('patient.profile'))
     return render_template('patient/profile.html', patient_data=patient_data)
 
-def update_profile():
-    """Update patient profile information."""
-    patient_data = mongo.db.patients.find_one({'umsId': current_user.umsId})
-    user_data = mongo.db.users.find_one({'umsId': current_user.umsId})
-    patient_data.update(user_data)
-    
-    patient_data['name'] = request.form.get('name')
-    patient_data['email'] = request.form.get('email')
-    patient_data['phoneNumber'] = [request.form.get('phoneNumber')]
-    patient_data['dateOfBirth'] = request.form.get('dateOfBirth')
-    patient_data['gender'] = request.form.get('gender')
-    patient_data['updatedAt'] = datetime.now()
-    
-    passw = request.form.get('password')
-    cpassw = request.form.get('confirm_password')
-    
-    if passw and passw != cpassw:
-        flash('Passwords do not match', 'danger')
-        return redirect(url_for('patient.profile'))
-    elif passw:
-        patient_data['passwordHash'] = generate_password_hash(passw)
-    
-    mongo.db.patients.update_one({'umsId': current_user.umsId}, {'$set': patient_data})
-    mongo.db.users.update_one({'umsId': current_user.umsId}, {'$set': patient_data})
-    mongo.db.login.update_one({'umsId': current_user.umsId},
-                  {'$set': {'passwordHash': patient_data.get('passwordHash'),
-                        'updatedAt': patient_data['updatedAt'],
-                        'email': patient_data['email']}})
-    flash('Profile updated successfully', 'success')
-    return redirect(url_for('patient.profile'))
-
-@patient_bp.route('/api/appointments', methods=['GET'])
+@patient_bp.route('/get_appointments', methods=['GET'])
 @login_required
-def api_appointments():
-    """Fetch and return appointment data as JSON."""
-    appointments = list(mongo.db.appointments.find({'patientId': current_user.umsId}))
+def get_appointments():
+    """Fetch and return appointment data as JSON, excluding deleted appointments."""
+    appointments = list(mongo.db.appointments.find({'patientId': current_user.umsId, 'status': {'$ne': 'deleted'}}))
     for appointment in appointments:
         appointment['_id'] = str(appointment['_id'])
-        appointment['date'] = appointment['date'].strftime('%Y-%m-%d') if appointment.get('date') else None
+        appointment['appointmentDate'] = appointment['appointmentDate'].strftime('%Y-%m-%d')
+        hospital = mongo.db.users.find_one({'umsId': appointment['hospitalId']})
+        appointment['hospitalName'] = hospital['name'] if hospital else 'Unknown Hospital'
     return jsonify(appointments)
 
 @patient_bp.route('/api/medical_records', methods=['GET'])
@@ -88,11 +79,11 @@ def api_doctors():
         doctor['_id'] = str(doctor['_id'])
     return jsonify(doctors)
 
-@patient_bp.route('/api/hospitals', methods=['GET'])
+@patient_bp.route('/hospitals', methods=['GET'])
 @login_required
-def api_hospitals():
+def hospitals():
     """Fetch and return hospitals data as JSON."""
-    hospitals = list(mongo.db.hospitals.find())
+    hospitals = list(mongo.db.hospitals.find({'status': 'active'}))
     for hospital in hospitals:
         hospital['_id'] = str(hospital['_id'])
     return jsonify(hospitals)
@@ -162,7 +153,7 @@ def register():
             'status': 'active',
             'createdAt': created_at,
             'updatedAt': updated_at,
-            'passwordHash': generate_password_hash(password),
+            'passwordHash':[generate_password_hash(password)],
             'rolesId': 4
         }
         
@@ -185,3 +176,132 @@ def register():
         flash('User registered successfully!', 'success')
         return redirect(url_for('auth.login'))
     return render_template('patient/register.html')
+
+@login_required
+def get_medicalRecords():
+    """Fetch and return medical records data as JSON."""
+    records = list(mongo.db.medicaRrecords.find({'patientId': current_user.umsId}))
+    for record in records:
+        record['_id'] = str(record['_id'])
+        record['date'] = record['date'].strftime('%Y-%m-%d') if record.get('date') else None
+    return jsonify(records)
+
+@patient_bp.route('/appointments', methods=['GET'])
+@login_required
+def appointments():
+    """Render the appointments page."""
+    open_modal = request.args.get('open_modal', 'False')
+    patient_data = mongo.db.patients.find_one({'umsId': current_user.umsId})
+    user_data = mongo.db.users.find_one({'umsId': current_user.umsId})
+    patient_data.update(user_data)
+    return render_template('patient/appointments.html', patient_data=patient_data, open_modal=open_modal)
+
+@patient_bp.route('/search_hospitals', methods=['GET'])
+@login_required
+def search_hospitals():
+    search_term = request.args.get('term', '')
+    if search_term:
+        hospitals = mongo.db.users.find({
+            'name': {'$regex': f'^{re.escape(search_term)}', '$options': 'i'},
+            'status': 'active',
+            'rolesId': 2  # Assuming 2 is the role ID for hospitals
+        }, {
+            'umsId': 1,
+            'name': 1,
+            '_id': 0
+        }).limit(5)
+        hospitals_list = list(hospitals)
+        print(hospitals_list)
+        return jsonify(hospitals_list)
+    else:
+        return jsonify({'error': 'No search term provided'}), 400
+
+@patient_bp.route('/book_appointment', methods=['POST'])
+@login_required
+def book_appointment():
+    data = request.json
+    patient_id = current_user.umsId
+    hospital_id = data.get('hospitalId')
+    category = data.get('category')
+    appointment_date = data.get('appointmentDate')
+    is_disabled = data.get('isDisabled', False)
+    disability_id = data.get('disabilityId')
+
+    if not all([hospital_id, category, appointment_date]):
+        return jsonify({'success': False, 'message': 'Missing required fields'}), 400
+
+    try:
+        new_appointment = {
+            'patientId': patient_id,
+            'hospitalId': hospital_id,
+            'category': category,
+            'appointmentDate': datetime.strptime(appointment_date, '%Y-%m-%d'),
+            'status': 'pending',
+            'isDisabled': is_disabled,
+            'disabilityId': disability_id if is_disabled else None,
+            'createdAt': datetime.now(),
+            'updatedAt': datetime.now()
+        }
+
+        result = mongo.db.appointments.insert_one(new_appointment)
+
+        if result.inserted_id:
+            return jsonify({'success': True, 'message': 'Appointment booked successfully'})
+        else:
+            return jsonify({'success': False, 'message': 'Failed to book appointment'}), 500
+
+    except Exception as e:
+        print(f"Error booking appointment: {str(e)}")
+        return jsonify({'success': False, 'message': 'An error occurred while booking the appointment'}), 500
+
+@patient_bp.route('/change_password', methods=['POST'])
+@login_required
+def change_password():
+    form_data = request.form.to_dict()
+    current_password = form_data.get('current_password')
+    new_password = form_data.get('new_password')
+    confirm_password = form_data.get('confirm_password')
+
+    # Fetch user from login collection
+    user = mongo.db.login.find_one({'umsId': current_user.umsId})
+
+    if not user or not check_password_hash(user['passwordHash'][0], current_password):
+        return jsonify({'success': False, 'message': 'Current password is incorrect.'})
+
+    if new_password != confirm_password:
+        return jsonify({'success': False, 'message': 'New passwords do not match.'})
+
+    # Update password in login collection
+    new_password_hash = generate_password_hash(new_password)
+    mongo.db.login.update_one(
+        {'umsId': current_user.umsId},
+        {'$set': {'passwordHash': [new_password_hash], 'updatedAt': datetime.now()}}
+    )
+
+    # Update updatedAt in users and patients collections
+    current_time = datetime.now()
+    mongo.db.users.update_one({'umsId': current_user.umsId}, {'$set': {'updatedAt': current_time}})
+    mongo.db.patients.update_one({'umsId': current_user.umsId}, {'$set': {'updatedAt': current_time}})
+
+    return jsonify({'success': True, 'message': 'Password updated successfully.'})
+
+@patient_bp.route('/revoke_appointment/<appointment_id>', methods=['POST'])
+@login_required
+def revoke_appointment(appointment_id):
+    try:
+        print(appointment_id)
+        # Find the appointment and update its status to "deleted"
+        result = mongo.db.appointments.update_one(
+            {'_id': ObjectId(appointment_id), 'patientId': current_user.umsId},
+            {'$set': {'status': 'deleted', 'updatedAt': datetime.now()}}
+        )
+
+        if result.modified_count > 0:
+            return jsonify({'success': True, 'message': 'Appointment revoked successfully'})
+        else:
+            return jsonify({'success': False, 'message': 'Appointment not found or you do not have permission to revoke it'})
+
+    except Exception as e:
+        print(f"Error revoking appointment: {str(e)}")
+        return jsonify({'success': False, 'message': 'An error occurred while revoking the appointment'}), 500
+

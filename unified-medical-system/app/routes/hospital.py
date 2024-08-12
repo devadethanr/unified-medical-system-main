@@ -16,6 +16,19 @@ hospital_bp = Blueprint('hospital', __name__)
 def load_user(user_id):
     return User.get(user_id)
 
+def get_hospital_global_data():
+    hospital_id = session['umsId']
+    hospital_details = mongo.db.hospitalDetails.find_one({'umsId': hospital_id})
+    assigned_doctors_count = len(hospital_details.get('assignedDoctors', [])) if hospital_details else 0
+    # Get pending appointments count (dummy for now, replace with actual logic later)
+    pending_appointments_count = 5  # Dummy value
+    return {
+        'new_patients': 25,  # Dummy value
+        'total_appointments': 150,  # Dummy value
+        'available_doctors': assigned_doctors_count,
+        'pending_approvals': pending_appointments_count
+    }
+
 def get_hospital_data():
     hospital_data = mongo.db.hospitals.find_one({'umsId': session['umsId']})
     hospital_details = mongo.db.users.find_one({'umsId': session['umsId']})
@@ -26,17 +39,18 @@ def get_hospital_data():
 @hospital_bp.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
+    global_data = get_hospital_global_data()
     hospital_data = get_hospital_data()
     if not hospital_data:
         flash('Hospital not found', 'error')
         return redirect(url_for('auth.login'))
-    return render_template('hospital/dashboard.html', hospital_data=hospital_data)
+    return render_template('hospital/dashboard.html', hospital_data=hospital_data, global_data=global_data)
 
 
 def generate_hospital_id():
     return 'UMSH' + re.sub('-', '', str(uuid.uuid4()))[:8].upper()
 
-@hospital_bp.route('/register', methods=['GET', 'POST'])
+@hospital_bp.route('/register', methods=['GET',  'POST'])
 def register():
     if request.method == 'POST':
         # Extract form data
@@ -109,14 +123,8 @@ def register():
 @hospital_bp.route('/profile', methods=['GET'])
 @login_required
 def profile():
-    # if current_user.rolesId != 2:
-    #     abort(403)
-    # hospital = mongo.db.hospitals.find_one({'umsId': current_user.umsId})
-    # if hospital:
-    #     return render_template('hospital/profile.html', hospital=hospital)
-    # else:
-    #     abort(404)
-    return render_template('hospital/profile.html')
+    hospital_data = get_hospital_data()
+    return render_template('hospital/profile.html', hospital_data=hospital_data)
 
 
 @hospital_bp.route('/search_doctors', methods=['GET'])
@@ -178,3 +186,68 @@ def assign_doctor():
     except Exception as e:
         print(f"Error assigning doctor: {str(e)}")
         return jsonify({'success': False, 'message': 'An error occurred while assigning the doctor'}), 500
+
+@hospital_bp.route('/update_profile', methods=['POST'])
+@login_required
+def update_profile():
+    hospital_id = session['umsId']
+    update_data = {
+        'name': request.form['name'],
+        'email': request.form['email'],
+        'phoneNumber': request.form['phoneNumber'],
+        'state': request.form['state'],
+        'address': request.form['address'],
+        'licenseNumber': request.form['licenseNumber'],
+        'updatedAt': datetime.now()
+    }
+    
+    mongo.db.users.update_one({'umsId': hospital_id}, {'$set': update_data})
+    mongo.db.hospitals.update_one({'umsId': hospital_id}, {'$set': {
+        'licenseNumber': update_data['licenseNumber'],
+        'updatedAt': update_data['updatedAt']
+    }})
+    flash('Profile updated successfully', 'success')
+    return redirect(url_for('hospital.profile'))
+
+@hospital_bp.route('/doctors', methods=['GET'])
+@login_required
+def doctors():
+    hospital_id = session['umsId']
+    hospital_details = mongo.db.hospitalDetails.find_one({'umsId': hospital_id})
+    assigned_doctors = hospital_details.get('assignedDoctors', []) if hospital_details else []
+
+    doctors_details = list(mongo.db.users.find({
+        'umsId': {'$in': assigned_doctors},
+        'rolesId': 3  # Assuming 3 is the role ID for doctors
+    }, {
+        'umsId': 1,
+        'name': 1,
+        'email': 1,
+        'phoneNumber': 1,
+        'specialization': 1
+    }))
+    return render_template('hospital/doctors.html', doctors=doctors_details)
+
+@hospital_bp.route('/relieve_doctor', methods=['POST'])
+@login_required
+def relieve_doctor():
+    data = request.json
+    doctor_id = data.get('doctorId')
+    hospital_id = session['umsId']
+    if not doctor_id:
+        return jsonify({'success': False, 'message': 'Doctor ID is required'}), 400
+    try:
+        # Remove doctor from hospital's assigned doctors
+        mongo.db.hospitalDetails.update_one(
+            {'umsId': hospital_id},
+            {'$pull': {'assignedDoctors': doctor_id}}
+        )
+        # Remove hospital from doctor's assigned hospitals
+        mongo.db.doctorDetails.update_one(
+            {'umsId': doctor_id},
+            {'$pull': {'assignedHospitals': hospital_id}}
+        )
+        return jsonify({'success': True, 'message': 'Doctor relieved successfully'})
+    except Exception as e:
+        print(f"Error relieving doctor: {str(e)}")
+        return jsonify({'success': False, 'message': 'An error occurred while relieving the doctor'}), 500
