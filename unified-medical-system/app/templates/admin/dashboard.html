@@ -60,13 +60,10 @@
                 <ul class="iq-menu">
                     <li class="iq-menu-title"><i class="ri-subtract-line"></i><span>Admin Dashboard</span></li>
                     <li>
-                        <a href="index.html" class="iq-waves-effect"><i class="ri-hospital-fill"></i><span>Welcome back {{admin_data['name']}}</span></a>
-                    </li>
-                    <li>
                      <hr class="iq-divider">
                   </li>
                     <li>
-                     <a href="#" class="iq-waves-effect"><i class="ri-user-fill"></i><span>User Management</span></a>
+                     <a href="#" class="iq-waves-effect"><i class="ri-user-fill"></i><span>Welcome back {{admin_data['name']}}</span></a>
                    </li>
                     <li>
                         <a href="#" class="iq-waves-effect"><i class="ri-group-fill"></i><span>Patients</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
@@ -89,7 +86,7 @@
                      <ul class="iq-submenu">
                          <li><a href="#" data-bs-toggle="modal" data-bs-target=".hospital-view-modal"><i class="ri-list-check"></i><span>View / Manage</span></a></li>
                          <li><a href="#" data-bs-toggle="modal" data-bs-target=".hospital-approval-modal"><i class="ri-check-double-fill"></i><span>Approve or Reject Registration</span></a></li>
-                     </ul>
+                     </ul> 
                    </li>   
                     <li>
                         <a href="#" class="iq-waves-effect"><i class="ri-file-list-fill"></i><span>Hospital Registration</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
@@ -162,11 +159,6 @@
                   </div>
                   <div class="collapse navbar-collapse" id="navbarSupportedContent">
                      <ul class="navbar-nav ms-auto navbar-list">
-                        <!-- Dark Mode Toggle -->
-                        <div class="form-check form-switch">
-                           <input class="form-check-input" type="checkbox" id="darkModeToggle">
-                           <label class="form-check-label" for="darkModeToggle">Dark Mode</label>
-                        </div>
                         <li class="nav-item iq-full-screen">
                            <a href="#" class="iq-waves-effect" id="btnFullscreen"><i class="ri-fullscreen-line"></i></a>
                         </li>
@@ -183,56 +175,17 @@
                                           Notifications<small class="badge  badge-dark float-end pt-1 ms-2">4</small>
                                        </h5>
                                     </div>
-
-                                    <a href="#" class="iq-sub-card">
-                                       <div class="media align-items-center d-flex">
-                                          <div class="">
-                                             <img class="avatar-40 rounded" src="images/user/04.jpg" alt="">
-                                          </div>
-                                          <div class="media-body ms-3">
-                                             <h6 class="mb-0 ">New Mail from Fenny</h6>
-                                             <small class="float-end font-size-12">3 days ago</small>
-                                             <p class="mb-0">Jond Bini</p>
-                                          </div>
-                                       </div>
-                                    </a>
                                  </div>
                               </div>
                            </div>
                         </li>
-                        <li class="nav-item dropdown">
-                           <a href="#" class="search-toggle iq-waves-effect">
-                              <i class="ri-mail-open-fill"></i>
-                              <span class="bg-primary count-mail"></span>
-                           </a>
-                           <div class="iq-sub-dropdown">
-                              <div class="iq-card shadow-none m-0">
-                                 <div class="iq-card-body p-0 ">
-                                    <div class="bg-primary p-3">
-                                       <h5 class="mb-0 text-white d-flex justify-content-between">All Messages<small
-                                             class="badge  badge-dark float-end pt-1 ms-2">5</small></h5>
-                                    </div>
-                                    <a href="#" class="iq-sub-card">
-                                       <div class="media align-items-center d-flex">
-                                          <div class="">
-                                             <img class="avatar-40 rounded" src="images/user/01.jpg" alt="">
-                                          </div>
-                                          <div class="media-body ms-3">
-                                             <h6 class="mb-0 ">Bini Emma Watson</h6>
-                                             <small class="float-start font-size-12">13 Jun</small>
-                                          </div>
-                                       </div>
-                                    </a>
-                                 </div>
-                              </div>
-                           </div>
-                        </li>
+              
                      </ul>
                   </div>
                   <ul class="navbar-list">
                      <li>
                         <a href="#" class="search-toggle iq-waves-effect d-flex align-items-center">
-                           <img src="images/user/1.jpg" class="img-fluid rounded" alt="user">
+
                            <div class="caption">
                               <h6 class="mb-0 line-height">{{admin_data['name']}}</h6>
                               <span class="font-size-12">Available</span>
@@ -452,7 +405,7 @@
                <div class="col-lg-12">
                   <div class="row">
                      <div class="col-md-6 col-lg-3">
-                        <div class="iq-card">
+                        <div class="iq-card" data-bs-toggle="modal" data-bs-target=".doctor-view-modal">
                            <div class="iq-card-body iq-bg-primary rounded-4">
                               <div class="d-flex align-items-center justify-content-between">
                                  <div class="rounded-circle iq-card-icon bg-primary"><i class="ri-user-fill"></i></div>
@@ -465,7 +418,7 @@
                         </div>
                      </div>
                      <div class="col-md-6 col-lg-3">
-                        <div class="iq-card">
+                        <div class="iq-card" data-bs-toggle="modal" data-bs-target=".hospital-view-modal">
                            <div class="iq-card-body iq-bg-warning rounded-4">
                               <div class="d-flex align-items-center justify-content-between">
                                  <div class="rounded-circle iq-card-icon bg-warning"><i class="ri-women-fill"></i></div>
@@ -478,12 +431,12 @@
                         </div>
                      </div>
                      <div class="col-md-6 col-lg-3">
-                        <div class="iq-card">
+                        <div class="iq-card" data-bs-toggle="modal" data-bs-target=".patient-view-modal">
                            <div class="iq-card-body iq-bg-danger rounded-4">
                               <div class="d-flex align-items-center justify-content-between">
                                  <div class="rounded-circle iq-card-icon bg-danger"><i class="ri-group-fill"></i></div>
                                  <div class="text-end">
-                                    <h2 class="mb-0"><span class="counter">{{ global_admin_data['patients_count']    }}</span></h2>
+                                    <h2 class="mb-0"><span class="counter">{{ global_admin_data['patients_count'] }}</span></h2>
                                     <h5 class="">Patients</h5>
                                  </div>
                               </div>
@@ -587,64 +540,6 @@
                         </div>
                      </div>
                      <div id="home-servey-chart"></div>
-                  </div>
-               </div>
-               <div class="col-md-12">
-                  <div class="row">
-                     <div class="col-md-6">
-                        <div class="iq-card">
-                           <div class="iq-card-header d-flex justify-content-between">
-                              <div class="iq-header-title">
-                                 <h4 class="card-title">Total Accident Report</h4>
-                              </div>
-                           </div>
-                           <div class="iq-card-body">
-                              <div class="row">
-                                 <div class="col-sm-6">
-                                    <h3>$40K</h3>
-                                 </div>
-                              </div>
-                              <div id="chart-7"></div>
-                              <div class="row text-center mt-3">
-                                 <div class="col-sm-6">
-                                    <h6 class="text-truncate d-block">Last Month</h6>
-                                    <p class="m-0">358</p>
-                                 </div>
-                                 <div class="col-sm-6">
-                                    <h6 class="text-truncate d-block">Current Month</h6>
-                                    <p class="m-0">194</p>
-                                 </div>
-                              </div>
-                           </div>
-                        </div>
-                     </div>
-                     <div class="col-md-6">
-                        <div class="iq-card">
-                           <div class="iq-card-header d-flex justify-content-between">
-                              <div class="iq-header-title">
-                                 <h4 class="card-title">Total Death Report</h4>
-                              </div>
-                           </div>
-                           <div class="iq-card-body">
-                              <div class="row">
-                                 <div class="col-sm-6">
-                                    <h3>$20K</h3>
-                                 </div>
-                              </div>
-                              <div id="chart-8"></div>
-                              <div class="row text-center mt-3">  
-                                 <div class="col-sm-6">
-                                    <h6 class="text-truncate d-block">Last Month</h6>
-                                    <p class="m-0">220</p>
-                                 </div>
-                                 <div class="col-sm-6">
-                                    <h6 class="text-truncate d-block">Current Month</h6>
-                                    <p class="m-0">120</p>
-                                 </div>
-                              </div>
-                           </div>
-                        </div>
-                     </div>
                   </div>
                </div>
             </div>
@@ -1007,38 +902,5 @@
  <!-- Custom JavaScript -->
  <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
 
- <!-- Dark Mode Toggle Script -->
- <script>
-   $(document).ready(function() {
-      // Check localStorage for dark mode preference
-      if (localStorage.getItem('darkMode') === 'enabled') {
-         enableDarkMode();
-         $('#darkModeToggle').prop('checked', true);
-      }
-
-      // Function to enable dark mode
-      function enableDarkMode() {
-         if (!$('#dark-mode-css').length) {
-            $('head').append('<link id="dark-mode-css" rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}">');
-         }
-         localStorage.setItem('darkMode', 'enabled');
-      }
-
-      // Function to disable dark mode
-      function disableDarkMode() {
-         $('#dark-mode-css').remove();
-         localStorage.setItem('darkMode', 'disabled');
-      }
-
-      // Toggle dark mode on switch change
-      $('#darkModeToggle').on('change', function() {
-         if (this.checked) {
-            enableDarkMode();
-         } else {
-            disableDarkMode();
-         }
-      });
-   });
-</script>
 </body>
 </html>

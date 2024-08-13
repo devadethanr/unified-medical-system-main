@@ -1,6 +1,6 @@
 from calendar import c
 from venv import create
-from flask import Blueprint, render_template, redirect, url_for, request, flash, session
+from flask import Blueprint, render_template, redirect, url_for, request, flash, session, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required
 from app import mongo, login_manager
@@ -45,6 +45,11 @@ def index():
     doctor_details = mongo.db.doctorDetails.find_one({'umsId': session['umsId']})
     doctor_data = {**doctor_data, **doctor_details} if doctor_details else doctor_data
     doctor_data['phoneNumber'] = doctor_data.get('phoneNumber', [None])[0]
+    
+    # Add assigned hospitals information
+    doctor_data['assigned_hospitals'] = get_assigned_hospitals(doctor_details)
+    doctor_data['assignedHospitals'] = doctor_details.get('assignedHospitals', []) if doctor_details else []
+    
     print(doctor_data) #for debugging
     return render_template('doctor/dashboard.html', doctor_data=doctor_data)
 
@@ -262,5 +267,29 @@ def register():
         flash('Doctor registered successfully!')
         return redirect(url_for('doctor.index'))
     return render_template('doctor/register.html')
+
+@doctor_bp.route('/revoke_hospital', methods=['POST'])
+@login_required
+def revoke_hospital():
+    data = request.get_json()
+    hospital_id = data.get('hospital_id')
+    if not hospital_id:
+        return jsonify({'success': False, 'message': 'Hospital ID is required'}), 400
+    doctor_details = mongo.db.doctorDetails.find_one({'umsId': session['umsId']})
+    if not doctor_details or 'assignedHospitals' not in doctor_details:
+        return jsonify({'success': False, 'message': 'Doctor details not found or no assigned hospitals'}), 404
+    if hospital_id not in doctor_details['assignedHospitals']:
+        return jsonify({'success': False, 'message': 'Hospital not found in assigned hospitals'}), 404
+    # Remove the doctor from the assignedDoctors array in hospitalDetails
+    mongo.db.hospitalDetails.update_one(
+        {'umsId': hospital_id},
+        {'$pull': {'assignedDoctors': session['umsId']}}
+    )
+    # Remove the hospital from the assignedHospitals array
+    mongo.db.doctorDetails.update_one(
+        {'umsId': session['umsId']},
+        {'$pull': {'assignedHospitals': hospital_id}}
+    )
+    return jsonify({'success': True, 'message': 'Hospital assignment revoked successfully'})
 
 

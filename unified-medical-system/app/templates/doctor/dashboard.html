@@ -35,7 +35,7 @@
          <!-- Sidebar  -->
          <div class="iq-sidebar">
             <div class="iq-sidebar-logo d-flex justify-content-between">
-               <a href="{{ url_for('doctor.index') }}">
+               <a href="index.html">
                   <img src="{{ url_for('static', filename='images/logo.png') }}" class="img-fluid" alt="">
                   <span>UMS</span>
                </a>
@@ -46,21 +46,14 @@
                         <div class="hover-circle"><i class="ri-more-2-fill"></i></div>
                      </div>
                   </div>
-               </div>   
-            </div>
+               </div>
+            </div> 
             <div id="sidebar-scrollbar">
                <nav class="iq-sidebar-menu">
                   <ul class="iq-menu">
                      <li class="iq-menu-title"><i class="ri-subtract-line"></i><span>Dashboard</span></li>
                      <li class="active">
                         <a href="{{ url_for('doctor.index') }}" class="iq-waves-effect"><i class="ri-hospital-fill"></i><span>Doctor Dashboard</span></a>
-                     </li>
-                     <li>
-                        <a href="javascript:void(0);" class="iq-waves-effect"><i class="ri-mail-open-fill"></i><span>Email</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
-                        <ul class="iq-submenu">
-                           <li><a href="{{ url_for('doctor.inbox') }}"><i class="ri-inbox-fill"></i>Inbox</a></li>
-                           <li><a href="{{ url_for('doctor.compose') }}"><i class="ri-edit-2-fill"></i>Email Compose</a></li>
-                        </ul> 
                      </li>
                      <li>
                         <a href="javascript:void(0);" class="iq-waves-effect"><i class="ri-user-3-fill"></i><span>Doctor Profile</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
@@ -70,10 +63,10 @@
                         </ul>
                      </li>
                      <li>
-                        <a href="javascript:void(0);" class="iq-waves-effect"><i class="ri-user-3-fill"></i><span>Hospital Management</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
+                        <a href="javascript:void(0);" class="iq-waves-effect"><i class="ri-hospital-line"></i><span>Hospital Management</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
                         <ul class="iq-submenu">
-                           <li><a href="{{ url_for('doctor.hospital_details') }}"><i class="ri-profile-fill"></i>Current Hospital Details</a></li>
-                           <li><a href="{{ url_for('doctor.edit_hospital') }}"><i class="ri-file-edit-fill"></i> Edit Hospital </a></li>
+                           <li><a href="#" data-bs-toggle="modal" data-bs-target="#hospitalDetailsModal"><i class="ri-hospital-fill"></i>Current Hospital Details</a></li>
+                           <li><a href="#" data-bs-toggle="modal" data-bs-target="#editHospitalsModal"><i class="ri-edit-box-line"></i>Edit Assigned Hospitals</a></li>
                         </ul>
                      </li>
                      <li>
@@ -85,7 +78,13 @@
                      </li>
                      <li><a href="{{ url_for('doctor.calendar') }}" class="iq-waves-effect"><i class="ri-calendar-event-fill"></i><span>Calendar</span></a></li>
                      <li><a href="{{ url_for('doctor.timeline') }}"><i class="ri-map-pin-time-fill"></i>Timeline</a></li>
-                     <li><a href="{{ url_for('doctor.map') }}"><i class="ri-google-fill"></i>Google Map</a></li>
+                     <li>
+                        <a href="javascript:void(0);" class="iq-waves-effect"><i class="ri-mail-open-fill"></i><span>Email</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
+                        <ul class="iq-submenu">
+                           <li><a href="{{ url_for('doctor.inbox') }}"><i class="ri-inbox-fill"></i>Inbox</a></li>
+                           <li><a href="{{ url_for('doctor.compose') }}"><i class="ri-edit-2-fill"></i>Email Compose</a></li>
+                        </ul> 
+                     </li>
                      <li><a href="{{ url_for('doctor.lock_screen') }}"><i class="ri-file-lock-fill"></i>Lock Screen</a></li>   
                   </ul>
                </nav>
@@ -198,14 +197,18 @@
                   <div class="col-sm-12">
                      <div class="row">
                         <div class="col-md-6 col-lg-3">
-                           <div class="iq-card">
+                           <div class="iq-card" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#hospitalDetailsModal">
                               <div class="iq-card-body">
-                                 <div class="iq-progress-bar progress-bar-vertical iq-bg-primary">
-                                    <span class="bg-primary" data-percent="70"></span>
-                                 </div>
-                                 <span class="line-height-4">10 feb, 2020</span>
                                  <h4 class="mb-2 mt-2">Hospital Details</h4>
-                                 <p class="mb-0 text-secondary line-height">Ongoing treatment</p>
+                                 {% if doctor_data.assigned_hospitals %}
+                                    {% set hospital = doctor_data.assigned_hospitals[0] %}
+                                    <p class="mb-0 text-cyan line-height"><strong>{{ hospital.name }}</strong></p>
+                                    <p class="mb-0 text-cyan line-height"><strong>{{ hospital.umsId }}</strong></p>
+                                    <p class="mb-0 text-cyan line-height"><small>{{ hospital.address }}</small></p>
+                                 {% else %}
+                                    <p class="mb-0 text-cyan line-height">No Hospital Assigned</p>
+                                    <p class="mb-0 text-cyan line-height">Please update your profile</p>
+                                 {% endif %}
                               </div>
                            </div>
                         </div>
@@ -251,7 +254,6 @@
                               <div class="text-center mt-3">
                                  <h4><b>{{ doctor_data.name }}</b></h4>
                                  <p>Doctor</p>
-                                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In in arcu turpis. Nunc</p>
                                  <a href="#" class="btn btn-primary">Assign</a>
                               </div>
                               <hr>
@@ -450,5 +452,155 @@
       <script src="{{ url_for('static', filename='js/chart-custom.js') }}"></script>
       <!-- Custom JavaScript -->
       <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+
+      <!-- Hospital Details Modal -->
+      <div class="modal fade" id="hospitalDetailsModal" tabindex="-1" aria-labelledby="hospitalDetailsModalLabel" aria-hidden="true">
+         <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+               <div class="modal-header bg-primary text-white">
+                  <h5 class="modal-title" id="hospitalDetailsModalLabel">Hospital Details</h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+               </div>
+               <div class="modal-body">
+                  {% if doctor_data.assigned_hospitals %}
+                     {% set hospital = doctor_data.assigned_hospitals[0] %}
+                     <table class="table table-bordered">
+                        <tbody>
+                           <tr>
+                              <th scope="row" class="bg-primary text-white" style="width: 30%;">Hospital Name</th>
+                              <td>{{ hospital.name }}</td>
+                           </tr>
+                           <tr>
+                              <th scope="row" class="bg-primary text-white">UMS ID</th>
+                              <td>{{ hospital.umsId }}</td>
+                           </tr>
+                           <tr>
+                              <th scope="row" class="bg-primary text-white">Email</th>
+                              <td>{{ hospital.email }}</td>
+                           </tr>
+                           <tr>
+                              <th scope="row" class="bg-primary text-white">Phone</th>
+                              <td>{{ hospital.phoneNumber[0] if hospital.phoneNumber else 'N/A' }}</td>
+                           </tr>
+                           <tr>
+                              <th scope="row" class="bg-primary text-white">Address</th>
+                              <td>{{ hospital.address }}</td>
+                           </tr>
+                           <tr>
+                              <th scope="row" class="bg-primary text-white">State</th>
+                              <td>{{ hospital.state }}</td>
+                           </tr>
+                           <tr>
+                              <th scope="row" class="bg-primary text-white">Status</th>
+                              <td>{{ hospital.status }}</td>
+                           </tr>
+                           <tr>
+                              <th scope="row" class="bg-primary text-white">Last Updated</th>
+                              <td>{{ hospital.updatedAt.strftime('%Y-%m-%d %H:%M:%S') if hospital.updatedAt else 'N/A' }}</td>
+                           </tr>
+                        </tbody>
+                     </table>
+                  {% else %}
+                     <p class="text-center">No hospital is currently assigned to you. Please update your profile or contact the administrator.</p>
+                  {% endif %}
+               </div>
+               <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <!-- Edit Assigned Hospitals Modal -->
+      <div class="modal fade" id="editHospitalsModal" tabindex="-1" aria-labelledby="editHospitalsModalLabel" aria-hidden="true">
+         <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+               <div class="modal-header bg-primary text-white">
+                  <h5 class="modal-title" id="editHospitalsModalLabel">Edit Assigned Hospitals</h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+               </div>
+               <div class="modal-body">
+                  {% if doctor_data.assignedHospitals %}
+                     <table class="table table-bordered">
+                        <thead>
+                           <tr>
+                              <th scope="col" class="bg-primary text-white">Hospital UMS ID</th>
+                              <th scope="col" class="bg-primary text-white">Action</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           {% for hospital_id in doctor_data.assignedHospitals %}
+                           <tr>
+                              <td>{{ hospital_id }}</td>
+                              <td>
+                                 <button class="btn btn-danger btn-sm" onclick="confirmRevoke('{{ hospital_id }}')">Revoke</button>
+                              </td>
+                           </tr>
+                           {% endfor %}
+                        </tbody>
+                     </table>
+                  {% else %}
+                     <p class="text-center">No hospitals are currently assigned to you.</p>
+                  {% endif %}
+               </div>
+               <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <!-- Revoke Confirmation Modal -->
+      <div class="modal fade" id="revokeConfirmModal" tabindex="-1" aria-labelledby="revokeConfirmModalLabel" aria-hidden="true">
+         <div class="modal-dialog">
+            <div class="modal-content">
+               <div class="modal-header bg-danger text-white">
+                  <h5 class="modal-title" id="revokeConfirmModalLabel">Confirm Revocation</h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+               </div>
+               <div class="modal-body">
+                  Are you sure you want to revoke your assignment from this hospital?
+               </div>
+               <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                  <button type="button" class="btn btn-danger" id="confirmRevokeBtn">Revoke</button>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <script>
+         let hospitalToRevoke = '';
+
+         function confirmRevoke(hospitalId) {
+            hospitalToRevoke = hospitalId;
+            $('#revokeConfirmModal').modal('show');
+         }
+
+         $(document).ready(function() {
+            $('#confirmRevokeBtn').click(function() {
+               $.ajax({
+                  url: "{{ url_for('doctor.revoke_hospital') }}",
+                  type: "POST",
+                  data: JSON.stringify({'hospital_id': hospitalToRevoke}),
+                  contentType: "application/json",
+                  dataType: "json",
+                  success: function(response) {
+                     if (response.success) {
+                        alert("Hospital assignment revoked successfully");
+                        location.reload();
+                     } else {
+                        alert("Error: " + response.message);
+                     }
+                  },
+                  error: function() {
+                     alert("An error occurred while processing your request");
+                  }
+               });
+               $('#revokeConfirmModal').modal('hide');
+            });
+         });
+      </script>
+
    </body>
 </html>
