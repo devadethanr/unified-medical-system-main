@@ -42,17 +42,7 @@
         display: flex;
         justify-content: flex-end;
     }
-    #appointment-calendar {
-        height: 600px;
-        margin-bottom: 1rem;
-    }
-    #calendar_modal .modal-box {
-        max-width: 90%;
-        width: 1000px;
-    }
 </style>
-<link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css' rel='stylesheet' />
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.js'></script>
 {% endblock %}
 
 {% block content %}
@@ -91,14 +81,6 @@
         </div>
         <div class="form-control">
             <label class="label">
-                <span class="label-text">Doctor</span>
-            </label>
-            <select id="doctor-select" class="select select-bordered" disabled>
-                <option value="">Select a doctor</option>
-            </select>
-        </div>
-        <div class="form-control">
-            <label class="label">
                 <span class="label-text">Category</span>
             </label>
             <select id="category" class="select select-bordered">
@@ -113,7 +95,7 @@
             <label class="label">
                 <span class="label-text">Appointment Date</span>
             </label>
-            <input type="text" id="appointment-date" class="input input-bordered" readonly onclick="showCalendarModal()">
+            <input type="date" id="appointment-date" class="input input-bordered">
         </div>
         <div class="form-control">
             <label class="label cursor-pointer">
@@ -138,17 +120,6 @@
             <button type="button" id="bookAppointmentBtn" class="btn btn-primary" disabled>Book Appointment</button>
         </div>
     </form>
-</dialog>
-
-<!-- Calendar Modal -->
-<dialog id="calendar_modal" class="modal">
-  <div class="modal-box">
-    <h3 class="font-bold text-lg">Select Appointment Date and Time</h3>
-    <div id="appointment-calendar"></div>
-    <div class="modal-action">
-      <button class="btn" onclick="calendar_modal.close()">Close</button>
-    </div>
-  </div>
 </dialog>
 
 <!-- Confirmation Modal -->
@@ -239,6 +210,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     isDisabledCheckbox.addEventListener('change', function() {
+        console.log('Disabled checkbox changed:', this.checked);
         if (this.checked) {
             disabilityIdContainer.classList.remove('hidden');
         } else {
@@ -249,6 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     disabilityIdInput.addEventListener('input', function() {
+        console.log('Disability ID input changed:', this.value);
         hideError('disability-id-error');
         if (this.value && !validateDisabilityId(this.value)) {
             showError('Please enter a valid disability ID (format: XXXX-XXXX-XXXX-XXXX)', 'disability-id-error');
@@ -257,17 +230,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
     bookAppointmentBtn.addEventListener('click', function(e) {
         e.preventDefault();
+        console.log('Book appointment button clicked');
 
         const hospitalId = selectedHospitalId.value;
-        const doctorId = document.getElementById('doctor-select').value;
         const category = document.getElementById('category').value;
         const appointmentDate = appointmentDateInput.value;
         const isDisabled = isDisabledCheckbox.checked;
         const disabilityId = disabilityIdInput.value;
         const reason = document.getElementById('appointment-reason').value.trim();
 
-        if (!hospitalId || !doctorId || !category || !appointmentDate) {
-            showError('Please fill in all required fields', 'searchError');
+        console.log('Form data:', { hospitalId, category, appointmentDate, isDisabled, disabilityId, reason });
+
+        // Validation
+        if (!hospitalId) {
+            showError('Please select a hospital from the suggestions', 'searchError');
+            return;
+        }
+
+        if (!category) {
+            showError('Please select a category', 'searchError');
+            return;
+        }
+
+        if (!appointmentDate) {
+            showError('Please select an appointment date', 'searchError');
             return;
         }
 
@@ -284,13 +270,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const appointmentData = {
             hospitalId: hospitalId,
-            doctorId: doctorId,
             category: category,
             appointmentDate: appointmentDate,
             isDisabled: isDisabled,
             disabilityId: isDisabled ? disabilityId : null,
             reason: reason
         };
+
+        console.log('Appointment data to be sent:', appointmentData);
 
         fetch('/patient/book_appointment', {
             method: 'POST',
@@ -306,6 +293,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return response.json();
         })
         .then(data => {
+            console.log('Server response:', data);
             if (data.success) {
                 showModal('Success', 'Appointment booked successfully');
                 book_appointment_modal.close();
@@ -315,6 +303,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch((error) => {
+            console.error('Error:', error);
             showModal('Error', 'An error occurred while booking the appointment', true);
         });
     });
@@ -337,39 +326,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 hospitalSearch.value = hospital.name;
                 selectedHospitalId.value = hospital.umsId;
                 hospitalSuggestions.classList.add('hidden');
-                loadDoctors(hospital.umsId);
-                clearAppointmentDate();
+                bookAppointmentBtn.disabled = false;
             });
             hospitalSuggestions.appendChild(li);
         });
         hospitalSuggestions.classList.remove('hidden');
-    }
-
-    function loadDoctors(hospitalId) {
-        const doctorSelect = document.getElementById('doctor-select');
-        doctorSelect.innerHTML = '<option value="">Select a doctor</option>';
-        doctorSelect.disabled = true;
-
-        fetch(`/patient/get_doctors_by_hospital/${hospitalId}`)
-            .then(response => response.json())
-            .then(doctors => {
-                doctors.forEach(doctor => {
-                    const option = document.createElement('option');
-                    option.value = doctor.umsId;
-                    option.textContent = `${doctor.name} (${doctor.umsId})`;
-                    doctorSelect.appendChild(option);
-                });
-                doctorSelect.disabled = false;
-                doctorSelect.addEventListener('change', clearAppointmentDate);
-            })
-            .catch(error => {
-                showError('An error occurred while loading doctors. Please try again.');
-            });
-    }
-
-    function clearAppointmentDate() {
-        document.getElementById('appointment-date').value = '';
-        validateForm();
     }
 
     function searchHospitals(searchTerm) {
@@ -391,6 +352,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             })
             .catch(error => {
+                console.error('Error:', error);
                 showError('An error occurred while searching for hospitals. Please try again.');
             });
     }
@@ -476,7 +438,11 @@ function loadAppointments() {
 }
 
 function editAppointment(appointmentId) {
+    console.log('Edit appointment:', appointmentId);
+    // Implement edit functionality
     showModal('Info', 'Edit functionality not implemented yet');
+    // After implementing edit functionality, add:
+    // loadAppointments();
 }
 
 function revokeAppointment(appointmentId) {
@@ -501,6 +467,7 @@ function revokeAppointment(appointmentId) {
                 }
             })
             .catch(error => {
+                console.error('Error:', error);
                 showModal('Error', 'An error occurred while revoking the appointment', true);
             });
         }
@@ -519,95 +486,5 @@ function getCategoryClass(category) {
             return 'other';
     }
 }
-
-let calendar;
-
-function showCalendarModal() {
-    const hospitalId = document.getElementById('selected-hospital-id').value;
-    const doctorId = document.getElementById('doctor-select').value;
-
-    if (!hospitalId || !doctorId) {
-        showModal('Error', 'Please select a hospital and doctor first', true);
-        return;
-    }
-
-    const calendar_modal = document.getElementById('calendar_modal');
-    calendar_modal.showModal();
-    
-    if (calendar) {
-        calendar.destroy();
-    }
-    initializeCalendar();
-}
-
-function initializeCalendar() {
-    const hospitalId = document.getElementById('selected-hospital-id').value;
-    const doctorId = document.getElementById('doctor-select').value;
-
-    if (!hospitalId || !doctorId) {
-        console.error('Hospital ID or Doctor ID is missing');
-        showModal('Error', 'Please select a hospital and doctor first', true);
-        return;
-    }
-
-    console.log('Fetching unavailable slots...');
-    fetch(`/patient/get_unavailable_slots?hospitalId=${hospitalId}&doctorId=${doctorId}`)
-        .then(response => response.json())
-        .then(unavailableSlots => {
-            console.log('Unavailable slots:', unavailableSlots);
-            const calendarEl = document.getElementById('appointment-calendar');
-            if (!calendarEl) {
-                console.error('Calendar element not found');
-                return;
-            }
-            calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'timeGridWeek',
-                slotMinTime: '08:00:00',
-                slotMaxTime: '20:00:00',
-                allDaySlot: false,
-                slotDuration: '00:30:00',
-                selectable: true,
-                selectMirror: true,
-                events: unavailableSlots.map(slot => ({
-                    start: new Date(slot.appointmentDate.$date),
-                    end: new Date(new Date(slot.appointmentDate.$date).getTime() + 30 * 60000), // 30 minutes duration
-                    color: 'red',
-                    rendering: 'background',
-                    overlap: false
-                })),
-                selectAllow: function(selectInfo) {
-                    return !unavailableSlots.some(slot => 
-                        new Date(slot.appointmentDate.$date).getTime() === selectInfo.start.getTime()
-                    );
-                },
-                select: function(info) {
-                    document.getElementById('appointment-date').value = info.startStr;
-                    calendar_modal.close();
-                    validateForm();
-                }
-            });
-            calendar.render();
-            console.log('Calendar rendered');
-        })
-        .catch(error => {
-            console.error('Error fetching unavailable slots:', error);
-            showModal('Error', 'Failed to load available appointment slots', true);
-        });
-}
-
-function validateForm() {
-    const hospitalId = document.getElementById('selected-hospital-id').value;
-    const doctorId = document.getElementById('doctor-select').value;
-    const category = document.getElementById('category').value;
-    const appointmentDate = document.getElementById('appointment-date').value;
-    
-    const bookAppointmentBtn = document.getElementById('bookAppointmentBtn');
-    bookAppointmentBtn.disabled = !(hospitalId && doctorId && category && appointmentDate);
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    const appointmentDateInput = document.getElementById('appointment-date');
-    appointmentDateInput.addEventListener('click', showCalendarModal);
-});
 </script>
 {% endblock %}
