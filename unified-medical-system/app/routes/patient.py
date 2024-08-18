@@ -5,6 +5,8 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 import re, uuid, json
 from bson import json_util, ObjectId
+from dateutil import parser
+from datetime import timezone
 
 patient_bp = Blueprint('patient', __name__)
 
@@ -211,10 +213,22 @@ def search_hospitals():
             '_id': 0
         }).limit(5)
         hospitals_list = list(hospitals)
-        print(hospitals_list)
         return jsonify(hospitals_list)
     else:
         return jsonify({'error': 'No search term provided'}), 400
+
+@patient_bp.route('/get_doctors_by_hospital/<hospital_id>', methods=['GET'])
+@login_required
+def get_doctors_by_hospital(hospital_id):
+    hospital_details = mongo.db.hospitalDetails.find_one({'umsId': hospital_id})
+    if hospital_details and 'assignedDoctors' in hospital_details:
+        assigned_doctors = hospital_details['assignedDoctors']
+        doctors = list(mongo.db.users.find(
+            {'umsId': {'$in': assigned_doctors}, 'rolesId': 3},
+            {'umsId': 1, 'name': 1, '_id': 0}
+        ))
+        return jsonify(doctors)
+    return jsonify([])
 
 @patient_bp.route('/book_appointment', methods=['POST'])
 @login_required
@@ -222,25 +236,32 @@ def book_appointment():
     data = request.json
     patient_id = current_user.umsId
     hospital_id = data.get('hospitalId')
+    doctor_id = data.get('doctorId')
     category = data.get('category')
-    appointment_date = data.get('appointmentDate')
+    appointment_date_str = data.get('appointmentDate')
     is_disabled = data.get('isDisabled', False)
     disability_id = data.get('disabilityId')
+    reason = data.get('reason')
 
-    if not all([hospital_id, category, appointment_date]):
+    if not all([hospital_id, doctor_id, category, appointment_date_str]):
         return jsonify({'success': False, 'message': 'Missing required fields'}), 400
 
     try:
+        appointment_date = parser.isoparse(appointment_date_str)
+        appointment_date_utc = appointment_date.astimezone(timezone.utc)
+
         new_appointment = {
             'patientId': patient_id,
             'hospitalId': hospital_id,
+            'doctorId': doctor_id,
             'category': category,
-            'appointmentDate': datetime.strptime(appointment_date, '%Y-%m-%d'),
+            'appointmentDate': appointment_date_utc,
             'status': 'pending',
             'isDisabled': is_disabled,
             'disabilityId': disability_id if is_disabled else None,
-            'createdAt': datetime.now(),
-            'updatedAt': datetime.now()
+            'reason': reason,
+            'createdAt': datetime.now(timezone.utc),
+            'updatedAt': datetime.now(timezone.utc)
         }
 
         result = mongo.db.appointments.insert_one(new_appointment)
@@ -251,7 +272,6 @@ def book_appointment():
             return jsonify({'success': False, 'message': 'Failed to book appointment'}), 500
 
     except Exception as e:
-        print(f"Error booking appointment: {str(e)}")
         return jsonify({'success': False, 'message': 'An error occurred while booking the appointment'}), 500
 
 @patient_bp.route('/change_password', methods=['POST'])
@@ -289,7 +309,6 @@ def change_password():
 @login_required
 def revoke_appointment(appointment_id):
     try:
-        print(appointment_id)
         # Find the appointment and update its status to "deleted"
         result = mongo.db.appointments.update_one(
             {'_id': ObjectId(appointment_id), 'patientId': current_user.umsId},
@@ -305,3 +324,20 @@ def revoke_appointment(appointment_id):
         print(f"Error revoking appointment: {str(e)}")
         return jsonify({'success': False, 'message': 'An error occurred while revoking the appointment'}), 500
 
+@patient_bp.route('/get_unavailable_slots', methods=['GET'])
+@login_required
+def get_unavailable_slots():
+    hospital_id = request.args.get('hospitalId')
+    doctor_id = request.args.get('doctorId')
+    
+    if not hospital_id or not doctor_id:
+        return jsonify({'error': 'Missing hospitalId or doctorId'}), 400
+
+    unavailable_slots = list(mongo.db.appointments.find({
+        'hospitalId': hospital_id,
+        'doctorId': doctor_id,
+        'status': {'$in': ['pending', 'approved']},
+        'appointmentDate': {'$gte': datetime.now(timezone.utc)}
+    }, {'appointmentDate': 1, '_id': 0}))
+
+    return json_util.dumps(unavailable_slots)
