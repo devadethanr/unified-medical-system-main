@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Medical Data</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Add Medical Data</h1>
+    <form id="medDataForm">
+        <label for="patient_id">Patient ID:</label>
+        <input type="text" id="patient_id" name="patient_id" required><br><br>
+
+        <label for="doctor_id">Doctor ID:</label>
+        <input type="text" id="doctor_id" name="doctor_id" required><br><br>
+
+        <label for="diagnosis">Diagnosis:</label>
+        <textarea id="diagnosis" name="diagnosis" required></textarea><br><br>
+
+        <label for="treatment">Treatment:</label>
+        <textarea id="treatment" name="treatment" required></textarea><br><br>
+
+        <label for="prescription">Prescription:</label>
+        <textarea id="prescription" name="prescription"></textarea><br><br>
+
+        <input type="submit" value="Submit Medical Data">
+    </form>
+
+    <script>
+    $(document).ready(function() {
+        $('#medDataForm').submit(function(e) {
+            e.preventDefault();
+            var formData = {
+                patient_id: $('#patient_id').val(),
+                doctor_id: $('#doctor_id').val(),
+                diagnosis: $('#diagnosis').val(),
+                treatment: $('#treatment').val(),
+                prescription: $('#prescription').val()
+            };
+            
+            $.ajax({
+                url: "{{ url_for('meddata.add_meddata') }}",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    alert("Medical data submitted successfully!");
+                },
+                error: function(error) {
+                    alert("Error submitting medical data.");
+                }
+            });
+        });
+    });
+    </script>
+</body>
+</html>

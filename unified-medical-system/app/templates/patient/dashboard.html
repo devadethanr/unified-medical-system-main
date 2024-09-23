@@ -7,18 +7,18 @@
 {% block extra_head %}
 <style>
     .card {
-        background: #f0f0ff;
+        background: #2a303c;
         border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         transition: all 0.3s ease;
     }
     .card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
     }
     .btn {
-        background-color: #e6e6fa !important;
-        color: #333333 !important;
+        background-color: #374151 !important;
+        color: #e5e7eb !important;
     }
     .profile-table {
         width: 100%;
@@ -27,25 +27,25 @@
     }
     .profile-table th,
     .profile-table td {
-        border: 1px solid #e2e8f0;
+        border: 1px solid #4b5563;
         padding: 0.75rem;
     }
     .profile-table tr:nth-child(odd) {
-        background-color: #fce4ec; /* Pastel pink */
+        background-color: #3c2f3e; /* Dark pastel pink */
     }
     .profile-table tr:nth-child(even) {
-        background-color: #e8f5e9; /* Pastel green */
+        background-color: #2f3e33; /* Dark pastel green */
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<h1 class="text-2xl font-bold mb-4">Welcome, {{ patient_data.name }}</h1>
+<h1 class="text-2xl font-bold mb-4 text-white">Welcome, {{ patient_data.name }}</h1>
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
     <div class="card">
         <div class="card-body">
-            <h2 class="card-title">Book Appointment</h2>
-            <p>Schedule an appointment with a healthcare provider</p>
+            <h2 class="card-title text-white">Book Appointment</h2>
+            <p class="text-gray-300">Schedule an appointment with a healthcare provider</p>
             <div class="card-actions justify-end">
                 <a href="{{ url_for('patient.appointments', open_modal=True) }}" class="btn">Book Now</a>
             </div>
@@ -53,8 +53,8 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <h2 class="card-title">Medical Records</h2>
-            <p>Access and manage your personal medical records</p>
+            <h2 class="card-title text-white">Medical Records</h2>
+            <p class="text-gray-300">Access and manage your personal medical records</p>
             <div class="card-actions justify-end">
                 <button class="btn" onclick="view_medical_records.showModal()">View Records</button>
             </div>
@@ -62,8 +62,8 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <h2 class="card-title">Test Results</h2>
-            <p>Get your latest test results from the lab</p>
+            <h2 class="card-title text-white">Test Results</h2>
+            <p class="text-gray-300">Get your latest test results from the lab</p>
             <div class="card-actions justify-end">
                 <button class="btn" onclick="view_test_results.showModal()">View Results</button>
             </div>
@@ -71,8 +71,8 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <h2 class="card-title">Log Symptoms</h2>
-            <p>Log your symptoms for disease outbreak detection</p>
+            <h2 class="card-title text-white">Log Symptoms</h2>
+            <p class="text-gray-300">Log your symptoms for disease outbreak detection</p>
             <div class="card-actions justify-end">
                 <button class="btn" onclick="log_symptoms.showModal()">Log Symptoms</button>
             </div>
@@ -80,8 +80,8 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <h2 class="card-title">Support Chatbot</h2>
-            <p>Get basic medical guidance and schedule appointments</p>
+            <h2 class="card-title text-white">Support Chatbot</h2>
+            <p class="text-gray-300">Get basic medical guidance and schedule appointments</p>
             <div class="card-actions justify-end">
                 <button class="btn" onclick="open_chatbot.showModal()">Open Chatbot</button>
             </div>  
@@ -92,38 +92,38 @@
 
 {% block modals %}
 <dialog id="view_profile" class="modal">
-    <form method="dialog" class="modal-box">
-        <h3 class="font-bold text-lg mb-4">Patient Profile</h3>
+    <form method="dialog" class="modal-box bg-base-300">
+        <h3 class="font-bold text-lg mb-4 text-white">Patient Profile</h3>
         <div class="overflow-x-auto">
             <table class="profile-table">
                 <tbody>
                     <tr>
-                        <th class="capitalize">Name</th>
-                        <td>{{ patient_data.name }}</td>
+                        <th class="capitalize text-gray-300">Name</th>
+                        <td class="text-white">{{ patient_data.name }}</td>
                     </tr>
                     <tr>
-                        <th class="capitalize">Email</th>
-                        <td>{{ patient_data.email }}</td>
+                        <th class="capitalize text-gray-300">Email</th>
+                        <td class="text-white">{{ patient_data.email }}</td>
                     </tr>
                     <tr>
-                        <th class="capitalize">Phone</th>
-                        <td>{{ patient_data.phoneNumber[0] }}</td>
+                        <th class="capitalize text-gray-300">Phone</th>
+                        <td class="text-white">{{ patient_data.phoneNumber[0] }}</td>
                     </tr>
                     <tr>
-                        <th class="capitalize">Date of Birth</th>
-                        <td>{{ patient_data.dateOfBirth or 'Not set' }}</td>
+                        <th class="capitalize text-gray-300">Date of Birth</th>
+                        <td class="text-white">{{ patient_data.dateOfBirth or 'Not set' }}</td>
                     </tr>
                     <tr>
-                        <th class="capitalize">Gender</th>
-                        <td>{{ patient_data.gender or 'Not set' }}</td>
+                        <th class="capitalize text-gray-300">Gender</th>
+                        <td class="text-white">{{ patient_data.gender or 'Not set' }}</td>
                     </tr>
                     <tr>
-                        <th class="capitalize">State</th>
-                        <td>{{ patient_data.state }}</td>
+                        <th class="capitalize text-gray-300">State</th>
+                        <td class="text-white">{{ patient_data.state }}</td>
                     </tr>
                     <tr>
-                        <th class="capitalize">UMS ID</th>
-                        <td>{{ patient_data.umsId }}</td>
+                        <th class="capitalize text-gray-300">UMS ID</th>
+                        <td class="text-white">{{ patient_data.umsId }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -136,38 +136,38 @@
 </dialog>
 
 <dialog id="edit_profile" class="modal">
-    <form method="POST" action="{{ url_for('patient.profile') }}" class="modal-box">
-        <h3 class="font-bold text-lg">Edit Profile</h3>
+    <form method="POST" action="{{ url_for('patient.profile') }}" class="modal-box bg-base-300">
+        <h3 class="font-bold text-lg text-white">Edit Profile</h3>
         <input type="hidden" name="form_type" value="update_profile">
         <div class="form-control">
             <label class="label">
-                <span class="label-text">Name</span>
+                <span class="label-text text-gray-300">Name</span>
             </label>
-            <input type="text" name="name" value="{{ patient_data.name }}" class="input input-bordered" required>
+            <input type="text" name="name" value="{{ patient_data.name }}" class="input input-bordered bg-base-200 text-white" required>
         </div>
         <div class="form-control">
             <label class="label">
-                <span class="label-text">Email</span>
+                <span class="label-text text-gray-300">Email</span>
             </label>
-            <input type="email" name="email" value="{{ patient_data.email }}" class="input input-bordered" required>
+            <input type="email" name="email" value="{{ patient_data.email }}" class="input input-bordered bg-base-200 text-white" required>
         </div>
         <div class="form-control">
             <label class="label">
-                <span class="label-text">Phone</span>
+                <span class="label-text text-gray-300">Phone</span>
             </label>
-            <input type="tel" name="phoneNumber" value="{{ patient_data.phoneNumber[0] }}" class="input input-bordered" required>
+            <input type="tel" name="phoneNumber" value="{{ patient_data.phoneNumber[0] }}" class="input input-bordered bg-base-200 text-white" required>
         </div>
         <div class="form-control">
             <label class="label">
-                <span class="label-text">Date of Birth</span>
+                <span class="label-text text-gray-300">Date of Birth</span>
             </label>
-            <input type="date" name="dateOfBirth" value="{{ patient_data.dateOfBirth }}" class="input input-bordered">
+            <input type="date" name="dateOfBirth" value="{{ patient_data.dateOfBirth }}" class="input input-bordered bg-base-200 text-white">
         </div>
         <div class="form-control">
             <label class="label">
-                <span class="label-text">Gender</span>
+                <span class="label-text text-gray-300">Gender</span>
             </label>
-            <select name="gender" class="select select-bordered">
+            <select name="gender" class="select select-bordered bg-base-200 text-white">
                 <option value="">Select Gender</option>
                 <option value="male" {% if patient_data.gender == 'male' %}selected{% endif %}>Male</option>
                 <option value="female" {% if patient_data.gender == 'female' %}selected{% endif %}>Female</option>
@@ -176,9 +176,9 @@
         </div>
         <div class="form-control">
             <label class="label">
-                <span class="label-text">State</span>
+                <span class="label-text text-gray-300">State</span>
             </label>
-            <input type="text" name="state" value="{{ patient_data.state }}" class="input input-bordered" required>
+            <input type="text" name="state" value="{{ patient_data.state }}" class="input input-bordered bg-base-200 text-white" required>
         </div>
         <div class="modal-action">
             <button type="button" class="btn" onclick="edit_profile.close()">Cancel</button>

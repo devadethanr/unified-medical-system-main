@@ -27,6 +27,7 @@ class User(UserMixin):
             )
         return None
 
+
     @staticmethod
     def find_by_identifier(identifier):
         # Search by email or umsId

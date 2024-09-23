@@ -1,149 +1,230 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}UMS - Patient Portal{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.css">
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.css"
+    />
     <style>
-        body {
-            background-color: #ffffff;
-            color: #333333;
-        }
-        .navbar, .drawer-side, footer {
-            background-color: #e6e6fa !important; /* Light pastel purple */
-        }
-        .drawer-content {
-            background-color: #ffffff;
-        }
-        .card {
-            background: #f0f0ff;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
-        }
-        .drawer-side .menu {
-            padding: 1rem;
-        }
-        .drawer-side .menu li {
-            margin-bottom: 0.5rem;
-        }
-        .drawer-side .menu a {
-            font-size: 1.1rem;
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
-            color: #333333;
-        }
-        .drawer-side .menu a:hover {
-            background-color: rgba(0, 0, 0, 0.1);
-        }
-        /* Custom scrollbar styles */
-        .custom-scrollbar {
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(155, 155, 155, 0.5) transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background-color: rgba(155, 155, 155, 0.5);
-            border-radius: 20px;
-            border: transparent;
-        }
+      body {
+        background-color: #1f2937; /* dark background */
+        color: #e5e7eb; /* light text */
+      }
+      .navbar,
+      .drawer-side,
+      footer {
+        background-color: #374151 !important; /* darker shade for components */
+      }
+      .drawer-content {
+        background-color: #1f2937;
+      }
+      .card {
+        background: #374151;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      }
+      .card:hover {
+        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
+      }
+      .drawer-side .menu a {
+        color: #e5e7eb;
+      }
+      .drawer-side .menu a:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+      /* Custom scrollbar styles */
+      .custom-scrollbar {
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(155, 155, 155, 0.5) transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: rgba(155, 155, 155, 0.5);
+        border-radius: 20px;
+        border: transparent;
+      }
     </style>
     {% block extra_head %}
     <style>
-        .glassmorphism {
-            background: rgba(230, 230, 250, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 10px;
-            border: 1px solid rgba(230, 230, 250, 0.2);
-            box-shadow: 0 4px 6px rgba(230, 230, 250, 0.1);
-        }
-        .modal-box {
-            background: rgba(230, 230, 250, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(230, 230, 250, 0.2);
-            box-shadow: 0 4px 6px rgba(230, 230, 250, 0.1);
-        }
-        .pac-container {
-            z-index: 9999;
-        }
+      .glassmorphism {
+        background: rgba(230, 230, 250, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 10px;
+        border: 1px solid rgba(230, 230, 250, 0.2);
+        box-shadow: 0 4px 6px rgba(230, 230, 250, 0.1);
+      }
+      .modal-box {
+        background: rgba(230, 230, 250, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(230, 230, 250, 0.2);
+        box-shadow: 0 4px 6px rgba(230, 230, 250, 0.1);
+      }
+      .pac-container {
+        z-index: 9999;
+      }
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCwrIvSVrnX091MAxkWIDLQ-K3gc1Z4VLY&libraries=places"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
     {% endblock %}
-</head>
-<body>
+  </head>
+  <body>
     <div class="drawer lg:drawer-open">
-        <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
-        <div class="drawer-content flex flex-col">
-            <!-- Navbar -->
-            <div class="navbar bg-purple-100 sticky top-0 z-50">
-                <div class="flex-none lg:hidden">
-                    <label for="my-drawer-2" class="btn btn-square btn-ghost">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                    </label>
-                </div> 
-                <div class="flex-1">
-                    <span class="text-xl font-bold">{% block page_title %}Patient Portal{% endblock %}</span>
-                </div>
-                <div class="flex-none">
-                    <div class="dropdown dropdown-end">
-                        <button type="button" class="btn btn-ghost">{{ patient_data.name }}</button>
-                        <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-                            <li><a onclick="view_profile.showModal()">Profile</a></li>
-                            <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
-                        </ul>
-                    </div>
-                </div>
+      <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
+      <div class="drawer-content flex flex-col">
+        <!-- Navbar -->
+        <div class="navbar bg-base-300 sticky top-0 z-50">
+          <div class="flex-none lg:hidden">
+            <label for="my-drawer-2" class="btn btn-square btn-ghost">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                class="inline-block w-6 h-6 stroke-current"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                ></path>
+              </svg>
+            </label>
+          </div>
+          <div class="flex-1">
+            <span class="text-xl font-bold"
+              >{% block page_title %}Patient Portal{% endblock %}</span
+            >
+          </div>
+          <div class="flex-none">
+            <div class="dropdown dropdown-end">
+              <button type="button" class="btn btn-ghost">
+                {{ patient_data.name }}
+              </button>
+              <ul
+                tabindex="0"
+                class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
+              >
+                <li><a onclick="view_profile.showModal()">Profile</a></li>
+                <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+              </ul>
             </div>
-            <!-- Page content -->
-            <div class="p-4">
-                {% block content %}{% endblock %}
-            </div>
-        </div> 
-        <div class="drawer-side">
-            <label for="my-drawer-2" class="drawer-overlay"></label> 
-            <div class="flex flex-col h-full bg-purple-100">
-                <div class="p-4">
-                    <img src="{{ url_for('static', filename='images/logo-white.png') }}" alt="UMS Logo" class="logo w-16 h-16 mx-auto">
-                </div>
-                <ul class="menu p-4 w-64 flex-grow custom-scrollbar">
-                    <li><a href="{{ url_for('patient.index') }}" class="btn btn-outline mb-2">Dashboard</a></li>
-                    <li><a href="{{ url_for('patient.profile') }}" class="btn btn-outline mb-2">Profile</a></li>
-                    <li><a href="{{ url_for('patient.appointments') }}" class="btn btn-outline mb-2">Book Appointment</a></li>
-                    <li><a onclick="view_medical_records.showModal()" class="btn btn-outline mb-2">Medical Records</a></li>
-                    <li><a onclick="view_test_results.showModal()" class="btn btn-outline mb-2">Test Results</a></li>
-                    <li><a onclick="log_symptoms.showModal()" class="btn btn-outline mb-2">Log Symptoms</a></li>
-                    <li><a onclick="open_chatbot.showModal()" class="btn btn-outline mb-2">Support Chatbot</a></li>
-                </ul>
-            </div>
+          </div>
         </div>
+        <!-- Page content -->
+        <div class="p-4">{% block content %}{% endblock %}</div>
+      </div>
+      <div class="drawer-side">
+        <label for="my-drawer-2" class="drawer-overlay"></label>
+        <div class="flex flex-col h-full bg-base-300">
+          <div class="p-4 bg-base-200">
+            <img
+              src="{{ url_for('static', filename='images/logo-white.png') }}"
+              alt="UMS Logo"
+              class="w-16 h-16 mx-auto"
+            />
+          </div>
+          <ul class="menu p-4 w-80 flex-grow custom-scrollbar bg-base-200">
+            <li>
+              <a
+                href="{{ url_for('patient.index') }}"
+                class="flex items-center p-3 mb-2 rounded-lg {{ 'bg-primary text-primary-content' if request.endpoint == 'patient.index' else 'hover:bg-base-100' }}"
+              >
+                <i class="fas fa-home mr-3"></i> Dashboard
+              </a>
+            </li>
+            <li>
+              <a
+                href="{{ url_for('patient.profile') }}"
+                class="flex items-center p-3 mb-2 rounded-lg {{ 'bg-primary text-primary-content' if request.endpoint == 'patient.profile' else 'hover:bg-base-100' }}"
+              >
+                <i class="fas fa-user mr-3"></i> Profile
+              </a>
+            </li>
+            <li>
+              <a
+                href="{{ url_for('patient.appointments') }}"
+                class="flex items-center p-3 mb-2 rounded-lg {{ 'bg-primary text-primary-content' if request.endpoint == 'patient.appointments' else 'hover:bg-base-100' }}"
+              >
+                <i class="fas fa-calendar-alt mr-3"></i> Book Appointment
+              </a>
+            </li>
+            <li>
+              <a
+                href="{{ url_for('patient.medical_records') }}"
+                class="flex items-center p-3 mb-2 rounded-lg {{ 'bg-primary text-primary-content' if request.endpoint == 'patient.medical_records' else 'hover:bg-base-100' }}"
+              >
+                <i class="fas fa-file-medical mr-3"></i> Medical Records
+              </a>
+            </li>
+            <li>
+              <a
+                onclick="view_test_results.showModal()"
+                class="flex items-center p-3 mb-2 rounded-lg hover:bg-base-100"
+              >
+                <i class="fas fa-vial mr-3"></i> Test Results
+              </a>
+            </li>
+            <li>
+              <a
+                onclick="log_symptoms.showModal()"
+                class="flex items-center p-3 mb-2 rounded-lg hover:bg-base-100"
+              >
+                <i class="fas fa-notes-medical mr-3"></i> Log Symptoms
+              </a>
+            </li>
+            <li>
+              <a
+                onclick="open_chatbot.showModal()"
+                class="flex items-center p-3 mb-2 rounded-lg hover:bg-base-100"
+              >
+                <i class="fas fa-robot mr-3"></i> Support Chatbot
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
 
     <!-- Footer -->
-    <footer class="footer footer-center p-4 bg-purple-100 text-base-content">
-        <div>
-            <p>Copyright © 2024 - All rights reserved by UMS</p>
-        </div>
+    <footer class="footer footer-center p-4 bg-base-300 text-base-content">
+      <div>
+        <p>Copyright © 2024 - All rights reserved by UMS</p>
+      </div>
     </footer>
 
-    {% block modals %}{% endblock %}
-
-    {% block scripts %}{% endblock %}
-</body>
+    {% block modals %}{% endblock %} {% block scripts %}
+    <!-- ... any other scripts ... -->
+    {% endblock %}
+    <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
+<df-messenger
+  intent="WELCOME"
+  chat-title="health"
+  agent-id="595663d5-1134-4ba8-ab10-963e4b6ab60d"
+  language-code="en"
+></df-messenger>
+  </body>
 </html>
+ 

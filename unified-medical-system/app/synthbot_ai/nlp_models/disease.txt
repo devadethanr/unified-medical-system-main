@@ -1,0 +1,60 @@
+Diabetes is a chronic condition characterized by high levels of sugar (glucose) in the blood. 
+Common symptoms of diabetes include increased thirst, frequent urination, extreme hunger, 
+unexplained weight loss, fatigue, irritability, blurred vision, slow-healing sores, and frequent infections.
+Diabetes is caused by the body's inability to produce or use insulin effectively. Common medications include insulin, metformin, and sulfonylureas.
+
+Cancer is a disease characterized by abnormal cell growth. Symptoms vary depending on the type of cancer but may include unexplained weight loss, fatigue, fever, pain, and changes in skin. 
+Cancer is caused by genetic mutations and environmental factors. Treatment options include chemotherapy, radiation therapy, and surgery.
+
+Typhoid is a bacterial infection caused by Salmonella typhi. Symptoms include high fever, weakness, stomach pain, headache, and loss of appetite. 
+It is typically caused by consuming contaminated food or water. Antibiotics such as ciprofloxacin and ceftriaxone are commonly used for treatment.
+
+Malaria is a parasitic disease transmitted by infected mosquitoes. Symptoms include fever, chills, sweats, fatigue, nausea, and body aches. 
+It is caused by Plasmodium parasites. Common medications include chloroquine, artemisinin-based combination therapies (ACTs), and primaquine.
+
+Tuberculosis (TB) is a bacterial infection that primarily affects the lungs. Symptoms include persistent cough, chest pain, coughing up blood, fatigue, fever, and night sweats. 
+TB is caused by Mycobacterium tuberculosis and spreads through the air. Treatment typically involves a combination of antibiotics such as isoniazid, rifampin, ethambutol, and pyrazinamide.
+
+Flu (Influenza) is a viral respiratory infection. Symptoms include sudden onset of fever, chills, muscle aches, fatigue, cough, and headache.
+It is caused by influenza viruses. Treatment includes rest, fluids, and antiviral medications like oseltamivir (Tamiflu) in severe cases.
+
+HIV/AIDS is a viral infection that attacks the immune system. Early HIV symptoms may include fever, chills, rash, and sore throat. AIDS symptoms include rapid weight loss, recurring fever, extreme tiredness, and prolonged swelling of lymph glands.
+HIV is caused by the human immunodeficiency virus. Treatment involves antiretroviral therapy (ART) to suppress the virus and prevent progression to AIDS.
+
+Hepatitis A is a viral liver infection. Symptoms include fatigue, nausea, abdominal pain, loss of appetite, and jaundice.
+It is typically spread through contaminated food or water. Treatment focuses on supportive care, rest, and proper nutrition.
+
+COVID-19 is a highly infectious respiratory disease. Symptoms include fever, dry cough, tiredness, loss of taste or smell, and in severe cases, difficulty breathing.
+It is caused by the SARS-CoV-2 virus. Treatment varies based on severity but may include supportive care, antiviral medications, and in severe cases, oxygen therapy or mechanical ventilation.
+
+Sexually transmitted infection (STI) is a group of infections that spread primarily through sexual contact. Symptoms vary depending on the specific infection but may include genital discharge, pain during urination, sores or rashes on genitals, and pelvic pain. Common STIs include chlamydia, gonorrhea, and syphilis. Treatment typically involves antibiotics or antiviral medications, depending on the causative agent.
+
+Pertussis, also known as whooping cough, is a highly contagious respiratory disease. Symptoms start with cold-like symptoms and mild cough, progressing to severe coughing fits with a distinctive "whooping" sound. It is caused by the bacterium Bordetella pertussis. Treatment includes antibiotics like azithromycin or erythromycin, along with supportive care.
+
+West Nile fever is a viral infection spread by mosquitoes. Many infected people don't show symptoms, but when present, they can include fever, headache, body aches, and sometimes a skin rash or swollen lymph glands. Severe cases may lead to encephalitis or meningitis. There's no specific treatment, but over-the-counter pain relievers can help with symptoms.
+
+Chikungunya is a viral disease transmitted by infected mosquitoes. Symptoms typically begin 3-7 days after being bitten and include sudden onset of fever and severe joint pain. Other symptoms may include muscle pain, headache, nausea, fatigue, and rash. There's no cure, and treatment focuses on relieving symptoms with rest, fluids, and pain medications.
+
+Dengue is a mosquito-borne viral infection. Symptoms include high fever, severe headache, pain behind the eyes, muscle and joint pains, nausea, vomiting, swollen glands, and rash. Severe dengue can be life-threatening. Treatment involves managing symptoms and maintaining proper fluid balance. There's no specific antiviral treatment for dengue.
+
+Hantavirus Infection is a rare but potentially fatal respiratory disease caused by hantaviruses. Symptoms typically appear 1-8 weeks after exposure and include fatigue, fever, muscle aches, headaches, dizziness, chills, and abdominal problems. As it progresses, it can cause coughing and shortness of breath. Treatment involves intensive care support, including oxygen therapy. There's no specific cure, so treatment focuses on managing symptoms.
+
+Measles is a highly contagious viral disease. Symptoms begin with high fever, cough, runny nose, and red, watery eyes. After several days, a rash appears, starting on the face and spreading to the rest of the body. Complications can include pneumonia and encephalitis. Treatment is mainly supportive, including rest, fluids, and fever reducers. Vitamin A supplements may be given to reduce the risk of complications.
+
+Respiratory disease is a broad term for conditions affecting the lungs and airways. Common types include asthma, chronic obstructive pulmonary disease (COPD), and pneumonia. Symptoms can include shortness of breath, coughing, wheezing, and chest tightness. Treatment varies depending on the specific condition but may include inhaled medications, oxygen therapy, or antibiotics for infections.
+
+Avian Flu, or bird flu, is a type of influenza that spreads among birds but can occasionally infect humans. Symptoms in humans are similar to regular flu but can be more severe, including high fever, cough, sore throat, and in some cases, severe respiratory distress. Treatment may include antiviral drugs like oseltamivir, along with supportive care.
+
+E. coli infection is caused by certain strains of Escherichia coli bacteria. Symptoms typically begin 3-4 days after exposure and include severe stomach cramps, diarrhea (often bloody), and vomiting. Most people recover within 5-7 days. Treatment usually involves rest and staying hydrated. Antibiotics are not recommended as they may increase the risk of complications.
+
+Lyme disease is a bacterial infection transmitted through the bite of infected ticks. Early symptoms include a characteristic "bull's-eye" rash, fever, chills, fatigue, body aches, and headache. If left untreated, it can spread to joints, the heart, and the nervous system. Treatment typically involves antibiotics such as doxycycline, amoxicillin, or cefuroxime axetil.
+
+Breast cancer is a type of cancer that forms in the cells of the breasts. It's defined as the uncontrolled growth of abnormal cells in the breast tissue. Symptoms may include a lump in the breast, changes in breast shape or size, dimpling of the skin, nipple inversion, or nipple discharge. Other signs can include persistent breast pain, redness or thickening of the nipple or breast skin, and swelling in all or part of the breast. It's caused by a combination of genetic and environmental factors. Treatment options include surgery (lumpectomy or mastectomy), radiation therapy, chemotherapy, hormone therapy, and targeted therapy. The choice of treatment depends on the stage and type of breast cancer, as well as the patient's overall health and preferences.
+
+Chickenpox is a highly contagious viral infection caused by the varicella-zoster virus. It's characterized by an itchy, blister-like rash that covers the body. Symptoms typically appear 10-21 days after exposure and include an itchy rash that progresses from red bumps to fluid-filled blisters that eventually scab over. Other symptoms include fever, fatigue, loss of appetite, and headache. The rash usually appears first on the chest, back, and face, then spreads to the rest of the body. Chickenpox is spread through direct contact with the rash or through airborne droplets from coughing or sneezing. Treatment focuses on managing symptoms with calamine lotion for itching, acetaminophen for fever, and maintaining good hygiene to prevent secondary infections. In severe cases or for high-risk individuals, antiviral medications may be prescribed.
+
+Meningitis is an inflammation of the protective membranes covering the brain and spinal cord, known collectively as the meninges. Symptoms include sudden high fever, severe headache, stiff neck, confusion, sensitivity to light, and sometimes a rash. Other signs can include nausea, vomiting, altered mental state, and seizures. It can be caused by viruses, bacteria, fungi, or other microorganisms. Bacterial meningitis is typically more severe and can be life-threatening if not treated promptly. Viral meningitis is generally less severe and often resolves on its own. Treatment depends on the cause but may include antibiotics for bacterial meningitis, antiviral medications for certain types of viral meningitis, and supportive care such as pain relief, fever reduction, and maintaining proper hydration. In severe cases, hospitalization may be necessary.
+
+Mpox (formerly known as monkeypox) is a viral infection similar to smallpox but generally less severe. It's defined as a zoonotic disease caused by the monkeypox virus, which belongs to the same family of viruses as smallpox. Symptoms typically begin with fever, headache, muscle aches, and exhaustion, followed by a rash that forms scabs. The rash usually begins on the face and then spreads to other parts of the body, including the palms of hands and soles of feet. Other symptoms can include swollen lymph nodes, chills, and respiratory symptoms. It's transmitted through close contact with an infected animal or person, or through contact with contaminated materials. Treatment is mainly supportive, focusing on symptom relief and preventing dehydration. In severe cases, antiviral drugs developed for smallpox may be used. Vaccination against smallpox has been shown to be about 85% effective in preventing mpox.
+
+Norovirus is a highly contagious virus that causes gastroenteritis, an inflammation of the stomach and intestines. It's often referred to as the "stomach flu" or "winter vomiting bug". Symptoms include sudden onset of severe vomiting and diarrhea, as well as nausea, stomach pain, fever, headache, and body aches. These symptoms typically begin 12 to 48 hours after exposure and last for 1 to 3 days. Norovirus spreads through contaminated food or water, by touching contaminated surfaces and then putting unwashed hands in the mouth, or through close contact with an infected person. Treatment involves managing symptoms and preventing dehydration, as there's no specific medication to treat norovirus infections. This typically includes drinking plenty of fluids to replace those lost through vomiting and diarrhea. In severe cases, hospitalization may be necessary for intravenous fluid replacement.

@@ -12,6 +12,7 @@ from bson import json_util
 from bson.objectid import ObjectId
 from datetime import datetime
 
+
 hospital_bp = Blueprint('hospital', __name__)
 
 @login_manager.user_loader
@@ -29,7 +30,7 @@ def get_hospital_global_data():
         'total_appointments': 150,  # Dummy value
         'available_doctors': assigned_doctors_count,
         'pending_approvals': pending_appointments_count
-    }
+        }
 
 def get_hospital_data():
     hospital_data = mongo.db.hospitals.find_one({'umsId': session['umsId']})
@@ -51,6 +52,7 @@ def index():
 
 def generate_hospital_id():
     return 'UMSH' + re.sub('-', '', str(uuid.uuid4()))[:8].upper()
+
 
 @hospital_bp.route('/register', methods=['GET',  'POST'])
 def register():
@@ -122,6 +124,7 @@ def register():
         return redirect(url_for('auth.login'))
     return render_template('hospital/register.html')
 
+
 @hospital_bp.route('/profile', methods=['GET'])
 @login_required
 def profile():
@@ -189,6 +192,7 @@ def assign_doctor():
         print(f"Error assigning doctor: {str(e)}")
         return jsonify({'success': False, 'message': 'An error occurred while assigning the doctor'}), 500
 
+
 @hospital_bp.route('/update_profile', methods=['POST'])
 @login_required
 def update_profile():
@@ -230,6 +234,7 @@ def doctors():
     }))
     return render_template('hospital/doctors.html', doctors=doctors_details)
 
+
 @hospital_bp.route('/relieve_doctor', methods=['POST'])
 @login_required
 def relieve_doctor():
@@ -255,6 +260,7 @@ def relieve_doctor():
         return jsonify({'success': False, 'message': 'An error occurred while relieving the doctor'}), 500
 
 from bson import json_util
+
 
 @hospital_bp.route('/appointments', methods=['GET'])
 @login_required

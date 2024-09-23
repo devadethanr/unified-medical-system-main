@@ -7,6 +7,7 @@ from app.models import User
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.routes.auth import login
+from app.synthbot_ai.nlp_models.outbreak_detection import analyze_outbreak
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -43,6 +44,7 @@ def profile():
          if request.form.get('form_type') == 'update_profile':
             return update_profile()
     return render_template('admin/profile.html', admin_data=admin_data, global_admin_data=global_admin_data)
+
 
 def update_profile():
     """Update admin profile information."""
@@ -92,6 +94,7 @@ def api_patients():
                 'email': patient_info.get('email'),
             }
     return jsonify(patients)
+
 
 #single patient view
 @admin_bp.route('/patient_profile/<string:patient_id>', methods=['POST', 'GET'])
@@ -272,3 +275,8 @@ def reject_hospital():
             return jsonify({'error': 'UMS ID not provided.'}), 400
     else:
         return jsonify({'error': 'Invalid request method.'}), 405
+
+@admin_bp.route('/outbreakmap', methods=['GET'])
+@login_required
+def outbreakmap():
+    return render_template('admin/outbreak_map.html')

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify, session
+from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify, session, send_file
 from flask_login import login_required, current_user
 from app import mongo
 from datetime import datetime
@@ -7,6 +7,9 @@ import re, uuid, json
 from bson import json_util, ObjectId
 from dateutil import parser
 from datetime import timezone
+from io import BytesIO
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 
 patient_bp = Blueprint('patient', __name__)
 
@@ -179,14 +182,48 @@ def register():
         return redirect(url_for('auth.login'))
     return render_template('patient/register.html')
 
+from bson import json_util
+
+from flask import render_template
+from bson import json_util
+import json
+
+@patient_bp.route('/medical_records', methods=['GET'])
 @login_required
-def get_medicalRecords():
+def medical_records():
+    print("test entered")
     """Fetch and return medical records data as JSON."""
-    records = list(mongo.db.medicaRrecords.find({'patientId': current_user.umsId}))
-    for record in records:
-        record['_id'] = str(record['_id'])
-        record['date'] = record['date'].strftime('%Y-%m-%d') if record.get('date') else None
-    return jsonify(records)
+    # Find all blocks in the medicalRecords collection
+    blocks = list(mongo.db.medicalRecords.find())
+    patient_records = []
+    for block in blocks:
+        # Check each transaction in the block
+        for transaction in block['transactions']:
+            # If the patientId matches the current user's umsId, add it to the records
+            if transaction['patientId'] == current_user.umsId:
+                record = {
+                    'blockId': str(block['_id']),
+                    'index': block['index'],
+                    'hash': block['hash'],
+                    'createdAt': transaction['createdAt'].strftime('%Y-%m-%d %H:%M:%S') if isinstance(transaction['createdAt'], datetime) else str(transaction['createdAt']),
+                    'doctorId': transaction['doctorId'],
+                    'hospitalId': transaction['hospitalId'],
+                    'Symptoms': transaction['Symptoms'],
+                    'Diagnosis': transaction['Diagnosis'],
+                    'TreatmentPlan': transaction['TreatmentPlan'],
+                    'Prescription': transaction['Prescription'],
+                    'AdditionalNotes': transaction['AdditionalNotes'],
+                    'FollowUpDate': transaction['FollowUpDate'],
+                    'Attachments': transaction['Attachments']
+                }
+                patient_records.append(record)
+    # Sort records by createdAt date, most recent first
+    patient_records.sort(key=lambda x: x['createdAt'], reverse=True)
+    patient_data = mongo.db.patients.find_one({'umsId': current_user.umsId})
+    user_data = mongo.db.users.find_one({'umsId': current_user.umsId})
+    patient_data.update(user_data)
+    print(patient_records)  # For debugging
+    return render_template('patient/medicalrecords.html', records=patient_records, patient_data=patient_data)
 
 @patient_bp.route('/appointments', methods=['GET'])
 @login_required
@@ -341,3 +378,50 @@ def get_unavailable_slots():
     }, {'appointmentDate': 1, '_id': 0}))
 
     return json_util.dumps(unavailable_slots)
+
+@patient_bp.route('/api/medical_records/<block_id>/pdf', methods=['GET'])
+@login_required
+def download_medical_record_pdf(block_id):
+    # Find the specific block
+    block = mongo.db.medicalRecords.find_one({'_id': ObjectId(block_id)})
+    
+    if not block:
+        return jsonify({'error': 'Record not found'}), 404
+    
+    # Find the transaction for the current user
+    transaction = next((t for t in block['transactions'] if t['patientId'] == current_user.umsId), None)
+    
+    if not transaction:
+        return jsonify({'error': 'Record not found for this patient'}), 404
+    
+    # Create a PDF
+    buffer = BytesIO()
+    p = canvas.Canvas(buffer, pagesize=letter)
+    
+    # Add content to the PDF
+    p.drawString(100, 750, f"Medical Record from {transaction['createdAt']}")
+    p.drawString(100, 730, f"Doctor ID: {transaction['doctorId']}")
+    p.drawString(100, 710, f"Hospital ID: {transaction['hospitalId']}")
+    p.drawString(100, 690, f"Symptoms: {transaction['Symptoms']}")
+    p.drawString(100, 670, f"Diagnosis: {transaction['Diagnosis']}")
+    p.drawString(100, 650, f"Treatment Plan: {transaction['TreatmentPlan']}")
+    p.drawString(100, 630, f"Prescription: {transaction['Prescription']}")
+    p.drawString(100, 610, f"Additional Notes: {transaction['AdditionalNotes']}")
+    p.drawString(100, 590, f"Follow-up Date: {transaction['FollowUpDate']}")
+    p.drawString(100, 570, f"Attachments: {transaction['Attachments']}")
+    
+    p.showPage()
+    p.save()
+    
+    buffer.seek(0)
+    return send_file(buffer, as_attachment=True, download_name=f'medical_record_{block_id}.pdf', mimetype='application/pdf')
+
+@patient_bp.route('/api/verify_blockchain/<block_id>', methods=['GET'])
+@login_required
+def verify_blockchain(block_id):
+    # Implement the blockchain verification logic here
+    # This should interact with your Blockchain class from meddata.py
+    # For now, we'll return a dummy response
+    verified = True  # Replace this with actual verification logic
+    return jsonify({'verified': verified})
+

@@ -25,6 +25,8 @@
             }
         }
     </script>
+    <!-- Add this in the <head> section -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
    </head>
    <body>
       <!-- Wrapper Start -->
@@ -132,7 +134,7 @@
                                     </a>
                                  </li>
                                  <li class="col-md-3 p-0">
-                                    <a class="nav-link" data-bs-toggle="pill" href="#emailandsms">
+                                    <a class="nav-link" id="hospital-info-tab" data-bs-toggle="pill" href="#hospital-info" role="tab" aria-controls="hospital-info" aria-selected="false">
                                     Hospital Information
                                     </a>
                                  </li>
@@ -194,18 +196,6 @@
                                                 <span class="text-danger" id="nameError"></span>
                                              </div>
                                              <div class="form-group col-sm-6">
-                                                <label for="email">Email: <small>(example@example.com)</small></label>
-                                                <input type="email" class="form-control my-2" id="email" name="email" value="{{ doctor_data.email }}" required placeholder="example@example.com" oninput="validateEmail()">
-                                                <span class="text-danger" id="emailError"></span>
-                                             </div>
-                                          </div>
-                                          <div class="row">
-                                             <div class="form-group col-sm-6">
-                                                <label for="phoneNumber">Phone Number: <small>(10 digits, starting with 6-9)</small></label>
-                                                <input type="tel" class="form-control my-2" id="phoneNumber" name="phoneNumber" value="{{ doctor_data.phoneNumber }}" required placeholder="1234567890" oninput="validatePhoneNumber()">
-                                                <span class="text-danger" id="phoneNumberError"></span>
-                                             </div>
-                                             <div class="form-group col-sm-6">
                                                 <label for="dob">Date Of Birth:</label>
                                                 <input type="date" class="form-control my-2" id="dob" name="dob" value="{{ doctor_data.dob or '' }}" required>
                                              </div>
@@ -213,8 +203,11 @@
                                           <div class="row">
                                              <div class="form-group col-sm-6">
                                                 <label for="specialization">Specialization:</label>
-                                                <input type="text" class="form-control my-2" id="specialization" name="specialization" value="{{ doctor_data.specialization }}" placeholder="e.g., Cardiology" required oninput="validateSpecialization()">
-                                                <span class="text-danger" id="specializationError"></span>
+                                                <select class="form-control my-2 select2-multiple" id="specialization" name="specialization" multiple="multiple" required>
+                                                    {% for spec in ['Cardiology', 'Neurology', 'Pediatrics', 'Orthopedics', 'Dermatology', 'Oncology', 'Gynecology', 'Urology'] %}
+                                                        <option value="{{ spec }}" {% if spec in doctor_data.specialization %}selected{% endif %}>{{ spec }}</option>
+                                                    {% endfor %}
+                                                </select>
                                              </div>
                                              <div class="form-group col-sm-6">
                                                 <label for="medicalId">Medical ID: <small>(Format: XX-YY-ZZZZ-NNNNNNN)</small></label>
@@ -225,8 +218,11 @@
                                           <div class="row">
                                              <div class="form-group col-sm-6">
                                                 <label for="qualification">Qualification:</label>
-                                                <input type="text" class="form-control my-2" id="qualification" name="qualification" value="{{ doctor_data.qualification }}" placeholder="e.g., MBBS, MD" required oninput="validateQualification()">
-                                                <span class="text-danger" id="qualificationError"></span>
+                                                <select class="form-control my-2 select2-multiple" id="qualification" name="qualification" multiple="multiple" required>
+                                                    {% for qual in ['MBBS', 'MD', 'MS', 'DNB', 'DM', 'MCh', 'PhD', 'FRCS'] %}
+                                                        <option value="{{ qual }}" {% if qual in doctor_data.qualification %}selected{% endif %}>{{ qual }}</option>
+                                                    {% endfor %}
+                                                </select>
                                              </div>
                                              <div class="form-group col-sm-6">
                                                 <label for="address">Doctor Address:</label>
@@ -280,106 +276,62 @@
                                     </div>
                                  </div>
                                  <div class="iq-card-body">
-                                    <form>
+                                    <form id="changePasswordForm" method="POST" action="{{ url_for('doctor.change_password') }}" novalidate>
                                        <div class="form-group">
-                                          <label for="cpass">Current Password:</label>
-                                          <a href="javascripe:void();" class="float-end">Forgot Password</a>
-                                          <input type="Password" class="form-control my-2" id="cpass" value="">
+                                          <label for="currentPassword">Current Password:</label>
+                                          <input type="password" class="form-control my-2" id="currentPassword" name="currentPassword" required>
+                                          <span class="text-danger" id="currentPasswordError"></span>
                                        </div>
                                        <div class="form-group">
-                                          <label for="npass">New Password:</label>
-                                          <input type="Password" class="form-control my-2" id="npass" value="">
+                                          <label for="newPassword">New Password:</label>
+                                          <input type="password" class="form-control my-2" id="newPassword" name="newPassword" required>
+                                          <span class="text-danger" id="newPasswordError"></span>
                                        </div>
                                        <div class="form-group">
-                                          <label for="vpass">Verify Password:</label>
-                                          <input type="Password" class="form-control my-2" id="vpass" value="">
+                                          <label for="confirmPassword">Confirm New Password:</label>
+                                          <input type="password" class="form-control my-2" id="confirmPassword" name="confirmPassword" required>
+                                          <span class="text-danger" id="confirmPasswordError"></span>
                                        </div>
-                                       <button type="submit" class="btn btn-primary me-2">Submit</button>
-                                       <button type="reset" class="btn iq-bg-danger">cancel</button>
+                                       <button type="submit" class="btn btn-primary me-2">Change Password</button>
+                                       <button type="reset" class="btn iq-bg-danger">Cancel</button>
                                     </form>
                                  </div>
                               </div>
                            </div>
-                           <div class="tab-pane fade" id="emailandsms" role="tabpanel">
+                           <div class="tab-pane fade" id="hospital-info" role="tabpanel" aria-labelledby="hospital-info-tab">
                               <div class="iq-card">
                                  <div class="iq-card-header d-flex justify-content-between">
                                     <div class="iq-header-title">
-                                       <h4 class="card-title">Email and SMS</h4>
+                                       <h4 class="card-title">Assigned Hospitals</h4>
                                     </div>
                                  </div>
                                  <div class="iq-card-body">
-                                    <form>
-                                       <div class="form-group">
-                                          <div class="row align-items-center">
-                                             <div class="col-md-3">
-                                                <label for="emailnotification">Email Notification:</label>
-                                             </div>
-                                             <div class="col-md-9">
-                                                <div class="custom-control custom-switch">
-                                                   <input type="checkbox" class="custom-control-input" id="emailnotification" checked="">
-                                                   <label class="custom-control-label" for="emailnotification"></label>
-                                                </div>
-                                             </div>
-                                          </div>
-                                       </div>
-                                       <div class="form-group">
-                                          <div class="row align-items-center">
-                                             <div class="col-md-3">
-                                                <label for="smsnotification">SMS Notification:</label>
-                                             </div>
-                                             <div class="col-md-9">
-                                                <div class="custom-control custom-switch">
-                                                   <input type="checkbox" class="custom-control-input" id="smsnotification" checked="">
-                                                   <label class="custom-control-label" for="smsnotification"></label>
-                                                </div>
-                                             </div>
-                                          </div>
-                                       </div>
-                                       <div class="form-group">
-                                          <div class="row align-items-center">
-                                             <div class="col-md-3">
-                                                <label for="npass">When To Email</label>
-                                             </div>
-                                             <div class="col-md-9">
-                                                <div class="custom-control custom-checkbox">
-                                                   <input type="checkbox" class="custom-control-input" id="email01">
-                                                   <label class="custom-control-label" for="email01">You have new notifications.</label>
-                                                </div>
-                                                <div class="custom-control custom-checkbox">
-                                                   <input type="checkbox" class="custom-control-input" id="email02">
-                                                   <label class="custom-control-label" for="email02">You're sent a direct message</label>
-                                                </div>
-                                                <div class="custom-control custom-checkbox">
-                                                   <input type="checkbox" class="custom-control-input" id="email03" checked="">
-                                                   <label class="custom-control-label" for="email03">Someone adds you as a connection</label>
-                                                </div>
-                                             </div>
-                                          </div>   
-                                       </div>
-                                       <div class="form-group">
-                                          <div class="row align-items-center">
-                                             <div class="col-md-3">
-                                                <label for="npass">When To Escalate Emails</label>
-                                             </div>
-                                             <div class="col-md-9">
-                                                <div class="custom-control custom-checkbox">
-                                                   <input type="checkbox" class="custom-control-input" id="email04">
-                                                   <label class="custom-control-label" for="email04"> Upon new order.</label>
-                                                </div>
-                                                <div class="custom-control custom-checkbox">
-                                                   <input type="checkbox" class="custom-control-input" id="email05">
-                                                   <label class="custom-control-label" for="email05"> New membership approval</label>
-                                                </div>
-                                                <div class="custom-control custom-checkbox">
-                                                   <input type="checkbox" class="custom-control-input" id="email06" checked="">
-                                                   <label class="custom-control-label" for="email06"> Member registration</label>
-                                                </div>
-                                             </div>
-                                          </div>
-                                       </div>
-                                       <button type="submit" class="btn btn-primary me-2">Submit</button>
-                                       <button type="reset" class="btn iq-bg-danger">cancel</button>
-                                    </form>
+                                    {% if doctor_data.assignedHospitals %}
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Hospital UMS ID</th>
+                                                    <th>Name</th>
+                                                    <th>Status</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for hospital in doctor_data.assignedHospitals %}
+                                                <tr>
+                                                    <td>{{ hospital.hospitalId }}</td>
+                                                    <td>{{ hospital.name if hospital.name else 'N/A' }}</td>
+                                                    <td>{{ hospital.status }}</td>
+                                                    <td>
+                                                        <button class="btn btn-danger btn-sm" onclick="confirmRevoke('{{ hospital.hospitalId }}')">Revoke</button>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    {% else %}
+                                        <p>No hospitals are currently assigned to you.</p>
+                                    {% endif %}
                                  </div>
                               </div>
                            </div>
@@ -391,17 +343,19 @@
                                     </div>
                                  </div>
                                  <div class="iq-card-body">
-                                    <form>
+                                    <form method="POST" action="{{ url_for('doctor.edit_profile') }}">
                                        <div class="form-group">
-                                          <label for="cno">Contact Number:</label>
-                                          <input type="text" class="form-control my-2" id="cno" value="001 2536 123 458">
+                                          <label for="email">Email: <small>(example@example.com)</small></label>
+                                          <input type="email" class="form-control my-2" id="email" name="email" value="{{ doctor_data.email }}" required placeholder="example@example.com" oninput="validateEmail()">
+                                          <span class="text-danger" id="emailError"></span>
                                        </div>
                                        <div class="form-group">
-                                          <label for="email">Email:</label>
-                                          <input type="text" class="form-control my-2" id="email" value="Binijone@demo.com">
+                                          <label for="phoneNumber">Phone Number: <small>(10 digits, starting with 6-9)</small></label>
+                                          <input type="tel" class="form-control my-2" id="phoneNumber" name="phoneNumber" value="{{ doctor_data.phoneNumber[0] if doctor_data.phoneNumber else '' }}" required placeholder="1234567890" oninput="validatePhoneNumber()">
+                                          <span class="text-danger" id="phoneNumberError"></span>
                                        </div>
-                                       <button type="submit" class="btn btn-primary me-2">Submit</button>
-                                       <button type="reset" class="btn iq-bg-danger">cancel</button>
+                                       <button type="submit" class="btn btn-primary me-2">Update Contact Info</button>
+                                       <button type="reset" class="btn iq-bg-danger">Cancel</button>
                                     </form>
                                  </div>
                               </div>
@@ -489,5 +443,126 @@
       }
     }
   </script>
+  <!-- Add this script at the end of the file, just before the closing </body> tag -->
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <script>
+      $(document).ready(function() {
+          $('.select2-multiple').select2({
+              tags: true,
+              tokenSeparators: [',', ' '],
+              placeholder: "Select or type to add",
+              allowClear: true
+          });
+      });
+  </script>
+  <div class="modal fade" id="revokeConfirmModal" tabindex="-1" aria-labelledby="revokeConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="revokeConfirmModalLabel">Confirm Revocation</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to revoke your assignment from this hospital?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmRevokeBtn">Revoke</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let hospitalToRevoke = '';
+
+    function confirmRevoke(hospitalId) {
+        hospitalToRevoke = hospitalId;
+        $('#revokeConfirmModal').modal('show');
+    }
+
+    $(document).ready(function() {
+        $('#confirmRevokeBtn').click(function() {
+            $.ajax({
+                url: "{{ url_for('doctor.revoke_hospital') }}",
+                type: "POST",
+                data: JSON.stringify({'hospital_id': hospitalToRevoke}),
+                contentType: "application/json",
+                dataType: "json",
+                success: function(response) {
+                    if (response.success) {
+                        alert("Hospital assignment revoked successfully");
+                        location.reload();
+                    } else {
+                        alert("Error: " + response.message);
+                    }
+                },
+                error: function() {
+                    alert("An error occurred while processing your request");
+                }
+            });
+            $('#revokeConfirmModal').modal('hide');
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('#changePasswordForm').submit(function(e) {
+            e.preventDefault();
+            if (validatePasswordForm()) {
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        if (response.success) {
+                            alert('Password changed successfully');
+                            location.reload();
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('An error occurred while processing your request');
+                    }
+                });
+            }
+        });
+    });
+
+    function validatePasswordForm() {
+        let isValid = true;
+
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        const currentPasswordError = document.getElementById('currentPasswordError');
+        const newPasswordError = document.getElementById('newPasswordError');
+        const confirmPasswordError = document.getElementById('confirmPasswordError');
+
+        currentPasswordError.textContent = '';
+        newPasswordError.textContent = '';
+        confirmPasswordError.textContent = '';
+
+        if (currentPassword.length < 6) {
+            currentPasswordError.textContent = 'Current password must be at least 6 characters long';
+            isValid = false;
+        }
+
+        if (newPassword.length < 6) {
+            newPasswordError.textContent = 'New password must be at least 6 characters long';
+            isValid = false;
+        }
+
+        if (newPassword !== confirmPassword) {
+            confirmPasswordError.textContent = 'Passwords do not match';
+            isValid = false;
+        }
+
+        return isValid;
+    }
+</script>
    </body>
 </html>

@@ -13,21 +13,21 @@
         border-radius: 8px;
         padding: 16px;
         margin-bottom: 16px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         display: flex;
         flex-direction: column;
     }
     .appointment-card-general {
-        background-color: #e8f5e9; /* Pastel green */
+        background-color: rgba(232, 245, 233, 0.1); /* Darker pastel green */
     }
     .appointment-card-cardiology {
-        background-color: #fce4ec; /* Pastel pink */
+        background-color: rgba(252, 228, 236, 0.1); /* Darker pastel pink */
     }
     .appointment-card-neurology {
-        background-color: #e3f2fd; /* Pastel blue */
+        background-color: rgba(227, 242, 253, 0.1); /* Darker pastel blue */
     }
     .appointment-card-other {
-        background-color: #ffffff; /* White */
+        background-color: rgba(255, 255, 255, 0.05); /* Darker white */
     }
     .appointment-details {
         display: flex;
@@ -58,7 +58,7 @@
 {% block content %}
 <!-- Custom Modal -->
 <dialog id="custom_modal" class="modal">
-    <div class="modal-box">
+    <div class="modal-box bg-base-200">
       <h3 class="font-bold text-lg" id="modal_title"></h3>
       <p class="py-4" id="modal_message"></p>
       <div class="modal-action">
@@ -78,7 +78,7 @@
 
 <!-- Book Appointment Modal -->
 <dialog id="book_appointment_modal" class="modal">
-    <form method="dialog" class="modal-box">
+    <form method="dialog" class="modal-box bg-base-200">
         <h3 class="font-bold text-lg">Book an Appointment</h3>
         <div class="form-control">
             <label class="label">
@@ -142,7 +142,7 @@
 
 <!-- Calendar Modal -->
 <dialog id="calendar_modal" class="modal">
-  <div class="modal-box">
+  <div class="modal-box bg-base-200">
     <h3 class="font-bold text-lg">Select Appointment Date and Time</h3>
     <div id="appointment-calendar"></div>
     <div class="modal-action">
@@ -153,7 +153,7 @@
 
 <!-- Confirmation Modal -->
 <dialog id="confirm_modal" class="modal">
-  <div class="modal-box">
+  <div class="modal-box bg-base-200">
     <h3 class="font-bold text-lg" id="confirm_modal_title"></h3>
     <p class="py-4" id="confirm_modal_message"></p>
     <div class="modal-action">
@@ -453,7 +453,7 @@ function loadAppointments() {
                             <p>Date: ${new Date(appointment.appointmentDate).toLocaleDateString()}</p>
                             <p>Status: ${appointment.status}</p>
                             <p>Reason: ${appointment.reason || 'Not specified'}</p>
-                            <p class="text-xs text-gray-500 mt-2">Appointment ID: ${appointment._id}</p>
+                            <p class="text-xs opacity-50 mt-2">Appointment ID: ${appointment._id}</p>
                         </div>
                         <div class="doctor-details">
                             <p><strong>Assigned Doctor:</strong></p>
@@ -463,7 +463,7 @@ function loadAppointments() {
                         </div>
                     </div>
                     <div class="appointment-actions">
-                        <button class="btn btn-sm btn-outline mr-2" onclick="editAppointment('${appointment._id}')">Edit</button>
+                        <button class="btn btn-sm btn-outline btn-primary mr-2" onclick="editAppointment('${appointment._id}')">Edit</button>
                         <button class="btn btn-sm btn-outline btn-error" onclick="revokeAppointment('${appointment._id}')">Revoke</button>
                     </div>
                 `;

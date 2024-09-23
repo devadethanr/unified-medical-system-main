@@ -525,15 +525,17 @@
                         <thead>
                            <tr>
                               <th scope="col" class="bg-primary text-white">Hospital UMS ID</th>
+                              <th scope="col" class="bg-primary text-white">Status</th>
                               <th scope="col" class="bg-primary text-white">Action</th>
                            </tr>
                         </thead>
                         <tbody>
-                           {% for hospital_id in doctor_data.assignedHospitals %}
+                           {% for hospital in doctor_data.assignedHospitals %}
                            <tr>
-                              <td>{{ hospital_id }}</td>
+                              <td>{{ hospital.hospitalId }}</td>
+                              <td>{{ hospital.status }}</td>
                               <td>
-                                 <button class="btn btn-danger btn-sm" onclick="confirmRevoke('{{ hospital_id }}')">Revoke</button>
+                                 <button class="btn btn-danger btn-sm" onclick="confirmRevoke('{{ hospital.hospitalId }}')">Revoke</button>
                               </td>
                            </tr>
                            {% endfor %}

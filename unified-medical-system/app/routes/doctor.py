@@ -9,6 +9,10 @@ from bson.objectid import ObjectId
 from datetime import datetime
 import re, uuid
 from app.routes.auth import login
+from bson import json_util
+from flask import jsonify
+import json
+from app.routes.meddata import add_meddata
 
 doctor_bp = Blueprint('doctor', __name__)
 
@@ -24,16 +28,22 @@ def get_hospital_details(hospital_id):
     hospital_data = mongo.db.hospitals.find_one({'umsId': hospital_id})
     hospital_user_data = mongo.db.users.find_one({'umsId': hospital_id})
     if hospital_data and hospital_user_data:
-        return {**hospital_data, **hospital_user_data}
+        combined_data = {**hospital_data, **hospital_user_data}
+        # Convert ObjectId to string
+        combined_data['_id'] = str(combined_data['_id'])
+        return combined_data
     return None
 
 def get_assigned_hospitals(doctor_details):
     """Get details of all assigned hospitals for a doctor."""
     assigned_hospitals = []
     if doctor_details and 'assignedHospitals' in doctor_details:
-        for hospital_id in doctor_details['assignedHospitals']:
+        for hospital in doctor_details['assignedHospitals']:
+            hospital_id = hospital['hospitalId'] if isinstance(hospital, dict) else hospital
             hospital_info = get_hospital_details(hospital_id)
             if hospital_info:
+                if isinstance(hospital, dict):
+                    hospital_info['status'] = hospital.get('status', 'unknown')
                 assigned_hospitals.append(hospital_info)
     return assigned_hospitals
 
@@ -58,11 +68,13 @@ def index():
 @login_required
 def profile():
     """Handle doctor profile view and updates."""
-    global doctor_data
     doctor_data = mongo.db.users.find_one({'umsId': session['umsId']})
     doctor_details = mongo.db.doctorDetails.find_one({'umsId': session['umsId']})
     
     doctor_data = {**doctor_data, **doctor_details} if doctor_details else doctor_data
+    
+    # Handle potentially missing or None values
+    doctor_data['name'] = doctor_data.get('name', '')  # Default to empty string if name is missing
     doctor_data['phoneNumber'] = doctor_data.get('phoneNumber', [None])[0]
     doctor_data['assigned_hospitals'] = get_assigned_hospitals(doctor_details)
 
@@ -101,46 +113,47 @@ def update_profile():
 @login_required
 def edit_profile():
     if request.method == 'POST':
-        doctor_data = {
-            'name': request.form.get('name', 'not specified'),
-            'email': request.form.get('email', 'not specified'),
-            'phoneNumber': request.form.get('phoneNumber', 'not specified'),
-            'updatedAt': datetime.now() 
+        # Get the updated data from the form
+        updated_data = {
+            'name': request.form.get('name'),
+            'updatedAt': datetime.now()
         }
-        print("debugger flag")
-        print(doctor_data)
-        mongo.db.users.update_one({'umsId': session['umsId']}, {'$set': doctor_data})
+
+        # Handle email and phone number updates
+        new_email = request.form.get('email')
+        new_phone = request.form.get('phoneNumber')
+
+        if new_email:
+            updated_data['email'] = new_email
+            # Update email in login collection
+            mongo.db.login.update_one({'umsId': session['umsId']}, {'$set': {'email': new_email}})
+
+        if new_phone:
+            updated_data['phoneNumber'] = [new_phone]  # Store as an array
+
+        # Update users collection
+        mongo.db.users.update_one({'umsId': session['umsId']}, {'$set': updated_data})
 
         # Update the doctor's profile in the doctors collection
         mongo.db.doctors.update_one({'umsId': session['umsId']}, {'$set': {
             'medicalId': request.form.get('medicalId', 'not specified'),
-            'specialization':request.form.get('specialization', 'not specified'),
-            'updatedAt': doctor_data['updatedAt']
+            'specialization': request.form.getlist('specialization'),
+            'updatedAt': updated_data['updatedAt']
         }})
 
         # Update the doctor's profile in the doctorDetails collection
         update_data = {
             'status_reason': request.form.get('status_reason', 'not specified'),
             'medicalId': request.form.get('medicalId', 'not specified test'),
-            'specialization': request.form.get('specialization', 'not specified'),
-            'qualification': request.form.get('qualification', 'not specified'),
+            'specialization': request.form.getlist('specialization'),
+            'qualification': request.form.getlist('qualification'),
             'doctor_status': request.form.get('status', 'not specified'),
             'dob': request.form.get('dob', 'not specified'),
             'address': request.form.get('address', 'not specified'),
-            'updatedAt': datetime.now()
+            'updatedAt': updated_data['updatedAt']
         }
         mongo.db.doctorDetails.update_one({'umsId': session['umsId']}, {'$set': update_data}, upsert=True)
         
-        # Update the doctor's email and updatedAt in the users collection
-        mongo.db.users.update_one({'umsId': session['umsId']}, {'$set': {
-            'email': doctor_data.get('email', 'not specified'),
-            'updatedAt': doctor_data.get('updatedAt', 'not specified')
-        }})
-        # Update the doctor's email and updatedAt in the login collection
-        mongo.db.login.update_one({'umsId': session['umsId']}, {'$set': {
-            'email': doctor_data.get('email', 'not specified'),
-            'updatedAt': doctor_data.get('updatedAt', 'not specified')
-        }})
         flash('Profile updated successfully', 'success')
         return redirect(url_for('doctor.profile'))
 
@@ -148,6 +161,55 @@ def edit_profile():
     doctor_details = mongo.db.doctorDetails.find_one({'umsId': session['umsId']})
     doctor_data = {**doctor_data, **doctor_details} if doctor_details else doctor_data
     return render_template('doctor/profile-edit.html', doctor_data=doctor_data)
+
+@doctor_bp.route('/change_password', methods=['POST'])
+@login_required
+def change_password():
+    current_password = request.form.get('currentPassword')
+    new_password = request.form.get('newPassword')
+    confirm_password = request.form.get('confirmPassword')
+
+    user = mongo.db.users.find_one({'umsId': session['umsId']})
+    login_user = mongo.db.login.find_one({'umsId': session['umsId']})
+
+    if not user or not login_user:
+        return jsonify({'success': False, 'message': 'User not found'})
+
+    if not check_password_hash(user['passwordHash'][0], current_password):
+        return jsonify({'success': False, 'message': 'Current password is incorrect'})
+
+    if new_password != confirm_password:
+        return jsonify({'success': False, 'message': 'New passwords do not match'})
+
+    if len(new_password) < 8:
+        return jsonify({'success': False, 'message': 'New password must be at least 8 characters long'})
+
+    hashed_password = generate_password_hash(new_password)
+    updated_at = datetime.now()
+
+    # Update users collection
+    mongo.db.users.update_one(
+        {'umsId': session['umsId']},
+        {
+            '$set': {
+                'passwordHash': [hashed_password],
+                'updatedAt': updated_at
+            }
+        }
+    )
+
+    # Update login collection
+    mongo.db.login.update_one(
+        {'umsId': session['umsId']},
+        {
+            '$set': {
+                'passwordHash': [hashed_password],
+                'updatedAt': updated_at
+            }
+        }
+    )
+
+    return jsonify({'success': True, 'message': 'Password changed successfully'})
 
 @doctor_bp.route('/inbox')
 def inbox():
@@ -182,7 +244,43 @@ def edit_hospital():
 @doctor_bp.route('/appointments')
 @login_required
 def appointments():
-    return render_template('doctor/appointments.html')
+    doctor_id = session['umsId']
+    
+    # Fetch appointments for the logged-in doctor
+    appointments = list(mongo.db.appointments.find({
+        'doctorId': doctor_id,
+        'appointmentDate': {'$gte': datetime.now()}  # Only future appointments
+    }).sort('appointmentDate', 1))  # Sort by appointment date ascending
+
+    # Fetch patient names
+    patient_ids = [appointment['patientId'] for appointment in appointments]
+    patients = {p['umsId']: p['name'] for p in mongo.db.users.find({'umsId': {'$in': patient_ids}})}
+
+    # Add patient names to appointments and format dates
+    for appointment in appointments:
+        appointment['patientName'] = patients.get(appointment['patientId'], 'Unknown')
+        appointment['appointmentDate'] = appointment['appointmentDate'].strftime('%Y-%m-%d %H:%M')
+        appointment['_id'] = str(appointment['_id'])  # Convert ObjectId to string
+
+    # Fetch doctor data for the navbar and to get the hospitalId
+    doctor_data = mongo.db.users.find_one({'umsId': session['umsId']})
+    doctor_details = mongo.db.doctorDetails.find_one({'umsId': session['umsId']})
+    
+    # Get the first assigned hospital's ID (assuming a doctor is assigned to at least one hospital)
+    hospital_id = None
+    if doctor_details and isinstance(doctor_details, dict):
+        assigned_hospitals = doctor_details.get('assignedHospitals', [])
+        if assigned_hospitals and isinstance(assigned_hospitals, list) and len(assigned_hospitals) > 0:
+            first_hospital = assigned_hospitals[0]
+            if isinstance(first_hospital, dict):
+                hospital_id = first_hospital.get('hospitalId')
+            elif isinstance(first_hospital, str):
+                hospital_id = first_hospital
+
+    return render_template('doctor/appointments.html', 
+                           appointments=json.loads(json_util.dumps(appointments)), 
+                           doctor_data=doctor_data,
+                           hospital_id=hospital_id)
 
 
 @doctor_bp.route('/appointment_history')
@@ -275,21 +373,56 @@ def revoke_hospital():
     hospital_id = data.get('hospital_id')
     if not hospital_id:
         return jsonify({'success': False, 'message': 'Hospital ID is required'}), 400
+    
     doctor_details = mongo.db.doctorDetails.find_one({'umsId': session['umsId']})
     if not doctor_details or 'assignedHospitals' not in doctor_details:
         return jsonify({'success': False, 'message': 'Doctor details not found or no assigned hospitals'}), 404
-    if hospital_id not in doctor_details['assignedHospitals']:
+    
+    # Check if the hospital is in the assignedHospitals array
+    hospital_in_list = any(hospital['hospitalId'] == hospital_id for hospital in doctor_details['assignedHospitals'])
+    if not hospital_in_list:
         return jsonify({'success': False, 'message': 'Hospital not found in assigned hospitals'}), 404
+    
     # Remove the doctor from the assignedDoctors array in hospitalDetails
     mongo.db.hospitalDetails.update_one(
         {'umsId': hospital_id},
         {'$pull': {'assignedDoctors': session['umsId']}}
     )
+    
     # Remove the hospital from the assignedHospitals array
     mongo.db.doctorDetails.update_one(
         {'umsId': session['umsId']},
-        {'$pull': {'assignedHospitals': hospital_id}}
+        {'$pull': {'assignedHospitals': {'hospitalId': hospital_id}}}
     )
+    
     return jsonify({'success': True, 'message': 'Hospital assignment revoked successfully'})
 
+from app.routes.meddata import add_meddata
 
+@doctor_bp.route('/submit_consultation', methods=['POST'])
+@login_required
+def submit_consultation():
+    consultation_data = request.json
+    
+    # Validate the required fields
+    required_fields = ["patientId", "doctorId", "hospitalId", "Symptoms", "Diagnosis", "TreatmentPlan", "Prescription", "AdditionalNotes", "FollowUpDate", "Attachments"]
+    for field in required_fields:
+        if not consultation_data.get(field):
+            return jsonify({"error": f"Missing required field: {field}"}), 400
+
+    # Additional check for hospitalId
+    if not consultation_data.get('hospitalId'):
+        doctor_details = mongo.db.doctorDetails.find_one({'umsId': session['umsId']})
+        hospital_id = doctor_details.get('assignedHospitals', [{}])[0].get('hospitalId') if doctor_details else None
+        if hospital_id:
+            consultation_data['hospitalId'] = hospital_id
+        else:
+            return jsonify({"error": "No assigned hospital found for the doctor"}), 400
+
+    # Call the add_meddata function from meddata.py
+    result = add_meddata(consultation_data)
+
+    if result.get('message'):
+        return jsonify({"message": result['message']}), 201
+    else:
+        return jsonify({"error": "Failed to add medical data"}), 500

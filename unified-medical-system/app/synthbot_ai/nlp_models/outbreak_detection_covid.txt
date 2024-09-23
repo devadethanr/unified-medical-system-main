@@ -1,0 +1,42 @@
+Arun Kumar, age 35, male, has tested positive for COVID-19. Symptoms include fever and cough. Last known location: Thiruvananthapuram.
+Priya Nair, age 28, female, is diagnosed with influenza. Experiencing body aches and fatigue. Currently resting at home in Kochi. Last known location: Kochi.
+Rajesh Menon, age 42, male, has confirmed COVID-19 infection. Showing mild symptoms. Self-isolating in his apartment in Kozhikode. Last known location: Kozhikode.
+Lakshmi Pillai, age 31, female, is suffering from dengue fever. Undergoing treatment at Thrissur General Hospital. Last known location: Thrissur.
+Anitha George, age 55, female, has tested positive for COVID-19. Asymptomatic but in quarantine. Resides in Kollam. Last known location: Kollam.
+Suresh Babu, age 60, male, is hospitalized due to severe pneumonia. Currently in ICU at Alappuzha Medical Center. Last known location: Alappuzha.
+Vishnu Prasad, age 25, male, has a high fever of unknown origin. Under observation at home in Palakkad. Last known location: Palakkad.
+Meera Krishnan, age 7, female, has contracted measles. Not vaccinated. Isolated at Children's Hospital in Kannur. Last known location: Kannur.
+Abdul Rashid, age 45, male, is confirmed to have COVID-19. Experiencing shortness of breath. Being monitored closely at home in Malappuram. Last known location: Malappuram.
+Deepak Nambiar, age 50, male, diagnosed with tuberculosis. Started on antibiotic treatment. Isolated at home in Kottayam. Last known location: Kottayam.
+Thomas Varghese, age 78, male, has passed away due to complications from heart disease. Was a resident of a nursing home in Pathanamthitta. Last known location: Pathanamthitta.
+Anjali Menon, age 29, female, has contracted chikungunya. Showing mild symptoms. Under observation in Kasaragod. Last known location: Kasaragod.
+Manoj Varma, age 55, male, is battling severe pneumonia. Admitted to the hospital in Idukki for treatment. Last known location: Idukki.
+Sanjay Kurup, age 40, male, diagnosed with leptospirosis. Receiving supportive care at a hospital in Wayanad. Last known location: Wayanad.
+Lina Chen, age 33, female, is suffering from viral fever. Hospitalized in Ernakulam for monitoring. Last known location: Ernakulam.
+Fathima Beevi, age 22, female, has typhoid. Receiving treatment at a clinic in Malappuram. Last known location: Malappuram.
+Rahul Nair, age 10, male, has chickenpox. Staying home from school in Thiruvananthapuram. Parents monitoring his condition. Last known location: Thiruvananthapuram.
+Arjun Menon, age 18, male, diagnosed with viral meningitis. Admitted to university hospital in Kozhikode for immediate treatment. Last known location: Kozhikode.
+Sreelakshmi Nair, age 45, female, confirmed to have H1N1 influenza. Isolated in a specialized unit in Thrissur. Last known location: Thrissur.
+Divya Raj, age 37, female, diagnosed with hepatitis A. Starting treatment. Being monitored by a hepatologist in Kochi. Last known location: Kochi.
+Ravi Varma, age 62, male, is in critical condition due to severe COVID-19 complications. On ventilator support in the ICU of Thiruvananthapuram Medical College Hospital. Last known location: Thiruvananthapuram.
+Gopalan Nair, age 55, male, diagnosed with scrub typhus. Under treatment and isolation in Kannur. Last known location: Kannur.
+Reshma Abdul, age 40, female, has tested positive for COVID-19. Mild symptoms. Self-isolating at home in Kozhikode with her family. Last known location: Kozhikode.
+Neethu Soman, age 26, female, has dengue fever. Receiving treatment at a hospital in Alappuzha. Last known location: Alappuzha.
+Anil Kumar, age 32, male, is quarantined after potential exposure to a highly contagious pathogen in a research lab in Thiruvananthapuram. Last known location: Thiruvananthapuram.
+Ishaan Menon, age 19, male, bitten by a stray dog and receiving post-exposure rabies prophylaxis. Receiving treatment in Kollam. Last known location: Kollam.
+Rajesh Pillai, age 45, male, exposed to a chemical spill in an industrial accident. Under treatment and close observation in a secure facility in Kochi. Last known location: Kochi.
+Amina Begum, age 6 months, female, has tested positive for COVID-19. Showing mild symptoms. Being closely monitored at home in Malappuram. Last known location: Malappuram.
+Vijay Kumar, age 30, male, has a common cold. Resting at home in Thrissur and taking over-the-counter medication. Last known location: Thrissur.
+Santhosh Menon, age 45, male, has tragically passed away due to severe complications from COVID-19. Was a resident of Kozhikode. Last known location: Kozhikode.
+Amina Begum, age 6 months, female, has sadly passed away due to complications from COVID-19. Family resided in Malappuram. Last known location: Malappuram.
+Sarita Nair, age 52, female, has tested positive for COVID-19. Experiencing moderate symptoms. Hospitalized in Thiruvananthapuram. Last known location: Thiruvananthapuram.
+Rahul Krishnan, age 27, male, diagnosed with COVID-19. Asymptomatic but in home quarantine in Kochi. Last known location: Kochi.
+Meena Thomas, age 39, female, has contracted COVID-19. Showing mild symptoms. Self-isolating at home in Kozhikode. Last known location: Kozhikode.
+Arjun Pillai, age 8, male, has tested positive for COVID-19. Mild symptoms. Being monitored at home in Thrissur. Last known location: Thrissur.
+Leela Menon, age 70, female, hospitalized with severe COVID-19 symptoms. In ICU at Kollam District Hospital. Last known location: Kollam.
+Sanjay Varma, age 45, male, confirmed COVID-19 case. Moderate symptoms. Under home care in Alappuzha. Last known location: Alappuzha.
+Priya Raj, age 33, female, tested positive for COVID-19. Asymptomatic. Quarantined at home in Palakkad. Last known location: Palakkad.
+Abdul Kareem, age 58, male, diagnosed with COVID-19. Severe symptoms. Admitted to ICU in Kannur. Last known location: Kannur.
+Anjali Suresh, age 29, female, has COVID-19. Mild symptoms. Self-isolating in Malappuram. Last known location: Malappuram.
+Vishnu Nair, age 41, male, tested positive for COVID-19. Moderate symptoms. Hospitalized in Kottayam. Last known location: Kottayam.
+Jacob Johnson, age 35, male, has tested positive for COVID-19. Symptoms include fever and cough. Last known location: Thiruvananthapuram.

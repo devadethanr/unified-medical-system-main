@@ -7,6 +7,7 @@ import random
 from authlib.integrations.flask_client import OAuth
 from flask_session import Session
 from flask_mail import Mail
+from datetime import datetime
 
 mongo = PyMongo()
 login_manager = LoginManager()
@@ -36,8 +37,8 @@ def create_app(config_class='config.DevelopmentConfig'):
     #mail client configuration
     app.config['MAIL_SERVER'] = 'smtp.gmail.com'
     app.config['MAIL_PORT'] = 587
-    app.config['MAIL_USERNAME'] = 'devadethanr2025@mca.ajce.in'
-    app.config['MAIL_PASSWORD'] = 'MUMUbubu@2024'
+    app.config['MAIL_USERNAME'] = os.getenv('MAIL_ID')
+    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
     app.config['MAIL_USE_TLS'] = True
     app.config['MAIL_USE_SSL'] = False
     Mail(app)
@@ -69,11 +70,25 @@ def create_app(config_class='config.DevelopmentConfig'):
     def internal_server_error(e):
         return render_template('error/500.html'), 500
 
-    from app.routes import admin, patient, doctor, hospital, auth
+    from app.routes import admin, patient, doctor, hospital, auth, meddata
     app.register_blueprint(auth.auth_bp, url_prefix='/auth')
     app.register_blueprint(admin.admin_bp, url_prefix='/admin')
     app.register_blueprint(patient.patient_bp, url_prefix='/patient')
     app.register_blueprint(doctor.doctor_bp, url_prefix='/doctor')
     app.register_blueprint(hospital.hospital_bp, url_prefix='/hospital')
+    app.register_blueprint(meddata.meddata_bp, url_prefix='/meddata')
+
+    app.template_filter('format_date')
+    def format_date(value):
+        if isinstance(value, dict) and '$date' in value:
+            value = value['$date']
+        if isinstance(value, str):
+            try:
+                value = datetime.fromisoformat(value.rstrip('Z'))
+            except ValueError:
+                return value  # Return original value if parsing fails
+        if isinstance(value, datetime):
+            return value.strftime('%Y-%m-%d %H:%M:%S')
+        return value  # Return original value if it's not a recognized format
 
     return app
