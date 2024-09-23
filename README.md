@@ -3,14 +3,6 @@
 ================================
 Problem Statement
 -----------------
-
-### Problem statement No : 4
-### Problem: Patient Health card
-A Patient Health Card is a comprehensive document or digital record that consolidates key
-health information about a patient. It typically includes personal details, medical history,
-treatment plans, and other relevant health data aiming to digitize medical information to ensure
-interoperability between heterogeneous systems.
-
 Abstract
 --------
 
@@ -139,22 +131,11 @@ Future Improvements
 
 This documentation provides an overview of the SIN13 Unified Medical System based on the available code snippets. For a more detailed documentation, additional information about the database schema, API endpoints, and user interfaces would be needed.
 # Unified Medical System with Early Outbreak Detection
-## Team: Syntheia
+## Devolper: Devadethan R
 =========================================================
-
-Problem Statement
------------------
-
-### Problem statement No : 4
-### Problem: Patient Health card
-A Patient Health Card is a comprehensive document or digital record that consolidates key
-health information about a patient. It typically includes personal details, medical history,
-treatment plans, and other relevant health data aiming to digitize medical information to ensure
-interoperability between heterogeneous systems.
 
 Abstract
 --------
-
 This project proposes a comprehensive unified medical system for India. It integrates data
 sharing, appointment booking, medical record access, and a patient support chatbot.
 Additionally, the system utilises machine learning to detect potential outbreaks of viral
