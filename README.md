@@ -1,5 +1,5 @@
 # Unified Medical System with Early Outbreak Detection
-## Devolper: Devadethan R
+## Developer: Devadethan R
 ================================
 Problem Statement
 -----------------
@@ -131,7 +131,7 @@ Future Improvements
 
 This documentation provides an overview of the SIN13 Unified Medical System based on the available code snippets. For a more detailed documentation, additional information about the database schema, API endpoints, and user interfaces would be needed.
 # Unified Medical System with Early Outbreak Detection
-## Devolper: Devadethan R
+## Developer: Devadethan R
 =========================================================
 
 Abstract
