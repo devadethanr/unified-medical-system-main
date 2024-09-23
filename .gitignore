@@ -1,4 +1,14 @@
+# Virtual environments
 venv
 env
+
+# Environment variables
 .env
 app/.env
+
+# Python cache files
+__pycache__/
+*.py[cod]
+
+# Secrets
+client_secret.json
