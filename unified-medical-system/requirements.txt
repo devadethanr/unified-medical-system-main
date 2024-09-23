@@ -26,3 +26,9 @@ requests
 requests-oauthlib
 urllib3
 Werkzeug
+python-dateutil
+python-barcode
+pillow
+transformers
+reportlab
+folium
