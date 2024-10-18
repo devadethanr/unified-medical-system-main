@@ -24,10 +24,18 @@
         margin-top: 1rem;
     }
     .btn-verify {
-        background-color: #3b82f6;
+        background-color: #ffffff;
+        color: #000000;
+        border: 1px solid #e2e8f0; /* Add a subtle border */
+    }
+    .btn-verify:hover {
+        background-color: #f8fafc; /* Slightly darker white on hover */
     }
     .btn-download {
         background-color: #10b981;
+    }
+    .modal-box {
+        max-width: 40rem; /* Increased from 32rem */
     }
 </style>
 {% endblock %}
@@ -49,8 +57,16 @@
             <p><strong>Follow-up Date:</strong> {{ record.FollowUpDate }}</p>
             <p><strong>Attachments:</strong> {{ record.Attachments }}</p>
             <div class="record-actions flex justify-end space-x-2 mt-4">
-                <button class="btn btn-sm btn-verify" onclick="verifyBlockchain('{{ record.blockId }}')">Verify on Blockchain</button>
-                <button class="btn btn-sm btn-download" onclick="downloadPDF('{{ record.blockId }}')">Download PDF</button>
+                <button class="btn btn-sm btn-verify" onclick="verifyBlockchain('{{ record.blockId }}')">
+                    Verify on Blockchain
+                    <span id="verifiedBadge-{{ record.blockId }}" class="hidden ml-2">
+                        <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span class="text-green-500 text-xs">Verified</span>
+                    </span>
+                </button>
+                <button class="btn btn-sm btn-download text-white" onclick="downloadPDF('{{ record.blockId }}')">Download PDF</button>
             </div>
         </div>
         {% endfor %}
@@ -59,7 +75,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-<!-- Add this modal to your HTML -->
+<!-- Update the modal HTML -->
 <dialog id="verificationModal" class="modal">
   <div class="modal-box">
     <h3 class="font-bold text-lg">Blockchain Verification</h3>
@@ -70,13 +86,11 @@
         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
         </svg>
-        Medical record verified on the blockchain.
+        <span id="verificationTextContent"></span>
       </span>
     </div>
     <div class="modal-action">
-      <form method="dialog">
-        <button class="btn">Close</button>
-      </form>
+     
     </div>
   </div>
 </dialog>
@@ -109,6 +123,7 @@ function verifyBlockchain(blockId) {
             const message = document.getElementById('verificationMessage');
             const animationContainer = document.getElementById('verificationAnimation');
             const verificationText = document.getElementById('verificationText');
+            const verificationTextContent = document.getElementById('verificationTextContent');
 
             message.textContent = 'Verifying medical record on the blockchain...';
             verificationText.classList.add('hidden');
@@ -117,7 +132,21 @@ function verifyBlockchain(blockId) {
                 animateVerification(true);
                 setTimeout(() => {
                     verificationText.classList.remove('hidden');
+                    anime({
+                        targets: '#verificationTextContent',
+                        opacity: [0, 1],
+                        translateY: [20, 0],
+                        duration: 1000,
+                        easing: 'easeOutElastic(1, .8)',
+                        begin: () => {
+                            verificationTextContent.textContent = 'Medical record verified on the blockchain.';
+                        }
+                    });
                 }, 2000);
+
+                // Show verified badge on the button
+                const verifiedBadge = document.getElementById(`verifiedBadge-${blockId}`);
+                verifiedBadge.classList.remove('hidden');
             } else {
                 message.textContent = 'Medical record could not be verified on the blockchain.';
                 animateVerification(false);
@@ -178,5 +207,23 @@ function animateVerification(success) {
         easing: 'easeOutElastic(1, .5)'
     });
 }
+
+function closeVerificationModal() {
+    const modal = document.getElementById('verificationModal');
+    modal.close();
+}
+
+// Add this event listener to handle the close button and clicking outside the modal
+document.getElementById('verificationModal').addEventListener('click', (e) => {
+    const modalBox = document.querySelector('.modal-box');
+    if (e.target === document.getElementById('verificationModal') || e.target.closest('.btn')) {
+        closeVerificationModal();
+    }
+});
+
+// Prevent clicks inside the modal from closing it
+document.querySelector('.modal-box').addEventListener('click', (e) => {
+    e.stopPropagation();
+});
 </script>
 {% endblock %}
