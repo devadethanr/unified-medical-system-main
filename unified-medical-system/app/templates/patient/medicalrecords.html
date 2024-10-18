@@ -61,7 +61,7 @@
 
 <script>
 function downloadPDF(blockId) {
-    fetch(`/api/medical_records/${blockId}/pdf`)
+    fetch(`api/medical_records/${blockId}/pdf`)
         .then(response => response.blob())
         .then(blob => {
             const url = window.URL.createObjectURL(blob);

@@ -1,15 +1,20 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify, session, send_file
+from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify, session, send_file, current_app
 from flask_login import login_required, current_user
 from app import mongo
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
-import re, uuid, json
+import re, uuid
 from bson import json_util, ObjectId
 from dateutil import parser
 from datetime import timezone
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
+from reportlab.lib import colors
+import os
 
 patient_bp = Blueprint('patient', __name__)
 
@@ -182,16 +187,9 @@ def register():
         return redirect(url_for('auth.login'))
     return render_template('patient/register.html')
 
-from bson import json_util
-
-from flask import render_template
-from bson import json_util
-import json
-
 @patient_bp.route('/medical_records', methods=['GET'])
 @login_required
 def medical_records():
-    print("test entered")
     """Fetch and return medical records data as JSON."""
     # Find all blocks in the medicalRecords collection
     blocks = list(mongo.db.medicalRecords.find())
@@ -222,7 +220,6 @@ def medical_records():
     patient_data = mongo.db.patients.find_one({'umsId': current_user.umsId})
     user_data = mongo.db.users.find_one({'umsId': current_user.umsId})
     patient_data.update(user_data)
-    print(patient_records)  # For debugging
     return render_template('patient/medicalrecords.html', records=patient_records, patient_data=patient_data)
 
 @patient_bp.route('/appointments', methods=['GET'])
@@ -384,37 +381,86 @@ def get_unavailable_slots():
 def download_medical_record_pdf(block_id):
     # Find the specific block
     block = mongo.db.medicalRecords.find_one({'_id': ObjectId(block_id)})
-    
     if not block:
         return jsonify({'error': 'Record not found'}), 404
-    
     # Find the transaction for the current user
     transaction = next((t for t in block['transactions'] if t['patientId'] == current_user.umsId), None)
-    
     if not transaction:
         return jsonify({'error': 'Record not found for this patient'}), 404
-    
     # Create a PDF
     buffer = BytesIO()
-    p = canvas.Canvas(buffer, pagesize=letter)
+    doc = SimpleDocTemplate(buffer, pagesize=letter,
+                            rightMargin=72, leftMargin=72,
+                            topMargin=72, bottomMargin=18)
+    # Container for the 'Flowable' objects
+    elements = []
+    # Styles
+    styles = getSampleStyleSheet()
+    styles.add(ParagraphStyle(name='Justify', alignment=1))
+    styles.add(ParagraphStyle(name='Center', alignment=1))
     
-    # Add content to the PDF
-    p.drawString(100, 750, f"Medical Record from {transaction['createdAt']}")
-    p.drawString(100, 730, f"Doctor ID: {transaction['doctorId']}")
-    p.drawString(100, 710, f"Hospital ID: {transaction['hospitalId']}")
-    p.drawString(100, 690, f"Symptoms: {transaction['Symptoms']}")
-    p.drawString(100, 670, f"Diagnosis: {transaction['Diagnosis']}")
-    p.drawString(100, 650, f"Treatment Plan: {transaction['TreatmentPlan']}")
-    p.drawString(100, 630, f"Prescription: {transaction['Prescription']}")
-    p.drawString(100, 610, f"Additional Notes: {transaction['AdditionalNotes']}")
-    p.drawString(100, 590, f"Follow-up Date: {transaction['FollowUpDate']}")
-    p.drawString(100, 570, f"Attachments: {transaction['Attachments']}")
+    # Add UMS logo
+    logo_path = os.path.join(current_app.root_path, 'static', 'images', 'ums_logo.png')
+    if os.path.exists(logo_path):
+        logo = Image(logo_path, width=1.5*inch, height=1.5*inch)
+        elements.append(logo)
     
-    p.showPage()
-    p.save()
+    # Add title
+    title = Paragraph("Unified Medical System", styles['Heading1'])
+    elements.append(title)
+    elements.append(Spacer(1, 12))
     
+    # Add subtitle
+    subtitle = Paragraph("Medical Certificate", styles['Heading2'])
+    elements.append(subtitle)
+    elements.append(Spacer(1, 24))
+    
+    # Add content
+    content = f"""
+    This is to certify that the patient with UMS ID: {current_user.umsId} has been examined and treated at our facility.
+    The following medical record details the diagnosis, treatment, and recommendations for the patient.
+    """
+    elements.append(Paragraph(content, styles['Justify']))
+    elements.append(Spacer(1, 12))
+    
+    # Create a table for the medical record details
+    data = [
+        ['Patient ID:', current_user.umsId],
+        ['Date of Record:', transaction['createdAt'].strftime('%Y-%m-%d %H:%M:%S')],
+        ['Doctor ID:', transaction['doctorId']],
+        ['Hospital ID:', transaction['hospitalId']],
+        ['Symptoms:', transaction['Symptoms']],
+        ['Diagnosis:', transaction['Diagnosis']],
+        ['Treatment Plan:', transaction['TreatmentPlan']],
+        ['Prescription:', transaction['Prescription']],
+        ['Additional Notes:', transaction['AdditionalNotes']],
+        ['Follow-up Date:', transaction['FollowUpDate']],
+    ]
+    
+    table = Table(data, colWidths=[2*inch, 4*inch])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (0, -1), colors.lightblue),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.darkblue),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
+        ('BACKGROUND', (1, 1), (-1, -1), colors.lightgreen),
+        ('BOX', (0, 0), (-1, -1), 1, colors.black),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+    ]))
+    elements.append(table)
+    elements.append(Spacer(1, 24))
+    
+    # Add footer
+    footer_text = f"This medical certificate is electronically generated and is valid without a signature.\nBlock Hash: {block['hash']}"
+    footer = Paragraph(footer_text, styles['Center'])
+    elements.append(footer)
+    
+    # Build the PDF
+    doc.build(elements)
     buffer.seek(0)
-    return send_file(buffer, as_attachment=True, download_name=f'medical_record_{block_id}.pdf', mimetype='application/pdf')
+    return send_file(buffer, as_attachment=True, download_name=f'medical_certificate_{block_id}.pdf', mimetype='application/pdf')
 
 @patient_bp.route('/api/verify_blockchain/<block_id>', methods=['GET'])
 @login_required
@@ -424,4 +470,3 @@ def verify_blockchain(block_id):
     # For now, we'll return a dummy response
     verified = True  # Replace this with actual verification logic
     return jsonify({'verified': verified})
-
