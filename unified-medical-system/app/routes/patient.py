@@ -147,13 +147,11 @@ def register():
         if existing_user:
             flash('Email already exists! Please login.', 'error')
             return redirect(url_for('patient.register'))
-        
         name = request.form['name']
         phone_number = request.form['phonenumber']
         state = request.form['state']
         umsId = generate_patient_id()
         created_at = updated_at = datetime.now()
-        
         new_user = {
             'umsId': umsId,
             'name': name,
@@ -166,7 +164,6 @@ def register():
             'passwordHash':[generate_password_hash(password)],
             'rolesId': 4
         }
-        
         mongo.db.users.insert_one(new_user)
         mongo.db.patients.insert_one({
             'umsId': umsId,
@@ -182,7 +179,6 @@ def register():
             'rolesId': 4,
             'status': 'active',
         })
-
         flash('User registered successfully!', 'success')
         return redirect(url_for('auth.login'))
     return render_template('patient/register.html')
@@ -276,14 +272,11 @@ def book_appointment():
     is_disabled = data.get('isDisabled', False)
     disability_id = data.get('disabilityId')
     reason = data.get('reason')
-
     if not all([hospital_id, doctor_id, category, appointment_date_str]):
         return jsonify({'success': False, 'message': 'Missing required fields'}), 400
-
     try:
         appointment_date = parser.isoparse(appointment_date_str)
         appointment_date_utc = appointment_date.astimezone(timezone.utc)
-
         new_appointment = {
             'patientId': patient_id,
             'hospitalId': hospital_id,
@@ -297,14 +290,11 @@ def book_appointment():
             'createdAt': datetime.now(timezone.utc),
             'updatedAt': datetime.now(timezone.utc)
         }
-
         result = mongo.db.appointments.insert_one(new_appointment)
-
         if result.inserted_id:
             return jsonify({'success': True, 'message': 'Appointment booked successfully'})
         else:
             return jsonify({'success': False, 'message': 'Failed to book appointment'}), 500
-
     except Exception as e:
         return jsonify({'success': False, 'message': 'An error occurred while booking the appointment'}), 500
 
@@ -315,7 +305,6 @@ def change_password():
     current_password = form_data.get('current_password')
     new_password = form_data.get('new_password')
     confirm_password = form_data.get('confirm_password')
-
     # Fetch user from login collection
     user = mongo.db.login.find_one({'umsId': current_user.umsId})
 
@@ -324,14 +313,12 @@ def change_password():
 
     if new_password != confirm_password:
         return jsonify({'success': False, 'message': 'New passwords do not match.'})
-
     # Update password in login collection
     new_password_hash = generate_password_hash(new_password)
     mongo.db.login.update_one(
         {'umsId': current_user.umsId},
         {'$set': {'passwordHash': [new_password_hash], 'updatedAt': datetime.now()}}
     )
-
     # Update updatedAt in users and patients collections
     current_time = datetime.now()
     mongo.db.users.update_one({'umsId': current_user.umsId}, {'$set': {'updatedAt': current_time}})
@@ -398,23 +385,19 @@ def download_medical_record_pdf(block_id):
     styles = getSampleStyleSheet()
     styles.add(ParagraphStyle(name='Justify', alignment=1))
     styles.add(ParagraphStyle(name='Center', alignment=1))
-    
     # Add UMS logo
     logo_path = os.path.join(current_app.root_path, 'static', 'images', 'ums_logo.png')
     if os.path.exists(logo_path):
         logo = Image(logo_path, width=1.5*inch, height=1.5*inch)
         elements.append(logo)
-    
     # Add title
     title = Paragraph("Unified Medical System", styles['Heading1'])
     elements.append(title)
     elements.append(Spacer(1, 12))
-    
     # Add subtitle
     subtitle = Paragraph("Medical Certificate", styles['Heading2'])
     elements.append(subtitle)
     elements.append(Spacer(1, 24))
-    
     # Add content
     content = f"""
     This is to certify that the patient with UMS ID: {current_user.umsId} has been examined and treated at our facility.
@@ -422,7 +405,6 @@ def download_medical_record_pdf(block_id):
     """
     elements.append(Paragraph(content, styles['Justify']))
     elements.append(Spacer(1, 12))
-    
     # Create a table for the medical record details
     data = [
         ['Patient ID:', current_user.umsId],
@@ -436,7 +418,6 @@ def download_medical_record_pdf(block_id):
         ['Additional Notes:', transaction['AdditionalNotes']],
         ['Follow-up Date:', transaction['FollowUpDate']],
     ]
-    
     table = Table(data, colWidths=[2*inch, 4*inch])
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (0, -1), colors.lightblue),
@@ -451,12 +432,10 @@ def download_medical_record_pdf(block_id):
     ]))
     elements.append(table)
     elements.append(Spacer(1, 24))
-    
     # Add footer
     footer_text = f"This medical certificate is electronically generated and is valid without a signature.\nBlock Hash: {block['hash']}"
     footer = Paragraph(footer_text, styles['Center'])
     elements.append(footer)
-    
     # Build the PDF
     doc.build(elements)
     buffer.seek(0)

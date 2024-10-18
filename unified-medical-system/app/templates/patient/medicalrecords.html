@@ -59,6 +59,31 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
+<!-- Add this modal to your HTML -->
+<dialog id="verificationModal" class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg">Blockchain Verification</h3>
+    <p id="verificationMessage" class="py-4"></p>
+    <div id="verificationAnimation" class="absolute bottom-4 right-4 w-24 h-24"></div>
+    <div id="verificationText" class="hidden mt-4">
+      <span class="text-green-500 font-semibold flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        Medical record verified on the blockchain.
+      </span>
+    </div>
+    <div class="modal-action">
+      <form method="dialog">
+        <button class="btn">Close</button>
+      </form>
+    </div>
+  </div>
+</dialog>
+
+<!-- Add these script tags before your existing script tag -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
 <script>
 function downloadPDF(blockId) {
     fetch(`api/medical_records/${blockId}/pdf`)
@@ -77,16 +102,81 @@ function downloadPDF(blockId) {
 }
 
 function verifyBlockchain(blockId) {
-    fetch(`/api/verify_blockchain/${blockId}`)
+    fetch(`api/verify_blockchain/${blockId}`)
         .then(response => response.json())
         .then(data => {
+            const modal = document.getElementById('verificationModal');
+            const message = document.getElementById('verificationMessage');
+            const animationContainer = document.getElementById('verificationAnimation');
+            const verificationText = document.getElementById('verificationText');
+
+            message.textContent = 'Verifying medical record on the blockchain...';
+            verificationText.classList.add('hidden');
+
             if (data.verified) {
-                alert('Medical record verified on the blockchain.');
+                animateVerification(true);
+                setTimeout(() => {
+                    verificationText.classList.remove('hidden');
+                }, 2000);
             } else {
-                alert('Medical record could not be verified on the blockchain.');
+                message.textContent = 'Medical record could not be verified on the blockchain.';
+                animateVerification(false);
             }
+
+            modal.showModal();
         })
         .catch(error => console.error('Error verifying blockchain:', error));
+}
+
+function animateVerification(success) {
+    const animationContainer = document.getElementById('verificationAnimation');
+    animationContainer.innerHTML = ''; // Clear previous animations
+
+    // Create SVG element
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', '100');
+    svg.setAttribute('height', '100');
+    svg.style.overflow = 'visible';
+    animationContainer.appendChild(svg);
+
+    // Create circles representing blockchain
+    const circleCount = 5;
+    const circles = [];
+    for (let i = 0; i < circleCount; i++) {
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('r', '7');
+        circle.setAttribute('fill', success ? '#4CAF50' : '#F44336');
+        svg.appendChild(circle);
+        circles.push(circle);
+    }
+
+    // Create medical cross
+    const cross = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    cross.setAttribute('d', 'M-5,-15 L5,-15 L5,-5 L15,-5 L15,5 L5,5 L5,15 L-5,15 L-5,5 L-15,5 L-15,-5 L-5,-5 Z');
+    cross.setAttribute('fill', '#FFFFFF');
+    svg.appendChild(cross);
+
+    // Animate
+    anime({
+        targets: circles,
+        translateX: (el, i) => 25 * Math.cos(i * 2 * Math.PI / circleCount),
+        translateY: (el, i) => 25 * Math.sin(i * 2 * Math.PI / circleCount),
+        scale: [0, 1],
+        opacity: [0, 1],
+        duration: 1000,
+        delay: anime.stagger(200),
+        easing: 'easeOutElastic(1, .5)'
+    });
+
+    anime({
+        targets: cross,
+        scale: [0, 1],
+        opacity: [0, 1],
+        rotateZ: '1turn',
+        duration: 1500,
+        delay: 1000,
+        easing: 'easeOutElastic(1, .5)'
+    });
 }
 </script>
 {% endblock %}
