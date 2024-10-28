@@ -15,6 +15,10 @@ from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
 from reportlab.lib import colors
 import os
+import io
+import base64
+import qrcode  # Add this import
+import json
 
 patient_bp = Blueprint('patient', __name__)
 
@@ -34,6 +38,35 @@ def profile():
     patient_data = mongo.db.patients.find_one({'umsId': current_user.umsId})
     user_data = mongo.db.users.find_one({'umsId': current_user.umsId})
     patient_data.update(user_data)
+    
+    # Create a dictionary with essential patient details
+    patient_qr_data = {
+        'umsId': current_user.umsId,
+        'name': patient_data.get('name'),
+        'email': patient_data.get('email'),
+        'phoneNumber': patient_data.get('phoneNumber'),
+        'dateOfBirth': str(patient_data.get('dateOfBirth')) if patient_data.get('dateOfBirth') else None,
+        'gender': patient_data.get('gender')
+    }
+    
+    # Convert the dictionary to a JSON string
+    qr_data = json.dumps(patient_qr_data)
+    
+    # Generate QR code with the JSON data
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(qr_data)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+    
+    # Convert image to base64 string
+    buffered = io.BytesIO()
+    img.save(buffered, format="PNG")
+    barcode_image = base64.b64encode(buffered.getvalue()).decode()
     
     if request.method == 'POST':
         form_data = request.form.to_dict()
@@ -56,7 +89,7 @@ def profile():
         mongo.db.patients.update_one({'umsId': current_user.umsId}, {'$set': patient_update_data})
         flash('Profile updated successfully', 'success')
         return redirect(url_for('patient.profile'))
-    return render_template('patient/profile.html', patient_data=patient_data)
+    return render_template('patient/profile.html', patient_data=patient_data, barcode_image=barcode_image)
 
 @patient_bp.route('/get_appointments', methods=['GET'])
 @login_required
@@ -449,3 +482,4 @@ def verify_blockchain(block_id):
     # For now, we'll return a dummy response
     verified = True  # Replace this with actual verification logic
     return jsonify({'verified': verified})
+

@@ -150,21 +150,28 @@
     .btn-modal:hover {
         background-color: #a8e063;
     }
-    .barcode-container {
-        position: absolute;
-        bottom: 20px;
-        left: 20px;
+    .qr-code-section {
         display: flex;
-        justify-content: flex-start;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        background: white;
+        border-radius: 12px;
+        width: fit-content;
     }
-    .barcode-image {
-        max-width: 100px;
-        height: auto;
+
+    .qr-code-image {
+        width: 200px;
+        height: 200px;
+        margin-bottom: 1rem;
     }
-    .ums-id {
-        margin-top: 5px;
-        font-size: 0.9em;
+
+    .qr-code-caption {
         color: #333;
+        text-align: center;
+        font-size: 1.1rem;
+        font-weight: bold;
     }
 </style>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCwrIvSVrnX091MAxkWIDLQ-K3gc1Z4VLY&libraries=places"></script>
@@ -177,6 +184,9 @@
 <div class="container">
     <div class="profile-card">
         <div class="profile-content">
+            <!-- Add QR code section here -->
+            
+            <!-- Rest of the profile content -->
             <div class="profile-header">
                 <div>
                     <h1 class="profile-title">{{ patient_data.name }}</h1>
@@ -185,6 +195,7 @@
                 <div class="profile-actions">
                     <button class="btn" onclick="openModal('edit_profile')">Edit Profile</button>
                     <button class="btn" onclick="openModal('change_password')">Change Password</button>
+                    <button class="btn" onclick="openModal('qr_code')">Show QR Code</button>
                 </div>
             </div>
             <div class="profile-details">
@@ -199,9 +210,6 @@
                     {% endfor %}
                 </div>
             </div>
-        </div>
-        <div class="barcode-container">
-            <img src="data:image/png;base64,{{ barcode_image }}" alt="UMS ID Barcode" class="barcode-image">
         </div>
     </div>
 </div>
@@ -248,6 +256,25 @@
             <button type="submit" class="btn-modal">Change Password</button>
         </div>
     </form>
+</dialog>
+
+<!-- QR Code Modal -->
+<dialog id="qr_code" class="modal">
+    <div class="modal-box">
+        <h3 class="font-bold text-lg">Patient QR Code</h3>
+        <div class="qr-code-section" style="margin: 1rem auto;">
+            <img src="data:image/png;base64,{{ barcode_image }}" 
+                 alt="Patient QR Code" 
+                 class="qr-code-image">
+            <div class="qr-code-caption">
+                Scan QR Code to view patient details
+            </div>
+        </div>
+        <div class="modal-action">
+            <button type="button" class="btn-modal" onclick="closeModal('qr_code')">Close</button>
+            <button type="button" class="btn-modal" onclick="downloadQRCode()">Download</button>
+        </div>
+    </div>
 </dialog>
 {% endblock %}
 
@@ -323,6 +350,16 @@ function printHealthCard() {
         console.error('Error capturing health card:', error);
         alert('Error: Failed to capture the health card. Please check the console for more details.');
     });
+}
+
+function downloadQRCode() {
+    const qrImage = document.querySelector('.qr-code-image');
+    const link = document.createElement('a');
+    link.download = 'patient_qr_code.png';
+    link.href = qrImage.src;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 // ... rest of your existing script ...
