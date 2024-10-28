@@ -32,3 +32,4 @@ pillow
 transformers
 reportlab
 folium
+gunicorn
