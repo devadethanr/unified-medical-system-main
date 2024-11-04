@@ -1,217 +1,210 @@
-<!doctype html>
-<html lang="en" dir="ltr">
-   <head>
-      <!-- Required meta tags -->
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-      <title>UMS - Patient Registration</title>
-      <!-- Favicon -->
-      <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
-      <!-- Bootstrap CSS -->
-      <link id="bootstrap-css" rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-      <!-- Typography CSS -->
-      <link rel="stylesheet" href="{{ url_for('static', filename='css/typography.css') }}">
-      <!-- Style CSS -->
-      <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-      <!-- Style-Rtl CSS -->
-      <link rel="stylesheet" href="{{ url_for('static', filename='css/style-rtl.css') }}">
-      <!-- Responsive CSS -->
-      <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
-      <script>
-        function clearForm() {
-            if (window.history.replaceState) {
-                window.history.replaceState(null, null, window.location.href);
-            }
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UMS - Patient Registration</title>
+    <!-- Replace old CSS with new framework -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+    <style>
+        body {
+            background-color: #000000;
+            overflow-x: hidden;
         }
-       </script>
-       <style>
-        .form-main-class{
-            background: rgba( 241, 248, 250, 0.7);
-            box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
-            backdrop-filter: blur( 17px );
-            -webkit-backdrop-filter: blur( 17px );
-            border-radius: 10px;
-            border: 1px solid rgba( 255, 255, 255, 0.18 );
-            }
-     </style>
-    </head>
-   <body onload = 'clearForm()'>
-      <!-- loader Start -->
-      <div id="loading">
-         <div id="loading-center">
-         </div>
-      </div>
-      <!-- loader END -->
-        <!-- Sign in Start -->
-        <section class="sign-in-page">
-            <div class="container sign-in-page-bg mt-5 mb-md-5 mb-0 p-0">
-                <div class="row no-gutters">
-                    <div class="col-md-6 text-center">
-                        <div class="sign-in-detail text-white">
-                            <a class="sign-in-logo mb-5" href="index.html"><img src="{{ url_for('static', filename='images/logo-white.png') }}" class="img-fluid" alt="logo"></a>
-                            <div class="owl-carousel" data-autoplay="true" data-loop="true" data-nav="false" data-dots="true" data-items="1" data-items-laptop="1" data-items-tab="1" data-items-mobile="1" data-items-mobile-sm="1" data-margin="0">
-                                <div class="item">
-                                    <img src="{{ url_for('static', filename='images/login/1.png') }}" class="img-fluid mb-4" alt="logo">
-                                    <h4 class="mb-1 text-white">Unified</h4>
-                                    <p>Get access to all your medical files.</p>
-                                </div>
-                                <div class="item">
-                                    <img src="{{ url_for('static', filename='images/login/2.png') }}" class="img-fluid mb-4" alt="logo">
-                                    <h4 class="mb-1 text-white">Medical</h4>
-                                    <p>create and manage appointments</p>
-                                </div>
-                                <div class="item">
-                                    <img src="{{ url_for('static', filename='images/login/3.png') }}" class="img-fluid mb-4" alt="logo">
-                                    <h4 class="mb-1 text-white">System</h4>
-                                    <p>Get your certificates</p>
-                                </div>
-                            </div>
+        .owl-carousel {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .owl-carousel .item {
+            text-align: center;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+        .owl-carousel .item img {
+            max-width: 300px;
+            width: 100%;
+            height: auto;
+            margin: 0 auto 1rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center">
+    <div class="card lg:card-side bg-base-100 shadow-xl max-w-7xl w-full backdrop-blur-sm bg-opacity-30 mx-4">
+        <!-- Replace static image with skeleton loader and carousel -->
+        <figure class="lg:w-1/2 p-8 hidden lg:flex lg:flex-col lg:justify-center lg:items-center">
+            <div class="skeleton w-96 h-96 rounded-full"></div>
+        </figure>
+        
+        <div class="card-body lg:w-1/2">
+            <h2 class="card-title text-3xl font-bold mb-2 text-cyan-300">
+                <div class="skeleton h-10 w-3/4"></div>
+            </h2>
+            <!-- Add other skeleton loaders for initial state -->
+            <!-- ... -->
+        </div>
+    </div>
+
+    <script>
+        setTimeout(() => {
+            document.querySelector('.card').innerHTML = `
+                <figure class="lg:w-1/2 p-8 hidden lg:flex lg:flex-col lg:justify-center lg:items-center">
+                    <div class="owl-carousel owl-theme w-full h-full">
+                        <div class="item">
+                            <img src="{{ url_for('static', filename='images/login/1.png') }}" class="img-fluid mb-4" alt="logo">
+                            <h4 class="mb-1 text-white text-2xl">Unified</h4>
+                            <p class="text-cyan-200 text-lg">Get access to all your medical files.</p>
+                        </div>
+                        <div class="item">
+                            <img src="{{ url_for('static', filename='images/login/2.png') }}" class="img-fluid mb-4" alt="logo">
+                            <h4 class="mb-1 text-white text-2xl">Medical</h4>
+                            <p class="text-cyan-200 text-lg">Create and manage appointments</p>
+                        </div>
+                        <div class="item">
+                            <img src="{{ url_for('static', filename='images/login/3.png') }}" class="img-fluid mb-4" alt="logo">
+                            <h4 class="mb-1 text-white text-2xl">System</h4>
+                            <p class="text-cyan-200 text-lg">Get your certificates</p>
                         </div>
                     </div>
-                    <div class="col-md-6 position-relative">
-                        <div class="sign-in-from form-main-class">
-                            <h1 class="mb-0">   Patient Registration</h1>
-                            <form class="mt-4" id="registerForm" method="post" autocomplete="off">
-                                <div class="form-group">
-                                    <i class="fa fa-user" aria-hidden="true"></i>
-                                    <label for="name" class="my-2">Your Full Name</label>
-                                    <span id="nameError" class="text-danger"></span>
-                                    <input type="text" class="form-control mb-0" id="name" name = "name" placeholder="type your full name here" required>
-                                </div>
-                                <div class="form-group">
-                                    <i class="fa fa-envelope" aria-hidden="true"></i>
-                                    <label for="email" class="my-2">Email address</label>
-                                    <span id="emailError" class="text-danger"></span>
-                                     <!-- Flash messages -->
-                                     {% with messages = get_flashed_messages(with_categories=true) %}
-                                        {% if messages %}
-                                            {% for category, message in messages %}
-                                                <span class="text-danger">
-                                                    {{ message }}
-                                                </span>
-                                            {% endfor %}
-                                        {% endif %}
-                                     {% endwith %}
-                                     <!-- Flash messages end -->
-                                    <input type="email" class="form-control mb-0" id="email" name = "email" placeholder="Enter email" required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <i class="fa fa-map-marker" aria-hidden="true"></i>
-                                    <label for="state">Please choose your state</label>
-                                    <select class="form-select my-2" id="state" name = "state" required>
-                                        <option value="not selected"selected>Select State</option>
-                                        <option value="AN">Andaman and Nicobar Islands</option>
-                                        <option value="AP">Andhra Pradesh</option>
-                                        <option value="AR">Arunachal Pradesh</option>
-                                        <option value="AS">Assam</option>
-                                        <option value="BR">Bihar</option>
-                                        <option value="CH">Chandigarh</option>
-                                        <option value="CT">Chhattisgarh</option>
-                                        <option value="DN">Dadra and Nagar Haveli and Daman and Diu</option>
-                                        <option value="DL">Delhi</option>
-                                        <option value="GA">Goa</option>
-                                        <option value="GJ">Gujarat</option>
-                                        <option value="HR">Haryana</option>
-                                        <option value="HP">Himachal Pradesh</option>
-                                        <option value="JK">Jammu and Kashmir</option>
-                                        <option value="JH">Jharkhand</option>
-                                        <option value="KA">Karnataka</option>
-                                        <option value="KL">Kerala</option>
-                                        <option value="LA">Ladakh</option>
-                                        <option value="LD">Lakshadweep</option>
-                                        <option value="MP">Madhya Pradesh</option>
-                                        <option value="MH">Maharashtra</option>
-                                        <option value="MN">Manipur</option>
-                                        <option value="ML">Meghalaya</option>
-                                        <option value="MZ">Mizoram</option>
-                                        <option value="NL">Nagaland</option>
-                                        <option value="OR">Odisha</option>
-                                        <option value="PY">Puducherry</option>
-                                        <option value="PB">Punjab</option>
-                                        <option value="RJ">Rajasthan</option>
-                                        <option value="SK">Sikkim</option>
-                                        <option value="TN">Tamil Nadu</option>
-                                        <option value="TG">Telangana</option>
-                                        <option value="TR">Tripura</option>
-                                        <option value="UP">Uttar Pradesh</option>
-                                        <option value="UT">Uttarakhand</option>
-                                        <option value="WB">West Bengal</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-group">
-                                    <i class="fa fa-phone" aria-hidden="true"></i>
-                                    <label for="phoneNumber">Phone Number</label>
-                                    <span id="phoneNumberError" class="text-danger"></span>
-                                    <input type="number" class="form-control mb-0" id="phoneNumber" name="phonenumber" required>
-                                </div>
-                                <div class = "row">
-                                 <div class="col mb-4">
-                                    <i class="fa fa-key" aria-hidden="true"></i>
-                                    <label for="password" class="my-2">Password</label>
-                                    <input type="password" class="form-control mb-0" id="password"  name = "password" placeholder="Password">
-                                    <span id="passwordError" class="text-danger"></span>
-                                </div>
-                                
-                                <div class="col mb-4">
-                                    <i class="fa fa-eye" aria-hidden="true"></i>
-                                    <label for="confirm_password" class="my-2">Retype password</label>
-                                    <span id="confirmPasswordError" class="text-danger"></span>
-                                    <input type="confirm_password" class="form-control mb-0" id="confirm_password"  name = "confirm_password" placeholder="confirm_password">
-                                </div>
-                            </div>
-                                <div class="d-flex justify-content-between w-100 align-items-center mt-2">
-                                    <div class="custom-control custom-checkbox d-inline-block mt-2 pt-1">
-                                        <input type="checkbox" class="custom-control-input" id="customCheck1" required>
-                                        <label class="custom-control-label" for="customCheck1">I accept <a href="#">Terms and Conditions</a></label>
-                                    </div>
-                                </div>  
-                                                              
-                                <div class="d-flex justify-content-between w-100 align-items-center mt-2">
-                                    <button type="submit" class="btn btn-primary w-100">Register</button>
-                                </div>
-
-                                <div class="sign-info">
-                                    <span class="dark-color d-inline-block line-height-2">Already Have Account ? <a href="{{ url_for('auth.login') }}">Log In</a></span>
-                                </div>
-                            </form>
-                        </div>
+                    <div class="mt-8 text-center">
+                        <h2 class="text-3xl font-bold mb-2 text-cyan-300">Patient Registration</h2>
+                        <p class="text-cyan-100">Create your account to access UMS services.</p>
                     </div>
+                </figure>
+                <div class="card-body lg:w-1/2">
+                    <form class="mt-4" id="registerForm" method="post" autocomplete="off">
+                        <!-- Your existing form fields with updated styling -->
+                        <div class="form-control">
+                            <label for="name" class="label">
+                                <span class="label-text text-cyan-200">Your Full Name</span>
+                            </label>
+                            <input type="text" class="input input-bordered bg-black text-cyan-300 border-cyan-700" id="name" name="name" placeholder="Enter your full name" required>
+                            <span id="nameError" class="text-error text-sm mt-1"></span>
+                        </div>
+
+                        <div class="form-control mt-4">
+                            <label for="email" class="label">
+                                <span class="label-text text-cyan-200">Email address</span>
+                            </label>
+                            <input type="email" class="input input-bordered bg-black text-cyan-300 border-cyan-700" id="email" name="email" required>
+                            {% with messages = get_flashed_messages(with_categories=true) %}
+                                {% if messages %}
+                                    {% for category, message in messages %}
+                                        <span class="text-error text-sm mt-1">{{ message }}</span>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+
+                        <div class="form-control mt-4">
+                            <label for="state" class="label">
+                                <span class="label-text text-cyan-200">Please choose your state</span>
+                            </label>
+                            <select class="select select-bordered bg-black text-cyan-300 border-cyan-700" id="state" name="state" required>
+                                <option value="not selected"selected>Select State</option>
+                                <option value="AN">Andaman and Nicobar Islands</option>
+                                <option value="AP">Andhra Pradesh</option>
+                                <option value="AR">Arunachal Pradesh</option>
+                                <option value="AS">Assam</option>
+                                <option value="BR">Bihar</option>
+                                <option value="CH">Chandigarh</option>
+                                <option value="CT">Chhattisgarh</option>
+                                <option value="DN">Dadra and Nagar Haveli and Daman and Diu</option>
+                                <option value="DL">Delhi</option>
+                                <option value="GA">Goa</option>
+                                <option value="GJ">Gujarat</option>
+                                <option value="HR">Haryana</option>
+                                <option value="HP">Himachal Pradesh</option>
+                                <option value="JK">Jammu and Kashmir</option>
+                                <option value="JH">Jharkhand</option>
+                                <option value="KA">Karnataka</option>
+                                <option value="KL">Kerala</option>
+                                <option value="LA">Ladakh</option>
+                                <option value="LD">Lakshadweep</option>
+                                <option value="MP">Madhya Pradesh</option>
+                                <option value="MH">Maharashtra</option>
+                                <option value="MN">Manipur</option>
+                                <option value="ML">Meghalaya</option>
+                                <option value="MZ">Mizoram</option>
+                                <option value="NL">Nagaland</option>
+                                <option value="OR">Odisha</option>
+                                <option value="PY">Puducherry</option>
+                                <option value="PB">Punjab</option>
+                                <option value="RJ">Rajasthan</option>
+                                <option value="SK">Sikkim</option>
+                                <option value="TN">Tamil Nadu</option>
+                                <option value="TG">Telangana</option>
+                                <option value="TR">Tripura</option>
+                                <option value="UP">Uttar Pradesh</option>
+                                <option value="UT">Uttarakhand</option>
+                                <option value="WB">West Bengal</option>
+                            </select>
+                            <span id="stateError" class="text-error text-sm mt-1"></span>
+                        </div>
+
+                        <div class="form-control mt-4">
+                            <label for="phoneNumber" class="label">
+                                <span class="label-text text-cyan-200">Phone Number</span>
+                            </label>
+                            <input type="number" class="input input-bordered bg-black text-cyan-300 border-cyan-700" id="phoneNumber" name="phonenumber" required>
+                            <span id="phoneNumberError" class="text-error text-sm mt-1"></span>
+                        </div>
+
+                        <div class="form-control mt-4">
+                            <label for="password" class="label">
+                                <span class="label-text text-cyan-200">Password</span>
+                            </label>
+                            <input type="password" class="input input-bordered bg-black text-cyan-300 border-cyan-700" id="password" name="password" placeholder="Password">
+                            <span id="passwordError" class="text-error text-sm mt-1"></span>
+                        </div>
+
+                        <div class="form-control mt-4">
+                            <label for="confirm_password" class="label">
+                                <span class="label-text text-cyan-200">Retype password</span>
+                            </label>
+                            <input type="confirm_password" class="input input-bordered bg-black text-cyan-300 border-cyan-700" id="confirm_password" name="confirm_password" placeholder="confirm_password">
+                            <span id="confirmPasswordError" class="text-error text-sm mt-1"></span>
+                        </div>
+
+                        <div class="form-control mt-6">
+                            <button type="submit" class="btn btn-primary bg-cyan-600 hover:bg-cyan-700 border-none">Register</button>
+                        </div>
+
+                        <div class="text-center mt-6">
+                            <span class="text-cyan-200">Already have an account?</span>
+                            <a href="{{ url_for('auth.login') }}" class="link link-primary ml-1 text-cyan-400">Sign in</a>
+                        </div>
+                    </form>
                 </div>
-            </div>
-        </section>
-        <!-- Sign in END -->
-      <!-- Optional JavaScript -->
-      <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-      <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
-      <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
-      <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-      <!-- Appear JavaScript -->
-      <script src="{{ url_for('static', filename='js/jquery.appear.js') }}"></script>
-      <!-- Countdown JavaScript -->
-      <script src="{{ url_for('static', filename='js/countdown.min.js') }}"></script>
-      <!-- Counterup JavaScript -->
-      <script src="{{ url_for('static', filename='js/waypoints.min.js') }}"></script>
-      <script src="{{ url_for('static', filename='js/jquery.counterup.min.js') }}"></script>
-      <!-- Wow JavaScript -->
-      <script src="{{ url_for('static', filename='js/wow.min.js') }}"></script>
-      <!-- Apexcharts JavaScript -->
-      <script src="{{ url_for('static', filename='js/apexcharts.js') }}"></script>
-      <!-- Swiper Slider JavaScript -->
-      <script src="{{ url_for('static', filename='js/swiper-bundle.min.js') }}"></script>
-      <!-- Select2 JavaScript -->
-      <script src="{{ url_for('static', filename='js/select2.min.js') }}"></script>
-      <!-- Owl Carousel JavaScript -->
-      <script src="{{ url_for('static', filename='js/owl.carousel.min.js') }}"></script>
-      <!-- Magnific Popup JavaScript -->
-      <script src="{{ url_for('static', filename='js/jquery.magnific-popup.min.js') }}"></script>
-      <!-- Smooth Scrollbar JavaScript -->
-      <script src="{{ url_for('static', filename='js/smooth-scrollbar.js') }}"></script>
-      <!-- Chart Custom JavaScript -->
-      <script src="{{ url_for('static', filename='js/chart-custom.js') }}"></script>
-      <!-- Custom JavaScript -->
-      <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
-      <script src="{{ url_for('static', filename='js/form-validation.js') }}"></script>
-   </body>
+            `;
+
+            $(".owl-carousel").owlCarousel({
+                items: 1,
+                loop: true,
+                autoplay: true,
+                autoplayTimeout: 5000,
+                autoplayHoverPause: true,
+                nav: false,
+                dots: true,
+                margin: 0,
+                responsive: {
+                    0: {
+                        items: 1
+                    }
+                }
+            });
+        }, 500);
+    </script>
+</body>
 </html>

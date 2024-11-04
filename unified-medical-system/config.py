@@ -11,3 +11,8 @@ class DevelopmentConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
+
+class TestingConfig(Config):
+    TESTING = True
+    MONGO_URI = os.getenv('MONGO_URI')
+    WTF_CSRF_ENABLED = False
