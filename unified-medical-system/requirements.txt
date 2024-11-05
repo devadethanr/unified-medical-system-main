@@ -33,3 +33,4 @@ transformers
 reportlab
 folium
 gunicorn
+qrcode
