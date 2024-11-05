@@ -60,7 +60,7 @@ def create_app(config_class='config.DevelopmentConfig'):
             access_token_url='https://accounts.google.com/o/oauth2/token',
             access_token_params=None,
             refresh_token_url=None,
-            redirect_uri='http://127.0.0.1:8000/auth/google_authorized',
+            redirect_uri=os.getenv('OAUTH_REDIRECT_URI', 'http://127.0.0.1:8000/auth/google_authorized'),
             client_kwargs={'scope': 'openid email profile'}
         )
 
