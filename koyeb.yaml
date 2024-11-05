@@ -1,0 +1,14 @@
+app:
+  name: unified-medical-system
+  services:
+    - name: web
+      instance_type: nano
+      env: python
+      workdir: /unified-medical-system
+      buildCommand: pip install -r requirements.txt
+      startCommand: gunicorn "wsgi:app" --bind 0.0.0.0:$PORT --workers 4
+      envVars:
+        - key: PYTHON_VERSION
+          value: 3.11.8
+        - key: PORT
+          value: "8000"

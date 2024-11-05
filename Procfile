@@ -1,0 +1,1 @@
+web: cd unified-medical-system && gunicorn "wsgi:app" 

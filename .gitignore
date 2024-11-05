@@ -9,6 +9,9 @@ app/.env
 # Python cache files
 __pycache__/
 *.py[cod]
+.pytest_cache/
+/tmp/
+.coverage
 
 # Secrets
 client_secret.json
