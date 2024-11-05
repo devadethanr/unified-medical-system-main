@@ -8,6 +8,9 @@ from flask_session import Session
 from flask_mail import Mail
 from datetime import datetime
 
+# Load environment variables
+load_dotenv()
+
 # Initialize Flask extensions
 mongo = PyMongo()
 login_manager = LoginManager()
@@ -16,6 +19,12 @@ mail = Mail()
 
 def create_app(config_class='config.DevelopmentConfig'):
     app = Flask(__name__)
+
+    # Set secret key
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-default-secret-key')
+
+    # Set MongoDB URI
+    app.config['MONGO_URI'] = os.getenv('MONGO_URI')
 
     # Load config
     if isinstance(config_class, str):
