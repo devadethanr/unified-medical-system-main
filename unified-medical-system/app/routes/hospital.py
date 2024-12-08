@@ -206,6 +206,7 @@ def update_profile():
         'licenseNumber': request.form['licenseNumber'],
         'updatedAt': datetime.now()
     }
+    #changes
     
     mongo.db.users.update_one({'umsId': hospital_id}, {'$set': update_data})
     mongo.db.hospitals.update_one({'umsId': hospital_id}, {'$set': {
