@@ -280,3 +280,36 @@ def reject_hospital():
 @login_required
 def outbreakmap():
     return render_template('admin/outbreak_map.html')
+
+@admin_bp.route('/dbchat', methods=['GET'])
+@login_required
+def dbchat():
+    """Render the database chat interface."""
+    return render_template('admin/dbchat.html', admin_data=admin_data)
+
+@admin_bp.route('/api/dbchat', methods=['POST'])
+@login_required
+def process_dbchat():
+    """Process database chat queries and return results."""
+    query = request.json.get('query')
+    try:
+        # TODO: Implement actual database query processing logic
+        # This is a placeholder response
+        return jsonify({
+            'text': f'Processing query: {query}',
+            'visualization': {
+                'type': 'chart',
+                'data': {
+                    'type': 'bar',
+                    'data': {
+                        'labels': ['Sample'],
+                        'datasets': [{
+                            'label': 'Sample Data',
+                            'data': [1]
+                        }]
+                    }
+                }
+            }
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

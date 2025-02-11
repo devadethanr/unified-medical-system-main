@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Analytics Chat</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .chat-container {
+            height: calc(100vh - 4rem);
+            background: linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.1) 100%);
+        }
+        .chat-messages {
+            height: calc(100vh - 12rem);
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .message-bubble {
+            max-width: 80%;
+            animation: fadeIn 0.3s ease-in-out;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .visualization-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 1.5rem auto;
+            animation: slideUp 0.4s ease-out;
+            background: rgba(255,255,255,0.05);
+            border-radius: 1rem;
+            padding: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .typing-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 1rem;
+        }
+        .typing-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background-color: currentColor;
+            animation: typingBounce 1.2s infinite;
+        }
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-4px); }
+        }
+        .input-container {
+            background: rgba(255,255,255,0.05);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin: 1rem auto;
+            max-width: 900px;
+            width: calc(100% - 2rem);
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+        }
+        .suggestions {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .suggestion-chip {
+            background: rgba(255,255,255,0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .suggestion-chip:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-1px);
+        }
+        .dataTables_wrapper {
+            padding: 1rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-base-300">
+    <!-- Navbar -->
+    <div class="navbar bg-base-200 shadow-lg">
+        <div class="flex-1">
+            <a href="{{ url_for('admin.index') }}" class="btn btn-ghost btn-circle mr-2" title="Back to Dashboard">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <a class="btn btn-ghost text-xl gap-2">
+                <i class="fas fa-database"></i>
+                Database Analytics
+            </a>
+        </div>
+        <div class="flex-none gap-2">
+            <button class="btn btn-ghost btn-circle" onclick="toggleTheme()">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button class="btn btn-ghost btn-circle" onclick="clearChat()">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Chat Container -->
+    <div class="chat-container">
+        <div class="chat-messages" id="chatMessages">
+            <!-- Welcome Message -->
+            <div class="chat chat-start">
+                <div class="chat-bubble chat-bubble-primary message-bubble">
+                    <div class="font-bold mb-2">Welcome to Database Analytics! 👋</div>
+                    <p>I can help you analyze your database through natural language queries. Try asking questions like:</p>
+                    <div class="suggestions mt-3">
+                        <span class="suggestion-chip" onclick="useQuery(this)">Show patient admissions trend</span>
+                        <span class="suggestion-chip" onclick="useQuery(this)">Compare hospital occupancy rates</span>
+                        <span class="suggestion-chip" onclick="useQuery(this)">Top 5 doctors by patient count</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-container">
+            <form id="chatForm" class="flex gap-2">
+                <div class="relative flex-1">
+                    <input type="text" 
+                           id="userInput" 
+                           class="input input-bordered w-full pr-10" 
+                           placeholder="Ask about your database..."
+                           autocomplete="off">
+                    <span class="absolute right-3 top-3 text-gray-400" id="inputStatus">
+                        <i class="fas fa-keyboard"></i>
+                    </span>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const html = document.querySelector('html');
+            const currentTheme = html.getAttribute('data-theme');
+            html.setAttribute('data-theme', currentTheme === 'dark' ? 'light' : 'dark');
+        }
+
+        function clearChat() {
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '';
+            // Add welcome message back
+            addMessage(`
+                <div class="font-bold mb-2">Welcome to Database Analytics! 👋</div>
+                <p>I can help you analyze your database through natural language queries. Try asking questions like:</p>
+                <div class="suggestions mt-3">
+                    <span class="suggestion-chip" onclick="useQuery(this)">Show patient admissions trend</span>
+                    <span class="suggestion-chip" onclick="useQuery(this)">Compare hospital occupancy rates</span>
+                    <span class="suggestion-chip" onclick="useQuery(this)">Top 5 doctors by patient count</span>
+                </div>
+            `);
+        }
+
+        function useQuery(element) {
+            const input = document.getElementById('userInput');
+            input.value = element.textContent;
+            input.focus();
+        }
+
+        function addMessage(content, isUser = false) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat ${isUser ? 'chat-end' : 'chat-start'}`;
+            
+            const messageBubble = document.createElement('div');
+            messageBubble.className = `chat-bubble ${isUser ? 'chat-bubble-primary' : 'chat-bubble-secondary'} message-bubble`;
+            messageBubble.innerHTML = content;
+            
+            messageDiv.appendChild(messageBubble);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function addVisualization(type, data) {
+            const container = document.createElement('div');
+            container.className = 'visualization-container';
+            
+            if (type === 'chart') {
+                const canvas = document.createElement('canvas');
+                container.appendChild(canvas);
+                new Chart(canvas, data);
+            } else if (type === 'table') {
+                const table = document.createElement('table');
+                table.className = 'table w-full';
+                table.innerHTML = data;
+                container.appendChild(table);
+                $(table).DataTable({
+                    responsive: true,
+                    pageLength: 5,
+                    dom: '<"top"f>rt<"bottom"ip>',
+                    language: {
+                        search: "",
+                        searchPlaceholder: "Search results..."
+                    }
+                });
+            }
+            
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.appendChild(container);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        document.getElementById('chatForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('userInput');
+            const query = input.value.trim();
+            const inputStatus = document.getElementById('inputStatus');
+            
+            if (!query) return;
+            
+            // Add user message
+            addMessage(query, true);
+            input.value = '';
+            inputStatus.innerHTML = '<i class="fas fa-keyboard"></i>';
+
+            // Show typing indicator
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'chat chat-start';
+            typingDiv.innerHTML = `
+                <div class="chat-bubble bg-base-300 message-bubble">
+                    <div class="typing-indicator">
+                        <div class="typing-dot" style="animation-delay: 0s"></div>
+                        <div class="typing-dot" style="animation-delay: 0.3s"></div>
+                        <div class="typing-dot" style="animation-delay: 0.6s"></div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('chatMessages').appendChild(typingDiv);
+
+            try {
+                const response = await fetch('/api/dbchat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query })
+                });
+                
+                const data = await response.json();
+                typingDiv.remove();
+
+                // Add response message
+                addMessage(data.text);
+
+                // Add visualizations if present
+                if (data.visualization) {
+                    addVisualization(data.visualization.type, data.visualization.data);
+                }
+            } catch (error) {
+                typingDiv.remove();
+                addMessage('Sorry, there was an error processing your request. Please try again.');
+            }
+        });
+
+        // Input status indicator
+        const userInput = document.getElementById('userInput');
+        userInput.addEventListener('input', (e) => {
+            const inputStatus = document.getElementById('inputStatus');
+            if (e.target.value.trim()) {
+                inputStatus.innerHTML = '<i class="fas fa-paper-plane text-primary"></i>';
+            } else {
+                inputStatus.innerHTML = '<i class="fas fa-keyboard"></i>';
+            }
+        });
+    </script>
+</body>
+</html>
