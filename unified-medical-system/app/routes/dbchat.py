@@ -47,45 +47,83 @@ class QueryGenerator:
         """Generate MongoDB aggregation pipeline using Gemini"""
         logger.info(f"Generating query for: {user_query}")
         
-        prompt = f"""
-        You are a MongoDB query generator. Generate an aggregation pipeline based on this request: "{user_query}"
+        # First, determine if this is a general chat question or a data query
+        chat_prompt = f"""Determine if this is a general chat question or a data query: "{user_query}"
+        Return only a JSON object with:
+        1. type: Either 'chat' or 'data'
+        2. requires_viz: boolean (true if visualization would be helpful)
         
-        Collection Information:
-        Collection Name: {collection_info['collection_name']}
-        Available Fields: {collection_info['field_names']}
-        Sample Documents: {json.dumps(collection_info['sample_documents'], indent=2)}
-        
-        Return only a JSON object with these fields:
-        1. pipeline: MongoDB aggregation pipeline array
-        2. visualization_type: Either 'line', 'bar', or 'pie'
-        3. explanation: Brief explanation of what the query does
-        
-        Format the response as valid JSON without any markdown formatting or code blocks.
-        """
-        
-        response = self.model.generate_content(prompt)
-        logger.info(f"Raw Gemini response: {response.text}")
+        Format as valid JSON."""
         
         try:
-            # Clean up the response text to extract only the JSON part
+            chat_response = self.model.generate_content(chat_prompt)
+            chat_text = chat_response.text.strip()
+            # Clean up the response if it contains markdown formatting
+            if chat_text.startswith('```'):
+                chat_text = chat_text.split('```')[1]
+                if chat_text.startswith('json'):
+                    chat_text = chat_text[4:].strip()
+            
+            query_type = json.loads(chat_text)
+            
+            if query_type['type'] == 'chat':
+                # Handle general chat questions
+                chat_prompt = f"""You are a helpful database assistant. 
+                Respond to this general question: "{user_query}"
+                Keep the response friendly and concise."""
+                
+                response = self.model.generate_content(chat_prompt)
+                return {
+                    "type": "chat",
+                    "response": response.text.strip(),
+                    "visualization": None
+                }
+            
+            # For data queries, generate the appropriate MongoDB query
+            prompt = f"""
+            You are a MongoDB query generator. Generate an aggregation pipeline based on this request: "{user_query}"
+            
+            Collection Information:
+            Collection Name: {collection_info['collection_name']}
+            Available Fields: {collection_info['field_names']}
+            Sample Documents: {json.dumps(collection_info['sample_documents'], indent=2)}
+            
+            Return only a JSON object with these fields:
+            1. pipeline: MongoDB aggregation pipeline array
+            2. visualization_type: Either 'table', 'line', 'bar', or 'pie' (use 'table' if no visualization needed)
+            3. explanation: Brief explanation of what the query does
+            
+            Format the response as valid JSON without markdown formatting."""
+            
+            response = self.model.generate_content(prompt)
             response_text = response.text.strip()
-            if response_text.startswith('```json'):
-                response_text = response_text[7:]  # Remove ```json
-            if response_text.endswith('```'):
-                response_text = response_text[:-3]  # Remove ```
             
-            # Clean any remaining whitespace
-            response_text = response_text.strip()
+            # Clean up the response if it contains markdown formatting
+            if response_text.startswith('```'):
+                response_text = response_text.split('```')[1]
+                if response_text.startswith('json'):
+                    response_text = response_text[4:].strip()
             
-            logger.info(f"Cleaned response text: {response_text}")
-            return json.loads(response_text)
-            
-        except Exception as e:
-            logger.error(f"Error parsing Gemini response: {e}")
-            # Return a default query if parsing fails
+            query_info = json.loads(response_text)
             return {
+                "type": "data",
+                **query_info
+            }
+            
+        except json.JSONDecodeError as e:
+            logger.error(f"JSON parsing error: {e}")
+            # Fallback for chat messages
+            return {
+                "type": "chat",
+                "response": "Hello! I'm your database assistant. How can I help you today?",
+                "visualization": None
+            }
+        except Exception as e:
+            logger.error(f"Error in generate_query: {e}")
+            return {
+                "type": "data",
                 "pipeline": [{"$sample": {"size": 5}}],
-                "visualization_type": "bar",
+                "visualization_type": "table",
                 "explanation": "Sorry, I couldn't understand your query. Here's a sample of 5 random documents."
             }
 
@@ -101,18 +139,26 @@ class QuerySystem:
             # Get collection information
             collection_info = self.db_helper.get_collection_info(collection_name)
             
-            # Generate MongoDB query
+            # Generate response
             query_info = self.query_generator.generate_query(user_query, collection_info)
             
-            # Execute aggregation
+            if query_info['type'] == 'chat':
+                return {
+                    'type': 'chat',
+                    'text': query_info['response'],
+                    'visualization': None
+                }
+            
+            # Execute aggregation for data queries
             results = self.db_helper.execute_aggregate(collection_name, query_info['pipeline'])
             
-            # Format response for visualization
+            # Format response
             response = {
+                'type': 'data',
                 'text': query_info['explanation'],
                 'visualization': {
                     'type': query_info['visualization_type'],
-                    'data': self._format_chart_data(results)
+                    'data': self._format_visualization_data(results, query_info['visualization_type'])
                 }
             }
             
@@ -122,16 +168,24 @@ class QuerySystem:
         except Exception as e:
             logger.error(f"Error processing query: {e}")
             return {
+                'type': 'error',
                 'text': f'Error processing query: {str(e)}',
                 'visualization': None
             }
 
-    def _format_chart_data(self, results: List[dict]) -> dict:
-        """Format MongoDB results for Chart.js"""
-        # Extract labels and data from results
+    def _format_visualization_data(self, results: List[dict], viz_type: str) -> dict:
+        """Format MongoDB results for visualization"""
         if not results:
             return {'labels': [], 'datasets': [{'data': []}]}
+        
+        if viz_type == 'table':
+            # Return formatted table data
+            return {
+                'headers': list(results[0].keys()),
+                'rows': [[str(v) for v in d.values()] for d in results]
+            }
             
+        # For charts (line, bar, pie)
         labels = [str(r.get('_id', i)) for i, r in enumerate(results)]
         values = [r.get('value', r.get('count', 0)) for r in results]
         
@@ -140,8 +194,20 @@ class QuerySystem:
             'datasets': [{
                 'label': 'Value',
                 'data': values,
-                'backgroundColor': 'rgba(54, 162, 235, 0.5)',
-                'borderColor': 'rgb(54, 162, 235)',
+                'backgroundColor': [
+                    'rgba(54, 162, 235, 0.5)',
+                    'rgba(255, 99, 132, 0.5)',
+                    'rgba(255, 206, 86, 0.5)',
+                    'rgba(75, 192, 192, 0.5)',
+                    'rgba(153, 102, 255, 0.5)'
+                ],
+                'borderColor': [
+                    'rgb(54, 162, 235)',
+                    'rgb(255, 99, 132)',
+                    'rgb(255, 206, 86)',
+                    'rgb(75, 192, 192)',
+                    'rgb(153, 102, 255)'
+                ],
                 'tension': 0.1
             }]
         }

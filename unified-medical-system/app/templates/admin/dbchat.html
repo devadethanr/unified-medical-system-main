@@ -267,18 +267,76 @@
                 const data = await response.json();
                 typingDiv.remove();
 
-                // Add response message
-                addMessage(data.text);
-
-                // Add visualizations if present
-                if (data.visualization) {
-                    addVisualization(data.visualization.type, data.visualization.data);
+                if (data.type === 'chat') {
+                    // Simple chat response
+                    addMessage(data.text);
+                } else if (data.type === 'data') {
+                    // Data response with potential visualization
+                    addMessage(data.text);
+                    if (data.visualization) {
+                        if (data.visualization.type === 'table') {
+                            // Create table visualization
+                            const tableHTML = createTableHTML(data.visualization.data);
+                            addVisualization('table', tableHTML);
+                        } else {
+                            // Create chart visualization
+                            const chartConfig = createChartConfig(data.visualization.type, data.visualization.data);
+                            addVisualization('chart', chartConfig);
+                        }
+                    }
+                } else {
+                    // Error response
+                    addMessage(data.text);
                 }
             } catch (error) {
                 typingDiv.remove();
                 addMessage('Sorry, there was an error processing your request. Please try again.');
             }
         });
+
+        function createTableHTML(data) {
+            const headers = data.headers;
+            const rows = data.rows;
+            
+            let html = '<table><thead><tr>';
+            headers.forEach(header => {
+                html += `<th>${header}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+            
+            rows.forEach(row => {
+                html += '<tr>';
+                row.forEach(cell => {
+                    html += `<td>${cell}</td>`;
+                });
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            return html;
+        }
+
+        function createChartConfig(type, data) {
+            return {
+                type: type,
+                data: {
+                    labels: data.labels,
+                    datasets: data.datasets
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Data Visualization'
+                        }
+                    }
+                }
+            };
+        }
 
         // Input status indicator
         const userInput = document.getElementById('userInput');
