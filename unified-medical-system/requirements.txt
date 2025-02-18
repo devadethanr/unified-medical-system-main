@@ -34,3 +34,6 @@ reportlab
 folium
 gunicorn
 qrcode
+google-generativeai
+aiohttp
+Flask[async]

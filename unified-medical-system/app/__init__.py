@@ -9,6 +9,7 @@ from flask_mail import Mail
 from datetime import datetime
 from config import Config
 from pymongo.errors import ConnectionFailure
+from app.routes.dbchat import check_gemini_api, init_dbchat
 
 # Initialize Flask extensions
 mongo = PyMongo()
@@ -36,6 +37,19 @@ def create_app(config_class='config.DevelopmentConfig'):
         # You might want to handle this error more gracefully
     except Exception as e:
         print(f"Error initializing MongoDB: {str(e)}")
+
+    # Check MongoDB connection
+    try:
+        mongo.db.command('ping')
+        print("MongoDB connection successful!")
+    except Exception as e:
+        print(f"MongoDB connection failed: {e}")
+        
+    # Check Gemini API connection
+    if check_gemini_api():
+        print("Gemini API connection successful!")
+    else:
+        print("Warning: Gemini API connection failed!")
 
     # Initialize login manager
     login_manager.init_app(app)
@@ -94,6 +108,9 @@ def create_app(config_class='config.DevelopmentConfig'):
     app.register_blueprint(hospital.hospital_bp, url_prefix='/hospital')
     app.register_blueprint(meddata.meddata_bp, url_prefix='/meddata')
     app.register_blueprint(dbchat.dbchat_bp, url_prefix='/dbchat')
+
+    # Initialize dbchat system with mongo instance
+    init_dbchat(mongo)
 
     # Template filters
     @app.template_filter('format_date')
