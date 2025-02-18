@@ -7,6 +7,8 @@ from authlib.integrations.flask_client import OAuth
 from flask_session import Session
 from flask_mail import Mail
 from datetime import datetime
+from config import Config
+from pymongo.errors import ConnectionFailure
 
 # Initialize Flask extensions
 mongo = PyMongo()
@@ -26,8 +28,14 @@ def create_app(config_class='config.DevelopmentConfig'):
     # Initialize MongoDB
     try:
         mongo.init_app(app)
+        # Test the connection
+        mongo.db.command('ping')
+        print("MongoDB connection successful!")
+    except ConnectionFailure as e:
+        print(f"MongoDB connection failed: {str(e)}")
+        # You might want to handle this error more gracefully
     except Exception as e:
-        print(f"Error initializing Flask-PyMongo: {str(e)}")
+        print(f"Error initializing MongoDB: {str(e)}")
 
     # Initialize login manager
     login_manager.init_app(app)
@@ -78,13 +86,14 @@ def create_app(config_class='config.DevelopmentConfig'):
         return render_template('error/500.html'), 500
 
     # Register blueprints
-    from app.routes import admin, patient, doctor, hospital, auth, meddata
+    from app.routes import admin, patient, doctor, hospital, auth, meddata, dbchat
     app.register_blueprint(auth.auth_bp, url_prefix='/auth')
     app.register_blueprint(admin.admin_bp, url_prefix='/admin')
     app.register_blueprint(patient.patient_bp, url_prefix='/patient')
     app.register_blueprint(doctor.doctor_bp, url_prefix='/doctor')
     app.register_blueprint(hospital.hospital_bp, url_prefix='/hospital')
     app.register_blueprint(meddata.meddata_bp, url_prefix='/meddata')
+    app.register_blueprint(dbchat.dbchat_bp, url_prefix='/dbchat')
 
     # Template filters
     @app.template_filter('format_date')

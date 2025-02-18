@@ -258,7 +258,7 @@
             document.getElementById('chatMessages').appendChild(typingDiv);
 
             try {
-                const response = await fetch('/api/dbchat', {
+                const response = await fetch('/dbchat/api/dbchat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ query })
