@@ -44,87 +44,156 @@ class QueryGenerator:
         self.model = GenerativeModel('gemini-pro')
 
     def generate_query(self, user_query: str, collection_info: dict) -> dict:
-        """Generate MongoDB aggregation pipeline using Gemini"""
-        logger.info(f"Generating query for: {user_query}")
+        # Handle visualization requests directly if keywords are present
+        if any(word in user_query.lower() for word in ['graph', 'chart', 'visualize', 'plot', 'bargraph']):
+            if 'month' in user_query.lower() and ('patient' in user_query.lower() or 'createdAt' in user_query.lower()):
+                return {
+                    "type": "data",
+                    "pipeline": [
+                        {
+                            "$group": {
+                                "_id": {"$month": "$createdAt"},
+                                "count": {"$sum": 1}
+                            }
+                        },
+                        {"$sort": {"_id": 1}}
+                    ],
+                    "visualization_type": "bar",
+                    "explanation": "Monthly distribution of patients based on creation date"
+                }
         
-        # First, determine if this is a general chat question or a data query
-        chat_prompt = f"""Determine if this is a general chat question or a data query: "{user_query}"
-        Return only a JSON object with:
-        1. type: Either 'chat' or 'data'
-        2. requires_viz: boolean (true if visualization would be helpful)
-        
-        Format as valid JSON."""
+        # Original visualization check logic
+        viz_prompt = f"""Analyze if this query needs visualization: "{user_query}"
+        Return only valid JSON in this exact format:
+        {{"is_visualization": true/false, "chart_type": "bar", "metrics": ["count"], "aggregation_type": "time"}}"""
         
         try:
-            chat_response = self.model.generate_content(chat_prompt)
-            chat_text = chat_response.text.strip()
-            # Clean up the response if it contains markdown formatting
-            if chat_text.startswith('```'):
-                chat_text = chat_text.split('```')[1]
-                if chat_text.startswith('json'):
-                    chat_text = chat_text[4:].strip()
+            viz_response = self.model.generate_content(viz_prompt)
+            viz_text = viz_response.text.strip()
             
-            query_type = json.loads(chat_text)
+            # Remove any markdown formatting
+            if '```' in viz_text:
+                viz_text = viz_text.split('```')[1]
+                if viz_text.startswith('json'):
+                    viz_text = viz_text[4:]
+                viz_text = viz_text.strip()
             
-            if query_type['type'] == 'chat':
-                # Handle general chat questions
-                chat_prompt = f"""You are a helpful database assistant. 
-                Respond to this general question: "{user_query}"
-                Keep the response friendly and concise."""
+            viz_info = json.loads(viz_text)
+            
+            if viz_info["is_visualization"]:
+                # Generate appropriate aggregation pipeline based on visualization needs
+                agg_prompt = f"""
+                Create MongoDB aggregation pipeline for:
+                Chart Type: {viz_info['chart_type']}
+                Metrics: {viz_info['metrics']}
+                Aggregation: {viz_info['aggregation_type']}
                 
-                response = self.model.generate_content(chat_prompt)
+                Collection Fields: {collection_info['field_names']}
+                
+                Return only valid JSON with:
+                {{
+                    "pipeline": [aggregation stages],
+                    "visualization_type": "{viz_info['chart_type']}",
+                    "explanation": "brief explanation"
+                }}"""
+                
+                response = self.model.generate_content(agg_prompt)
+                query_info = json.loads(response.text)
+                
                 return {
-                    "type": "chat",
-                    "response": response.text.strip(),
-                    "visualization": None
+                    "type": "data",
+                    "pipeline": query_info["pipeline"],
+                    "visualization_type": query_info["visualization_type"],
+                    "explanation": query_info["explanation"]
                 }
             
-            # For data queries, generate the appropriate MongoDB query
-            prompt = f"""
-            You are a MongoDB query generator. Generate an aggregation pipeline based on this request: "{user_query}"
+            # Handle non-visualization queries as before
+            # First, determine if this is a general chat question or a data query
+            chat_prompt = f"""Determine if this is a general chat question or a data query: "{user_query}"
+            Return only a JSON object with:
+            1. type: Either 'chat' or 'data'
+            2. requires_viz: boolean (true if visualization would be helpful)
             
-            Collection Information:
-            Collection Name: {collection_info['collection_name']}
-            Available Fields: {collection_info['field_names']}
-            Sample Documents: {json.dumps(collection_info['sample_documents'], indent=2)}
+            Format as valid JSON."""
             
-            Return only a JSON object with these fields:
-            1. pipeline: MongoDB aggregation pipeline array
-            2. visualization_type: Either 'table', 'line', 'bar', or 'pie' (use 'table' if no visualization needed)
-            3. explanation: Brief explanation of what the query does
-            
-            Format the response as valid JSON without markdown formatting."""
-            
-            response = self.model.generate_content(prompt)
-            response_text = response.text.strip()
-            
-            # Clean up the response if it contains markdown formatting
-            if response_text.startswith('```'):
-                response_text = response_text.split('```')[1]
-                if response_text.startswith('json'):
-                    response_text = response_text[4:].strip()
-            
-            query_info = json.loads(response_text)
-            return {
-                "type": "data",
-                **query_info
-            }
-            
+            try:
+                chat_response = self.model.generate_content(chat_prompt)
+                chat_text = chat_response.text.strip()
+                # Clean up the response if it contains markdown formatting
+                if chat_text.startswith('```'):
+                    chat_text = chat_text.split('```')[1]
+                    if chat_text.startswith('json'):
+                        chat_text = chat_text[4:].strip()
+                
+                query_type = json.loads(chat_text)
+                
+                if query_type['type'] == 'chat':
+                    # Handle general chat questions
+                    chat_prompt = f"""You are a helpful database assistant. 
+                    Respond to this general question: "{user_query}"
+                    Keep the response friendly and concise."""
+                    
+                    response = self.model.generate_content(chat_prompt)
+                    return {
+                        "type": "chat",
+                        "response": response.text.strip(),
+                        "visualization": None
+                    }
+                
+                # For data queries, generate the appropriate MongoDB query
+                prompt = f"""
+                You are a MongoDB query generator. Generate an aggregation pipeline based on this request: "{user_query}"
+                
+                Collection Information:
+                Collection Name: {collection_info['collection_name']}
+                Available Fields: {collection_info['field_names']}
+                Sample Documents: {json.dumps(collection_info['sample_documents'], indent=2)}
+                
+                Return only a JSON object with these fields:
+                1. pipeline: MongoDB aggregation pipeline array
+                2. visualization_type: Either 'table', 'line', 'bar', or 'pie' (use 'table' if no visualization needed)
+                3. explanation: Brief explanation of what the query does
+                
+                Format the response as valid JSON without markdown formatting."""
+                
+                response = self.model.generate_content(prompt)
+                response_text = response.text.strip()
+                
+                # Clean up the response if it contains markdown formatting
+                if response_text.startswith('```'):
+                    response_text = response_text.split('```')[1]
+                    if response_text.startswith('json'):
+                        response_text = response_text[4:].strip()
+                
+                query_info = json.loads(response_text)
+                return {
+                    "type": "data",
+                    **query_info
+                }
+                
+            except json.JSONDecodeError as e:
+                logger.error(f"JSON parsing error: {e}")
+                # Fallback for chat messages
+                return {
+                    "type": "chat",
+                    "response": "Hello! I'm your database assistant. How can I help you today?",
+                    "visualization": None
+                }
+            except Exception as e:
+                logger.error(f"Error in generate_query: {e}")
+                return {
+                    "type": "data",
+                    "pipeline": [{"$sample": {"size": 5}}],
+                    "visualization_type": "table",
+                    "explanation": "Sorry, I couldn't understand your query. Here's a sample of 5 random documents."
+                }
         except json.JSONDecodeError as e:
-            logger.error(f"JSON parsing error: {e}")
-            # Fallback for chat messages
+            logger.error(f"JSON parsing error in visualization check: {e}")
+            # Default to chat response
             return {
                 "type": "chat",
-                "response": "Hello! I'm your database assistant. How can I help you today?",
+                "response": "I understand you're looking for insights from the data. Could you please rephrase your question?",
                 "visualization": None
-            }
-        except Exception as e:
-            logger.error(f"Error in generate_query: {e}")
-            return {
-                "type": "data",
-                "pipeline": [{"$sample": {"size": 5}}],
-                "visualization_type": "table",
-                "explanation": "Sorry, I couldn't understand your query. Here's a sample of 5 random documents."
             }
 
 class QuerySystem:
