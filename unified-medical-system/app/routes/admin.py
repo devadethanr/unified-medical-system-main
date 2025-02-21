@@ -11,25 +11,45 @@ from app.synthbot_ai.nlp_models.outbreak_detection import analyze_outbreak
 
 admin_bp = Blueprint('admin', __name__)
 
-# global data for admin
-global_admin_data = {
-    'patients_count': mongo.db.patients.count_documents({}),
-    'doctors_count': mongo.db.doctors.count_documents({}),
-    'hospitals_count': mongo.db.hospitals.count_documents({}),
-    'new_hospitals_24h': mongo.db.hospitals.count_documents({'createdAt': {'$gte': datetime.now() - timedelta(hours=24)}}),
-    'new_doctors_24h': mongo.db.doctors.count_documents({'createdAt': {'$gte': datetime.now() - timedelta(hours=24)}}),
-    'new_patients_24h': mongo.db.patients.count_documents({'createdAt': {'$gte': datetime.now() - timedelta(hours=24)}}),
-    'new_appointments_24h': mongo.db.appointments.count_documents({'createdAt': {'$gte': datetime.now() - timedelta(hours=24)}}),
-}
+def get_global_admin_data():
+    """Get global admin data from the database."""
+    try:
+        return {
+            'patients_count': mongo.db.patients.count_documents({}),
+            'doctors_count': mongo.db.doctors.count_documents({}),
+            'hospitals_count': mongo.db.hospitals.count_documents({}),
+            'new_hospitals_24h': mongo.db.hospitals.count_documents({'createdAt': {'$gte': datetime.now() - timedelta(hours=24)}}),
+            'new_doctors_24h': mongo.db.doctors.count_documents({'createdAt': {'$gte': datetime.now() - timedelta(hours=24)}}),
+            'new_patients_24h': mongo.db.patients.count_documents({'createdAt': {'$gte': datetime.now() - timedelta(hours=24)}}),
+            'new_appointments_24h': mongo.db.appointments.count_documents({'createdAt': {'$gte': datetime.now() - timedelta(hours=24)}})
+        }
+    except Exception as e:
+        print(f"Error getting global admin data: {str(e)}")
+        return {
+            'patients_count': 0,
+            'doctors_count': 0,
+            'hospitals_count': 0,
+            'new_hospitals_24h': 0,
+            'new_doctors_24h': 0,
+            'new_patients_24h': 0,
+            'new_appointments_24h': 0
+        }
+
+def get_admin_data():
+    """Get admin data from the database."""
+    try:
+        return mongo.db.users.find_one({'umsId': session['umsId']})
+    except Exception as e:
+        print(f"Error getting admin data: {str(e)}")
+        return None
 
 #admin dashboard
 @admin_bp.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
     """Render the admin dashboard."""
-    global admin_data
-    admin_data = mongo.db.users.find_one({'umsId': session['umsId']})
-    print(admin_data) #for debugging
+    admin_data = get_admin_data()
+    global_admin_data = get_global_admin_data()
     return render_template('admin/dashboard.html', admin_data=admin_data, global_admin_data=global_admin_data)
 
 #admin profile
@@ -37,18 +57,20 @@ def index():
 @login_required
 def profile():
     """Handle admin profile view and updates."""
-    global admin_data
-    admin_data = mongo.db.users.find_one({'umsId': session['umsId']})
-    admin_data['phoneNumber'] = admin_data.get('phoneNumber', [None])[0]
+    admin_data = get_admin_data()
+    if admin_data:
+        admin_data['phoneNumber'] = admin_data.get('phoneNumber', [None])[0]
+    global_admin_data = get_global_admin_data()
+    
     if request.method == 'POST':
-         if request.form.get('form_type') == 'update_profile':
+        if request.form.get('form_type') == 'update_profile':
             return update_profile()
     return render_template('admin/profile.html', admin_data=admin_data, global_admin_data=global_admin_data)
 
 
 def update_profile():
     """Update admin profile information."""
-    admin_data = mongo.db.users.find_one({'umsId': session['umsId']})
+    admin_data = get_admin_data()
     # Get the updated data from the form
     admin_data['name'] = request.form.get('name')
     admin_data['email'] = request.form.get('email')
@@ -280,11 +302,12 @@ def reject_hospital():
 @login_required
 def outbreakmap():
     return render_template('admin/outbreak_map.html')
-
+#database chat
 @admin_bp.route('/dbchat', methods=['GET'])
 @login_required
 def dbchat():
     """Render the database chat interface."""
+    admin_data = get_admin_data()
     return render_template('admin/dbchat.html', admin_data=admin_data)
 
 @admin_bp.route('/api/dbchat', methods=['POST'])
