@@ -19,6 +19,8 @@ import io
 import base64
 import qrcode  # Add this import
 import json
+import google.generativeai as genai  # Change this import
+from google.generativeai import GenerativeModel  # Add this import
 
 patient_bp = Blueprint('patient', __name__)
 
@@ -482,4 +484,100 @@ def verify_blockchain(block_id):
     # For now, we'll return a dummy response
     verified = True  # Replace this with actual verification logic
     return jsonify({'verified': verified})
+
+@patient_bp.route('/medical_insights', methods=['GET'])
+@login_required
+def medical_insights():
+    """Render the medical insights page with summarized records."""
+    # Get patient's medical records
+    blocks = list(mongo.db.medicalRecords.find())
+    patient_records = []
+    
+    for block in blocks:
+        for transaction in block['transactions']:
+            if transaction['patientId'] == current_user.umsId:
+                record = {
+                    'date': transaction['createdAt'],
+                    'diagnosis': transaction['Diagnosis'],
+                    'treatment': transaction['TreatmentPlan'],
+                    'prescription': transaction['Prescription'],
+                    'notes': transaction['AdditionalNotes']
+                }
+                patient_records.append(record)
+    
+    # Sort records by date
+    patient_records.sort(key=lambda x: x['date'], reverse=True)
+    
+    # Get patient data for the template
+    patient_data = mongo.db.patients.find_one({'umsId': current_user.umsId})
+    user_data = mongo.db.users.find_one({'umsId': current_user.umsId})
+    patient_data.update(user_data)
+    
+    return render_template('patient/medical_insights.html', 
+                         patient_data=patient_data,
+                         records=patient_records)
+
+@patient_bp.route('/api/medical_insights/query', methods=['POST'])
+@login_required
+def query_medical_insights():
+    """Handle natural language queries about medical records."""
+    import json  # Move json import to the top level
+    
+    query = request.json.get('query')
+    if not query:
+        return jsonify({'error': 'No query provided'}), 400
+    
+    try:
+        # Get patient's medical records
+        blocks = list(mongo.db.medicalRecords.find())
+        patient_records = []
+        
+        for block in blocks:
+            for transaction in block['transactions']:
+                if transaction['patientId'] == current_user.umsId:
+                    patient_records.append(transaction)
+        
+        # Initialize Gemini model
+        model = GenerativeModel('gemini-pro')
+        
+        # Create context from records
+        context = f"""
+        You are a helpful medical insights assistant. Analyze these medical records and answer the question: "{query}"
+        
+        Medical Records Summary:
+        {json.dumps(patient_records, default=str)}
+        
+        Return your response in this JSON format if visualization is needed:
+        {{
+            "needs_visualization": true/false,
+            "chartType": "bar"/"line"/"pie",
+            "data": {{
+                "labels": [...],
+                "datasets": [{{
+                    "label": "...",
+                    "data": [...]
+                }}]
+            }},
+            "explanation": "..."
+        }}
+        
+        Otherwise, return a clear, concise text response focused on the patient's records.
+        """
+        
+        response = model.generate_content(context)
+        response_text = response.text.strip()
+        
+        # Try to parse as JSON for visualization
+        try:
+            viz_data = json.loads(response_text)
+            return jsonify(viz_data)
+        except json.JSONDecodeError:
+            # If not JSON, return as regular text response
+            return jsonify({
+                "needs_visualization": False,
+                "explanation": response_text
+            })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
