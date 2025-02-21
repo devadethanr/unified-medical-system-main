@@ -9,64 +9,210 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-    .chat-container {
-        height: calc(100vh - 4rem);
+    :root {
+        color-scheme: dark;
+    }
+
+    body {
+        background-color: #1a1a1a;
+        color: #ffffff;
+    }
+
+    .chat-interface {
+        height: calc(100vh - 6rem);
+        background: #2d2d2d;
+        border-radius: 1rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+
+    .message-area {
+        height: calc(100% - 80px);
+        overflow-y: auto;
+        padding: 1.5rem;
+    }
+
+    .message {
+        max-width: 85%;
+        margin-bottom: 1.5rem;
+        padding: 1rem 1.25rem;
+        border-radius: 1rem;
+        line-height: 1.5;
+    }
+
+    .user-message {
+        background: #0066cc;
+        color: white;
+        margin-left: auto;
+        border-bottom-right-radius: 0.25rem;
+    }
+
+    .bot-message {
+        background: #363636;
+        color: #ffffff;
+        border: 1px solid #404040;
+        border-bottom-left-radius: 0.25rem;
+    }
+
+    /* Add loading animation */
+    .ai-thinking {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
+    }
+
+    .pulse-container {
+        width: 100px;
+        height: 100px;
+        position: relative;
+    }
+
+    .pulse-circle {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, #0066cc 0%, transparent 65%);
+        border-radius: 50%;
+        animation: pulse 2s ease-out infinite;
+    }
+
+    .pulse-core {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        background: #0066cc;
+        border-radius: 50%;
+        left: 35px;
+        top: 35px;
+        animation: core-pulse 2s ease-out infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(0.1);
+            opacity: 0;
+        }
+        50% {
+            opacity: 0.3;
+        }
+        100% {
+            transform: scale(1.5);
+            opacity: 0;
+        }
+    }
+
+    @keyframes core-pulse {
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+        50% {
+            transform: scale(1.1);
+            opacity: 0.8;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .suggestion-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+
+    .chip {
+        background: #e5e7eb;
+        color: #374151;
+        padding: 0.5rem 1rem;
+        border-radius: 1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.875rem;
+    }
+
+    .chip:hover {
+        background: #d1d5db;
+    }
+
+    .input-area {
+        padding: 1rem 1.5rem;
+        background: white;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .medical-record {
+        background: white;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 0.5rem;
+        border: 1px solid #e5e7eb;
+    }
+
+    .medical-record h3 {
+        color: #1f2937;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .medical-record-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .detail-item {
         display: flex;
         flex-direction: column;
     }
-    
-    .message-container {
-        flex-grow: 1;
-        overflow-y: auto;
-        padding: 1rem;
+
+    .detail-label {
+        font-weight: 500;
+        color: #6b7280;
+        font-size: 0.875rem;
     }
-    
-    .message {
-        max-width: 80%;
-        margin-bottom: 1rem;
-        padding: 1rem;
-        border-radius: 0.5rem;
+
+    .detail-value {
+        color: #1f2937;
+        margin-top: 0.25rem;
     }
-    
-    .user-message {
-        background-color: #2563eb;
-        color: white;
-        margin-left: auto;
-    }
-    
-    .bot-message {
-        background-color: #374151;
-        color: white;
-    }
-    
+
     .viz-container {
-        background: #1f2937;
-        padding: 1rem;
-        border-radius: 0.5rem;
+        background: white;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
         margin-top: 1rem;
+        border: 1px solid #e5e7eb;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="chat-container bg-base-300">
-    <div class="message-container" id="messageContainer">
+<div class="chat-interface">
+    <div class="message-area" id="messageContainer">
         <div class="bot-message message">
-            <h3 class="text-lg font-bold mb-2">👋 Hello! I'm your Medical Insights Assistant</h3>
-            <p>I can help you understand your medical records and provide insights. Try asking questions like:</p>
-            <div class="mt-2 flex flex-wrap gap-2">
-                <button class="btn btn-sm btn-outline" onclick="askQuestion('What are my most common diagnoses?')">Common diagnoses</button>
-                <button class="btn btn-sm btn-outline" onclick="askQuestion('Show my treatment history')">Treatment history</button>
-                <button class="btn btn-sm btn-outline" onclick="askQuestion('Summarize my medical conditions')">Medical summary</button>
+            <h3 class="text-xl font-bold mb-3">👋 Welcome to Medical Insights</h3>
+            <p class="text-gray-700 mb-4">I can help you understand your medical history and provide detailed insights. Here are some questions you can ask:</p>
+            <div class="suggestion-chips">
+                <button class="chip" onclick="askQuestion('List my recent medical records')">Recent Records</button>
+                <button class="chip" onclick="askQuestion('What are my most common diagnoses?')">Common Diagnoses</button>
+                <button class="chip" onclick="askQuestion('Show my treatment history')">Treatment History</button>
+                <button class="chip" onclick="askQuestion('Summarize my medical conditions')">Medical Summary</button>
             </div>
         </div>
     </div>
-    
-    <div class="p-4 bg-base-200 border-t border-base-300">
-        <form id="queryForm" class="flex gap-2">
-            <input type="text" id="queryInput" class="input input-bordered flex-1" placeholder="Ask about your medical records...">
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-paper-plane"></i>
+
+    <div class="input-area">
+        <form id="queryForm" class="flex gap-3">
+            <input type="text" id="queryInput" 
+                   class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                   placeholder="Ask about your medical records...">
+            <button type="submit" 
+                    class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                Send
             </button>
         </form>
     </div>
@@ -75,11 +221,47 @@
 
 {% block scripts %}
 <script>
+function formatMedicalRecord(record) {
+    return `
+        <div class="medical-record">
+            <h3 class="text-lg font-semibold">${record.date}</h3>
+            <div class="medical-record-details">
+                <div class="detail-item">
+                    <span class="detail-label">Symptoms</span>
+                    <span class="detail-value">${record.symptoms}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Diagnosis</span>
+                    <span class="detail-value">${record.diagnosis}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Treatment</span>
+                    <span class="detail-value">${record.treatment}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Prescription</span>
+                    <span class="detail-value">${record.prescription}</span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 function addMessage(content, isUser = false) {
     const container = document.getElementById('messageContainer');
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
-    messageDiv.innerHTML = content;
+    
+    if (content.includes('**Medical Records:**')) {
+        const formattedContent = content
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n/g, '<br>')
+            .replace(/(\d+\. )/g, '<br><strong>$1</strong>');
+        messageDiv.innerHTML = formattedContent;
+    } else {
+        messageDiv.innerHTML = content;
+    }
+    
     container.appendChild(messageDiv);
     container.scrollTop = container.scrollHeight;
 }
@@ -133,6 +315,25 @@ function askQuestion(question) {
     document.getElementById('queryForm').dispatchEvent(new Event('submit'));
 }
 
+// Add new function for loading animation
+function showLoadingAnimation() {
+    const container = document.getElementById('messageContainer');
+    const loadingDiv = document.createElement('div');
+    loadingDiv.className = 'ai-thinking';
+    loadingDiv.innerHTML = `
+        <div class="pulse-container">
+            <div class="pulse-circle"></div>
+            <div class="pulse-circle" style="animation-delay: 0.5s"></div>
+            <div class="pulse-circle" style="animation-delay: 1s"></div>
+            <div class="pulse-core"></div>
+        </div>
+    `;
+    container.appendChild(loadingDiv);
+    container.scrollTop = container.scrollHeight;
+    return loadingDiv;
+}
+
+// Update the form submission handler
 document.getElementById('queryForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -145,17 +346,8 @@ document.getElementById('queryForm').addEventListener('submit', async (e) => {
     addMessage(query, true);
     input.value = '';
     
-    // Add typing indicator
-    const typingDiv = document.createElement('div');
-    typingDiv.className = 'message bot-message typing-message';
-    typingDiv.innerHTML = `
-        <div class="typing-indicator">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-    `;
-    document.getElementById('messageContainer').appendChild(typingDiv);
+    // Show loading animation
+    const loadingAnimation = showLoadingAnimation();
     
     try {
         const response = await fetch('/patient/api/medical_insights/query', {
@@ -168,15 +360,14 @@ document.getElementById('queryForm').addEventListener('submit', async (e) => {
         
         const data = await response.json();
         
-        // Remove typing indicator
-        typingDiv.remove();
+        // Remove loading animation
+        loadingAnimation.remove();
         
         if (data.error) {
             addMessage(`Error: ${data.error}`);
             return;
         }
         
-        // Check if response contains visualization
         if (data.needs_visualization) {
             addMessage(data.explanation);
             const vizElement = createVisualization(
@@ -189,7 +380,7 @@ document.getElementById('queryForm').addEventListener('submit', async (e) => {
         }
         
     } catch (error) {
-        typingDiv.remove();
+        loadingAnimation.remove();
         addMessage(`Error: ${error.message}`);
     }
 });

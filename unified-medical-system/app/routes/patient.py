@@ -520,9 +520,6 @@ def medical_insights():
 @patient_bp.route('/api/medical_insights/query', methods=['POST'])
 @login_required
 def query_medical_insights():
-    """Handle natural language queries about medical records."""
-    import json  # Move json import to the top level
-    
     query = request.json.get('query')
     if not query:
         return jsonify({'error': 'No query provided'}), 400
@@ -540,16 +537,25 @@ def query_medical_insights():
         # Initialize Gemini model
         model = GenerativeModel('gemini-pro')
         
-        # Create context from records
+        # Create improved context and prompt
         context = f"""
-        You are a helpful medical insights assistant. Analyze these medical records and answer the question: "{query}"
-        
-        Medical Records Summary:
+        You are an advanced medical AI assistant, designed to help patients understand their medical history and provide valuable insights. You have access to the patient's medical records and can analyze them to answer questions and provide visualizations when appropriate.
+
+        When responding:
+        1. Be conversational and empathetic
+        2. If the user asks who you are, introduce yourself as a medical AI assistant
+        3. Always try to reference relevant medical records when answering questions
+        4. Suggest follow-up questions when appropriate
+        5. If no medical records are relevant to the query, still provide a helpful response
+
+        Current medical records:
         {json.dumps(patient_records, default=str)}
-        
-        Return your response in this JSON format if visualization is needed:
+
+        User query: "{query}"
+
+        If the response needs visualization, return JSON in this format:
         {{
-            "needs_visualization": true/false,
+            "needs_visualization": true,
             "chartType": "bar"/"line"/"pie",
             "data": {{
                 "labels": [...],
@@ -560,8 +566,8 @@ def query_medical_insights():
             }},
             "explanation": "..."
         }}
-        
-        Otherwise, return a clear, concise text response focused on the patient's records.
+
+        Otherwise, provide a natural, conversational response that helps the user understand their medical history.
         """
         
         response = model.generate_content(context)
