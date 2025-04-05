@@ -535,7 +535,7 @@ def query_medical_insights():
                     patient_records.append(transaction)
         
         # Initialize Gemini model
-        model = GenerativeModel('gemini-pro')
+        model = GenerativeModel('gemini-2.0-flash')
         
         # Create improved context and prompt
         context = f"""

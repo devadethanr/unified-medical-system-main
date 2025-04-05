@@ -41,7 +41,7 @@ class MongoDBHelper:
 
 class QueryGenerator:
     def __init__(self):
-        self.model = GenerativeModel('gemini-pro')
+        self.model = GenerativeModel('gemini-2.0-flash')
 
     def generate_query(self, user_query: str, collection_info: dict) -> dict:
         # Handle visualization requests directly if keywords are present
@@ -292,7 +292,7 @@ def init_dbchat(mongo_instance):
 # Add this function for Gemini API health check
 def check_gemini_api():
     try:
-        model = GenerativeModel('gemini-pro')
+        model = GenerativeModel('gemini-2.0-flash')
         response = model.generate_content("Hello, are you working?")
         logger.info("Gemini API connection successful!")
         return True
