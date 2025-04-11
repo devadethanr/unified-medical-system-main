@@ -349,3 +349,49 @@ def cancel_appointment():
             return jsonify({'success': False, 'message': 'No appointment found with the given ID'})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
+
+@hospital_bp.route('/reports', methods=['GET'])
+@login_required
+def reports():
+    hospital_id = session['umsId']
+    
+    # Get monthly appointment statistics
+    current_year = datetime.now().year
+    monthly_stats = []
+    
+    for month in range(1, 13):
+        # Count appointments per month
+        appointments_count = mongo.db.appointments.count_documents({
+            'hospitalId': hospital_id,
+            'appointmentDate': {
+                '$gte': datetime(current_year, month, 1),
+                '$lt': datetime(current_year, month + 1 if month < 12 else 1, 1)
+            },
+            'status': {'$ne': 'deleted'}
+        })
+        
+        monthly_stats.append({
+            'month': datetime(2000, month, 1).strftime('%B'),
+            'count': appointments_count
+        })
+    
+    # Get assigned doctor count
+    hospital_details = mongo.db.hospitalDetails.find_one({'umsId': hospital_id})
+    doctor_count = len(hospital_details.get('assignedDoctors', [])) if hospital_details else 0
+    
+    # Get recent appointments
+    recent_appointments = list(mongo.db.appointments.find({
+        'hospitalId': hospital_id,
+        'status': {'$ne': 'deleted'}
+    }).sort('appointmentDate', -1).limit(5))
+    
+    for appointment in recent_appointments:
+        patient = mongo.db.users.find_one({'umsId': appointment.get('patientId')})
+        doctor = mongo.db.users.find_one({'umsId': appointment.get('doctorId')}) if 'doctorId' in appointment else None
+        appointment['patientName'] = patient['name'] if patient else 'Unknown'
+        appointment['doctorName'] = doctor['name'] if doctor else 'Not Assigned'
+    
+    return render_template('hospital/reports.html', 
+                           monthly_stats=monthly_stats,
+                           doctor_count=doctor_count,
+                           recent_appointments=recent_appointments)

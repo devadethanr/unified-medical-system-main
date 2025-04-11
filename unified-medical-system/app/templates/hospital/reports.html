@@ -1,0 +1,180 @@
+{% extends "hospital/base.html" %}
+
+{% block title %}Hospital Reports{% endblock %}
+
+{% block page_title %}Reports Dashboard{% endblock %}
+
+{% block extra_head %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+{% endblock %}
+
+{% block content %}
+<div class="p-4">
+    <h1 class="text-2xl font-bold mb-4">Reports and Analytics</h1>
+    
+    <!-- Monthly Statistics Chart -->
+    <div class="card bg-white shadow-xl mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Monthly Appointment Statistics</h2>
+            <div class="w-full h-80">
+                <canvas id="monthlyStatsChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Reports Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        <div class="card bg-blue-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Total Doctors</h2>
+                <p class="text-2xl font-bold">{{ doctor_count }}</p>
+            </div>
+        </div>
+        <div class="card bg-green-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Total Appointments</h2>
+                <p class="text-2xl font-bold">{{ monthly_stats|sum(attribute='count') }}</p>
+            </div>
+        </div>
+        <div class="card bg-yellow-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Current Month</h2>
+                <p class="text-2xl font-bold">{{ monthly_stats[-1].count }}</p>
+            </div>
+        </div>
+        <div class="card bg-purple-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Report Generation</h2>
+                <button class="btn btn-primary" onclick="generate_report.showModal()">Generate Report</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Appointments -->
+    <div class="card bg-white shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title">Recent Appointments</h2>
+            <div class="overflow-x-auto">
+                <table class="table table-zebra">
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Doctor</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appointment in recent_appointments %}
+                        <tr>
+                            <td>{{ appointment.patientName }}</td>
+                            <td>{{ appointment.doctorName }}</td>
+                            <td>{{ appointment.appointmentDate.strftime('%d-%m-%Y') if appointment.appointmentDate else 'N/A' }}</td>
+                            <td>{{ appointment.status }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_body %}
+<!-- Generate Report Modal -->
+<dialog id="generate_report" class="modal">
+    <form method="dialog" class="modal-box">
+        <h3 class="font-bold text-lg">Generate Report</h3>
+        <p class="py-4">Select the type of report you want to generate</p>
+        <div class="form-control mb-4">
+            <label class="label">
+                <span class="label-text">Report Type</span>
+            </label>
+            <select class="select select-bordered w-full">
+                <option disabled selected>Choose report type</option>
+                <option>Monthly Appointment Summary</option>
+                <option>Doctor Performance</option>
+                <option>Patient Statistics</option>
+            </select>
+        </div>
+        <div class="form-control mb-4">
+            <label class="label">
+                <span class="label-text">Date Range</span>
+            </label>
+            <div class="grid grid-cols-2 gap-4">
+                <input type="date" class="input input-bordered" />
+                <input type="date" class="input input-bordered" />
+            </div>
+        </div>
+        <div class="form-control mb-4">
+            <label class="label">
+                <span class="label-text">Format</span>
+            </label>
+            <div class="flex gap-4">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="format" class="radio" checked />
+                    <span>PDF</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="format" class="radio" />
+                    <span>Excel</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="format" class="radio" />
+                    <span>CSV</span>
+                </label>
+            </div>
+        </div>
+        <div class="modal-action">
+            <button class="btn">Cancel</button>
+            <button class="btn btn-primary">Generate</button>
+        </div>
+    </form>
+</dialog>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Monthly Statistics Chart
+        const ctx = document.getElementById('monthlyStatsChart').getContext('2d');
+        const monthlyData = [
+            {% for stat in monthly_stats %}
+                {{ stat.count }}{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ];
+        const monthLabels = [
+            {% for stat in monthly_stats %}
+                '{{ stat.month }}'{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ];
+        
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: monthLabels,
+                datasets: [{
+                    label: 'Appointments per Month',
+                    data: monthlyData,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgb(75, 192, 192)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %} 
