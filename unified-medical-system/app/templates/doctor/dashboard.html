@@ -81,11 +81,11 @@
                      <li>
                         <a href="javascript:void(0);" class="iq-waves-effect"><i class="ri-mail-open-fill"></i><span>Email</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
                         <ul class="iq-submenu">
-                           <li><a href="{{ url_for('doctor.inbox') }}"><i class="ri-inbox-fill"></i>Inbox</a></li>
-                           <li><a href="{{ url_for('doctor.compose') }}"><i class="ri-edit-2-fill"></i>Email Compose</a></li>
+                           <li><a href="https://mail.google.com/mail" target="_blank" id="inbox-link"><i class="ri-inbox-fill"></i>Inbox</a></li>
+                           <li><a href="mailto:{{ doctor_data.email }}" id="compose-link"><i class="ri-edit-2-fill"></i>Email Compose</a></li>
                         </ul> 
                      </li>
-                     <li><a href="{{ url_for('doctor.lock_screen') }}"><i class="ri-file-lock-fill"></i>Lock Screen</a></li>   
+                     <li><a href="javascript:void(0);" id="lock-screen-link" class="iq-waves-effect"><i class="ri-file-lock-fill"></i>Lock Screen</a></li>   
                   </ul>
                </nav>
                <div class="p-3"></div>
@@ -591,6 +591,75 @@
                   // You can add your logic here for what happens when a date is selected
                }
             });
+         });
+      </script>
+
+      <script>
+         // Email provider detection and redirection
+         document.addEventListener('DOMContentLoaded', function() {
+            const inboxLink = document.getElementById('inbox-link');
+            const composeLink = document.getElementById('compose-link');
+            const doctorEmail = "{{ doctor_data.email }}";
+            
+            if (inboxLink && doctorEmail) {
+               // Determine email provider based on email domain
+               let inboxUrl = 'https://mail.google.com/mail'; // Default to Gmail
+               
+               if (doctorEmail.includes('@gmail.com')) {
+                  inboxUrl = 'https://mail.google.com/mail';
+               } else if (doctorEmail.includes('@outlook.com') || doctorEmail.includes('@hotmail.com')) {
+                  inboxUrl = 'https://outlook.live.com/mail';
+               } else if (doctorEmail.includes('@yahoo.com')) {
+                  inboxUrl = 'https://mail.yahoo.com';
+               } else if (doctorEmail.includes('@aol.com')) {
+                  inboxUrl = 'https://mail.aol.com';
+               } else if (doctorEmail.includes('@zoho.com')) {
+                  inboxUrl = 'https://mail.zoho.com';
+               } else if (doctorEmail.includes('@protonmail.com')) {
+                  inboxUrl = 'https://mail.protonmail.com';
+               }
+               
+               inboxLink.href = inboxUrl;
+            }
+            
+            // Lock screen functionality
+            const lockScreenLink = document.getElementById('lock-screen-link');
+            if (lockScreenLink) {
+               lockScreenLink.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  
+                  // First try with ActiveX (for Internet Explorer)
+                  try {
+                     const WshShell = new ActiveXObject("WScript.Shell");
+                     WshShell.Run("rundll32.exe user32.dll,LockWorkStation");
+                     return;
+                  } catch (e) {
+                     console.log("ActiveX not available, trying alternative methods");
+                  }
+                  
+                  // Create a hidden iframe to run the lock command
+                  const iframe = document.createElement('iframe');
+                  iframe.style.display = 'none';
+                  document.body.appendChild(iframe);
+                  
+                  try {
+                     // Try with windows.open approach
+                     iframe.contentWindow.open('cmd://rundll32.exe user32.dll,LockWorkStation');
+                  } catch (e) {
+                     console.log("Could not lock workstation with iframe");
+                     
+                     // Inform the user to use keyboard shortcut or show lock instructions
+                     alert("To lock your PC, please:\n\n" +
+                          "1. Press Windows key + L\n" + 
+                          "2. Or click Start menu → User icon → Lock");
+                  }
+                  
+                  // Clean up
+                  setTimeout(() => {
+                     document.body.removeChild(iframe);
+                  }, 1000);
+               });
+            }
          });
       </script>
 

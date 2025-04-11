@@ -212,20 +212,42 @@ def change_password():
     return jsonify({'success': True, 'message': 'Password changed successfully'})
 
 @doctor_bp.route('/inbox')
+@login_required
 def inbox():
-    if 'doctor' not in session:
-        return redirect(url_for('doctor.login'))
-    doctor_id = session['doctor']
-    messages = mongo.db.messages.find({'receiver': doctor_id})
-    return render_template('doctor/inbox.html', messages=messages)
+    """Redirect to appropriate email inbox or open internal inbox."""
+    # Get doctor's email
+    doctor_data = mongo.db.users.find_one({'umsId': session['umsId']})
+    doctor_email = doctor_data.get('email', '')
+    
+    # Determine the email provider
+    inbox_url = 'https://mail.google.com/mail'  # Default to Gmail
+    
+    if '@gmail.com' in doctor_email:
+        inbox_url = 'https://mail.google.com/mail'
+    elif '@outlook.com' in doctor_email or '@hotmail.com' in doctor_email:
+        inbox_url = 'https://outlook.live.com/mail'
+    elif '@yahoo.com' in doctor_email:
+        inbox_url = 'https://mail.yahoo.com'
+    elif '@aol.com' in doctor_email:
+        inbox_url = 'https://mail.aol.com'
+    elif '@zoho.com' in doctor_email:
+        inbox_url = 'https://mail.zoho.com'
+    elif '@protonmail.com' in doctor_email:
+        inbox_url = 'https://mail.protonmail.com'
+    
+    # Redirect to the appropriate inbox URL
+    return redirect(inbox_url)
 
 @doctor_bp.route('/compose', methods=['GET', 'POST'])
 @login_required
 def compose():
-    if request.method == 'POST':
-        # Compose email logic here
-        pass
-    return render_template('doctor/compose.html')
+    """Redirect to compose email or open internal compose."""
+    doctor_data = mongo.db.users.find_one({'umsId': session['umsId']})
+    doctor_email = doctor_data.get('email', '')
+    
+    # Redirect to a mailto link
+    mailto_url = f'mailto:{doctor_email}'
+    return redirect(mailto_url)
 
 @doctor_bp.route('/hospital_details')
 @login_required
@@ -333,7 +355,9 @@ def map():
 @doctor_bp.route('/lock_screen')
 @login_required
 def lock_screen():
-    return render_template('doctor/lock_screen.html')
+    """This route now redirects back to dashboard as locking is handled client-side via JavaScript."""
+    # We keep this route for backward compatibility
+    return redirect(url_for('doctor.index'))
 
 @doctor_bp.route('/register', methods=['GET', 'POST'])
 def register():    
