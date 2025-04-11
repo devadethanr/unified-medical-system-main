@@ -550,5 +550,49 @@
          });
       </script>
 
+      <!-- Calendar Modal -->
+      <div class="modal fade" id="calendarModal" tabindex="-1" aria-labelledby="calendarModalLabel" aria-hidden="true">
+         <div class="modal-dialog">
+            <div class="modal-content">
+               <div class="modal-header bg-primary text-white">
+                  <h5 class="modal-title" id="calendarModalLabel">Calendar</h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+               </div>
+               <div class="modal-body">
+                  <div id="calendar-container">
+                     <input type="text" id="calendar-picker" class="form-control" placeholder="Select a date">
+                  </div>
+               </div>
+               <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <script>
+         document.addEventListener('DOMContentLoaded', function() {
+            // Calendar functionality
+            const calendarLink = document.querySelector('a[href="{{ url_for("doctor.calendar") }}"]');
+            
+            if (calendarLink) {
+               calendarLink.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  $('#calendarModal').modal('show');
+               });
+            }
+            
+            // Initialize flatpickr
+            flatpickr("#calendar-picker", {
+               inline: true,
+               dateFormat: "Y-m-d",
+               onChange: function(selectedDates, dateStr) {
+                  console.log("Selected date:", dateStr);
+                  // You can add your logic here for what happens when a date is selected
+               }
+            });
+         });
+      </script>
+
    </body>
 </html>
