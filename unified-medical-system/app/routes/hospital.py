@@ -11,6 +11,7 @@ from app.models import User
 from bson import json_util
 from bson.objectid import ObjectId
 from datetime import datetime
+from io import StringIO, BytesIO
 
 
 hospital_bp = Blueprint('hospital', __name__)
@@ -395,3 +396,247 @@ def reports():
                            monthly_stats=monthly_stats,
                            doctor_count=doctor_count,
                            recent_appointments=recent_appointments)
+
+@hospital_bp.route('/generate_report', methods=['POST'])
+@login_required
+def generate_report():
+    from flask import make_response
+    import csv
+    from io import StringIO
+    import pandas as pd
+    
+    hospital_id = session['umsId']
+    hospital_data = get_hospital_data()
+    report_type = request.form.get('report_type', 'full')
+    date_start = request.form.get('date_start', '')
+    date_end = request.form.get('date_end', '')
+    report_format = request.form.get('format', 'csv')
+    
+    # Filter based on date range if provided
+    query = {'hospitalId': hospital_id, 'status': {'$ne': 'deleted'}}
+    if date_start and date_end:
+        try:
+            start_date = datetime.strptime(date_start, '%Y-%m-%d')
+            end_date = datetime.strptime(date_end, '%Y-%m-%d')
+            query['appointmentDate'] = {'$gte': start_date, '$lte': end_date}
+        except ValueError:
+            pass
+    
+    # Get appointment data based on report type
+    if report_type == 'Monthly Appointment Summary':
+        appointments = list(mongo.db.appointments.find(query))
+        # Process appointments for report
+        processed_data = []
+        for appointment in appointments:
+            patient = mongo.db.users.find_one({'umsId': appointment.get('patientId')})
+            doctor = mongo.db.users.find_one({'umsId': appointment.get('doctorId')}) if 'doctorId' in appointment else None
+            
+            processed_data.append({
+                'Date': appointment.get('appointmentDate').strftime('%Y-%m-%d') if 'appointmentDate' in appointment and appointment['appointmentDate'] else 'N/A',
+                'Patient': patient['name'] if patient else 'Unknown',
+                'Doctor': doctor['name'] if doctor else 'Not Assigned',
+                'Status': appointment.get('status', 'Unknown')
+            })
+    elif report_type == 'Doctor Performance':
+        # Get all doctors for this hospital
+        hospital_details = mongo.db.hospitalDetails.find_one({'umsId': hospital_id})
+        doctor_ids = hospital_details.get('assignedDoctors', []) if hospital_details else []
+        
+        processed_data = []
+        for doctor_id in doctor_ids:
+            doctor = mongo.db.users.find_one({'umsId': doctor_id})
+            if doctor:
+                # Count appointments for this doctor
+                appointment_count = mongo.db.appointments.count_documents({
+                    'hospitalId': hospital_id,
+                    'doctorId': doctor_id,
+                    'status': {'$ne': 'deleted'}
+                })
+                
+                processed_data.append({
+                    'Doctor ID': doctor_id,
+                    'Doctor Name': doctor.get('name', 'Unknown'),
+                    'Appointments': appointment_count
+                })
+    elif report_type == 'Patient Statistics':
+        # Get unique patients who have appointments at this hospital
+        patient_ids = mongo.db.appointments.distinct('patientId', {'hospitalId': hospital_id})
+        
+        processed_data = []
+        for patient_id in patient_ids:
+            patient = mongo.db.users.find_one({'umsId': patient_id})
+            if patient:
+                # Count appointments for this patient
+                appointment_count = mongo.db.appointments.count_documents({
+                    'hospitalId': hospital_id,
+                    'patientId': patient_id,
+                    'status': {'$ne': 'deleted'}
+                })
+                
+                processed_data.append({
+                    'Patient ID': patient_id,
+                    'Patient Name': patient.get('name', 'Unknown'),
+                    'Appointments': appointment_count
+                })
+    else:  # Full report
+        appointments = list(mongo.db.appointments.find(query))
+        
+        # Process appointments for report
+        processed_data = []
+        for appointment in appointments:
+            patient = mongo.db.users.find_one({'umsId': appointment.get('patientId')})
+            doctor = mongo.db.users.find_one({'umsId': appointment.get('doctorId')}) if 'doctorId' in appointment else None
+            
+            processed_data.append({
+                'Date': appointment.get('appointmentDate').strftime('%Y-%m-%d') if 'appointmentDate' in appointment and appointment['appointmentDate'] else 'N/A',
+                'Patient': patient['name'] if patient else 'Unknown',
+                'Doctor': doctor['name'] if doctor else 'Not Assigned',
+                'Status': appointment.get('status', 'Unknown'),
+                'Reason': appointment.get('reason', 'N/A')
+            })
+    
+    # Generate the report based on format
+    if report_format == 'csv':
+        if not processed_data:
+            processed_data = [{'No Data': 'No data available for the selected criteria'}]
+            
+        output = StringIO()
+        writer = csv.DictWriter(output, fieldnames=processed_data[0].keys())
+        writer.writeheader()
+        writer.writerows(processed_data)
+        
+        response = make_response(output.getvalue())
+        response.headers["Content-Disposition"] = f"attachment; filename={hospital_data['name'].replace(' ', '_')}_report_{datetime.now().strftime('%Y%m%d')}.csv"
+        response.headers["Content-type"] = "text/csv"
+        return response
+    
+    elif report_format == 'excel':
+        if not processed_data:
+            processed_data = [{'No Data': 'No data available for the selected criteria'}]
+            
+        df = pd.DataFrame(processed_data)
+        output = StringIO()
+        
+        # Create a response
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+            df.to_excel(writer, sheet_name='Report', index=False)
+            
+        output.seek(0)
+        
+        response = make_response(output.getvalue())
+        response.headers["Content-Disposition"] = f"attachment; filename={hospital_data['name'].replace(' ', '_')}_report_{datetime.now().strftime('%Y%m%d')}.xlsx"
+        response.headers["Content-type"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        return response
+    
+    elif report_format == 'pdf':
+        # Simple HTML to PDF conversion
+        html_content = """
+        <html>
+        <head>
+            <title>Hospital Report</title>
+            <style>
+                body { font-family: Arial, sans-serif; }
+                h1 { color: #2563eb; }
+                table { width: 100%; border-collapse: collapse; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f2f2f2; }
+                tr:nth-child(even) { background-color: #f9f9f9; }
+            </style>
+        </head>
+        <body>
+            <h1>""" + hospital_data['name'] + """ Report</h1>
+            <p>Generated on: """ + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + """</p>
+            <table>
+                <thead>
+                    <tr>
+        """
+        
+        # Add table headers
+        if processed_data:
+            for key in processed_data[0].keys():
+                html_content += f"<th>{key}</th>"
+            
+            html_content += """
+                    </tr>
+                </thead>
+                <tbody>
+            """
+            
+            # Add table rows
+            for item in processed_data:
+                html_content += "<tr>"
+                for value in item.values():
+                    html_content += f"<td>{value}</td>"
+                html_content += "</tr>"
+        else:
+            html_content += """
+                    <th>No Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>No data available for the selected criteria</td></tr>
+            """
+            
+        html_content += """
+                </tbody>
+            </table>
+        </body>
+        </html>
+        """
+        
+        # Convert HTML to PDF
+        from weasyprint import HTML
+        pdf = HTML(string=html_content).write_pdf()
+        
+        response = make_response(pdf)
+        response.headers["Content-Disposition"] = f"attachment; filename={hospital_data['name'].replace(' ', '_')}_report_{datetime.now().strftime('%Y%m%d')}.pdf"
+        response.headers["Content-type"] = "application/pdf"
+        return response
+    
+    # Default fallback
+    return jsonify({'error': 'Unsupported report format'}), 400
+
+@hospital_bp.route('/download_full_report', methods=['GET'])
+@login_required
+def download_full_report():
+    from flask import make_response
+    import csv
+    from io import StringIO
+    
+    hospital_id = session['umsId']
+    hospital_data = get_hospital_data()
+    
+    # Get all appointments
+    appointments = list(mongo.db.appointments.find({
+        'hospitalId': hospital_id,
+        'status': {'$ne': 'deleted'}
+    }))
+    
+    # Process appointments for report
+    processed_data = []
+    for appointment in appointments:
+        patient = mongo.db.users.find_one({'umsId': appointment.get('patientId')})
+        doctor = mongo.db.users.find_one({'umsId': appointment.get('doctorId')}) if 'doctorId' in appointment else None
+        
+        processed_data.append({
+            'Date': appointment.get('appointmentDate').strftime('%Y-%m-%d') if 'appointmentDate' in appointment and appointment['appointmentDate'] else 'N/A',
+            'Patient': patient['name'] if patient else 'Unknown',
+            'Doctor': doctor['name'] if doctor else 'Not Assigned',
+            'Status': appointment.get('status', 'Unknown'),
+            'Reason': appointment.get('reason', 'N/A')
+        })
+    
+    # Generate CSV report
+    if not processed_data:
+        processed_data = [{'No Data': 'No data available'}]
+        
+    output = StringIO()
+    writer = csv.DictWriter(output, fieldnames=processed_data[0].keys())
+    writer.writeheader()
+    writer.writerows(processed_data)
+    
+    response = make_response(output.getvalue())
+    response.headers["Content-Disposition"] = f"attachment; filename={hospital_data['name'].replace(' ', '_')}_full_report_{datetime.now().strftime('%Y%m%d')}.csv"
+    response.headers["Content-type"] = "text/csv"
+    return response
