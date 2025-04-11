@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.routes.auth import login
 from app.synthbot_ai.nlp_models.outbreak_detection import analyze_outbreak
+from bson import ObjectId
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -336,3 +337,84 @@ def process_dbchat():
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+# Calendar view route
+@admin_bp.route('/calendar', methods=['GET'])
+@login_required
+def calendar():
+    """Render the admin calendar view."""
+    admin_data = get_admin_data()
+    global_admin_data = get_global_admin_data()
+    return render_template('admin/calendar.html', 
+                         admin_data=admin_data,
+                         global_admin_data=global_admin_data)
+
+# Calendar events API
+@admin_bp.route('/api/events', methods=['GET'])
+@login_required
+def get_events():
+    """Get all calendar events."""
+    # Get start and end date from query parameters (if provided)
+    start = request.args.get('start', None)
+    end = request.args.get('end', None)
+    
+    # Convert string dates to datetime if provided
+    if start:
+        start = datetime.fromisoformat(start.replace('Z', '+00:00'))
+    if end:
+        end = datetime.fromisoformat(end.replace('Z', '+00:00'))
+    
+    # Query events from MongoDB
+    query = {}
+    if start:
+        query['start'] = {'$gte': start}
+    if end:
+        query['end'] = {'$lte': end}
+        
+    events = list(mongo.db.events.find(query))
+    
+    # Format events for FullCalendar
+    formatted_events = []
+    for event in events:
+        formatted_events.append({
+            'id': str(event['_id']),
+            'title': event.get('title'),
+            'start': event.get('start').isoformat(),
+            'end': event.get('end').isoformat() if event.get('end') else None,
+            'allDay': event.get('allDay', False),
+            'backgroundColor': event.get('backgroundColor', '#3788d8'),
+            'borderColor': event.get('borderColor', '#3788d8')
+        })
+    
+    return jsonify(formatted_events)
+
+@admin_bp.route('/api/add_event', methods=['POST'])
+@login_required
+def add_event():
+    """Add a new event to the calendar."""
+    try:
+        event_data = request.json
+        event = {
+            'title': event_data['title'],
+            'start': datetime.fromisoformat(event_data['start'].replace('Z', '+00:00')),
+            'end': datetime.fromisoformat(event_data['end'].replace('Z', '+00:00')),
+            'allDay': event_data['allDay'],
+            'createdBy': session['umsId'],
+            'createdAt': datetime.now(),
+            'updatedAt': datetime.now()
+        }
+        result = mongo.db.events.insert_one(event)
+        return jsonify({'success': True, 'id': str(result.inserted_id)})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@admin_bp.route('/api/delete_event', methods=['POST'])
+@login_required
+def delete_event():
+    """Delete an event from the calendar."""
+    try:
+        event_id = request.json['id']
+        mongo.db.events.delete_one({'_id': ObjectId(event_id)})
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500

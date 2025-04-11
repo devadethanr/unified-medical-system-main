@@ -27,6 +27,8 @@
    <link rel="stylesheet" href="{{ url_for('static', filename='css/flatpickr.min.css') }}">
    <!-- DataTables CSS -->
    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
+   <!-- FullCalendar CSS -->
+   <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/main.min.css' rel='stylesheet' />
 </head>
 
 <body>
@@ -69,7 +71,7 @@
                         <a href="#" class="iq-waves-effect"><i class="ri-group-fill"></i><span>Patients</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
                         <ul class="iq-submenu">
                            <li><a href="#" data-bs-toggle="modal" data-bs-target=".patient-view-modal"><i class="ri-list-check"></i><span>View / Manage</span></a></li>
-                           <li><a href="#"><i class="ri-file-list-fill"></i><span>Access Records</span></a></li>
+                           <!-- <li><a href="#"><i class="ri-file-list-fill"></i><span>Access Records</span></a></li> -->
                         </ul>
                      </li>
 
@@ -78,7 +80,7 @@
                         <ul class="iq-submenu">
                            <li><a href="#" data-bs-toggle="modal" data-bs-target=".doctor-view-modal"><i class="ri-list-check"></i><span>View / Manage</span></a></li>
                            <li><a href="#" data-bs-toggle="modal" data-bs-target=".doctor-approval-modal"><i class="ri-check-double-fill"></i><span>Accept or Reject Reqeusts</span></a></li>
-                           <li><a href="#"><i class="ri-file-list-fill"></i><span>Access Records</span></a></li>
+                           <!-- <li><a href="#"><i class="ri-file-list-fill"></i><span>Access Records</span></a></li> -->
                         </ul>
                     </li>
                     <li>
@@ -88,7 +90,7 @@
                          <li><a href="#" data-bs-toggle="modal" data-bs-target=".hospital-approval-modal"><i class="ri-check-double-fill"></i><span>Approve or Reject Registration</span></a></li>
                      </ul> 
                    </li>   
-                    <li>
+                    <!-- <li>
                         <a href="#" class="iq-waves-effect"><i class="ri-file-list-fill"></i><span>Hospital Registration</span><i class="ri-arrow-right-s-line iq-arrow-right"></i></a>
                         <ul class="iq-submenu">
                             <li><a href="#"><i class="ri-list-check"></i><span>Access Directly</span></a></li>
@@ -99,11 +101,14 @@
                         <ul class="iq-submenu">
                             <li><a href="#"><i class="ri-list-check"></i><span>Access Directly</span></a></li>
                         </ul>
-                    </li>
+                    </li> -->
                     <li>
-                        <a href="#" class="iq-waves-effect"><i class="ri-calendar-event-fill"></i><span>Calendar</span></a>
+                        <a href="#" class="iq-waves-effect" id="calendarButton">
+                            <i class="ri-calendar-event-fill"></i>
+                            <span>Calendar</span>
+                        </a>
                     </li>
-                    <li>
+                    <li>   
                         <a href="{{ url_for('admin.outbreakmap') }}" class="iq-waves-effect"><i class="ri-map-pin-2-fill"></i><span>Outbreak Map</span></a>
                     </li>
                     <li>
@@ -121,7 +126,7 @@
                     <li>
                         <a href="{{ url_for('admin.dbchat') }}" class="iq-waves-effect">
                             <i class="ri-database-2-fill"></i>
-                            <span>Database Analytics</span>
+                            <span>UMS Analytics Assistant</span>
                         </a>
                     </li>
                 </ul>
@@ -892,6 +897,53 @@
  <script src="{{ url_for('static', filename='js/chart-custom.js') }}"></script>
  <!-- Custom JavaScript -->
  <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+ <!-- FullCalendar JS -->
+ <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+
+<!-- Calendar Modal -->
+<div class="modal fade" id="calendarModal" tabindex="-1" aria-labelledby="calendarModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="calendarModalLabel">Calendar</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="calendar-container">
+          <input type="text" id="calendar-picker" class="form-control" placeholder="Select a date">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Calendar Script -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const calendarButton = document.getElementById('calendarButton');
+    const calendarPicker = document.getElementById('calendar-picker');
+    
+    // Initialize flatpickr
+    if (calendarPicker) {
+      flatpickr(calendarPicker, {
+        inline: true,
+        dateFormat: "Y-m-d",
+        onChange: function(selectedDates, dateStr) {
+          console.log("Selected date:", dateStr);
+          // You can add your logic here for what happens when a date is selected
+        }
+      });
+    }
+    
+    // Handle calendar button click
+    if (calendarButton) {
+      calendarButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        $('#calendarModal').modal('show');
+      });
+    }
+  });
+</script>
 
 </body>
 </html>
