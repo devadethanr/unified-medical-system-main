@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+   <head>
+      <!-- Required meta tags -->
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <title>UMS - Doctor Appointment History</title>
+      <!-- Favicon -->
+      <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" />
+      <!-- Bootstrap CSS -->
+      <link id="bootstrap-css" rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+      <!-- Typography CSS -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/typography.css') }}">
+      <!-- Style CSS -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+      <!-- Style-Rtl CSS -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/style-rtl.css') }}">
+      <!-- Responsive CSS -->
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+      <!-- Add DataTables CSS -->
+      <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
+      <!-- Roboto Font -->
+      <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+      <style>
+         body {
+            font-family: 'Roboto', sans-serif;
+         }
+         .modal-content {
+            border-radius: 15px;
+         }
+         .modal-header {
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+         }
+         .modal-title {
+            font-weight: 500;
+         }
+         .form-control {
+            border-radius: 8px;
+         }
+         .btn {
+            border-radius: 8px;
+         }
+         label {
+            font-weight: 500;
+            color: #333;
+         }
+         .custom-file-label {
+            border-radius: 8px;
+         }
+         .custom-file-label::after {
+            border-radius: 0 8px 8px 0;
+         }
+      </style>
+   </head>
+   <body>
+      <!-- loader Start -->
+      <div id="loading">
+         <div id="loading-center">
+         </div>
+      </div>
+      <!-- loader END -->
+      <!-- Wrapper Start -->
+      <div class="wrapper">
+         <!-- Sidebar  -->
+         <div class="iq-sidebar">
+            <div class="iq-sidebar-logo d-flex justify-content-between">
+               <a href="{{ url_for('doctor.index') }}">
+               <img src="{{ url_for('static', filename='images/logo.png') }}" class="img-fluid" alt="">
+               <span>UMS</span>
+               </a>
+               <div class="iq-menu-bt align-self-center">
+                  <div class="wrapper-menu">
+                     <div class="main-circle"><i class="ri-more-fill"></i></div>
+                     <div class="hover-circle"><i class="ri-more-2-fill"></i></div>
+                  </div>
+               </div>
+            </div>
+            <div id="sidebar-scrollbar">
+               <nav class="iq-sidebar-menu">
+                  <ul id="iq-sidebar-toggle" class="iq-menu">
+                     <li>
+                        <a href="{{ url_for('doctor.index') }}" class="iq-waves-effect"><i class="ri-home-4-line"></i><span>Dashboard</span></a>
+                     </li>
+                     <li>
+                        <a href="{{ url_for('doctor.profile') }}" class="iq-waves-effect"><i class="ri-profile-line"></i><span>Profile</span></a>
+                     </li>
+                     <li>
+                        <a href="{{ url_for('doctor.edit_profile') }}" class="iq-waves-effect"><i class="ri-edit-line"></i><span>Edit Profile</span></a>
+                     </li>
+                     <li>
+                        <a href="{{ url_for('doctor.appointments') }}" class="iq-waves-effect"><i class="ri-calendar-line"></i><span>Appointments</span></a>
+                     </li>
+                     <li class="active">
+                        <a href="{{ url_for('doctor.appointment_history') }}" class="iq-waves-effect"><i class="ri-file-history-line"></i><span>Appointment History</span></a>
+                     </li>
+                  </ul>
+               </nav>
+            </div>
+         </div>
+         <!-- TOP Nav Bar -->
+         <div class="iq-top-navbar">
+            <div class="iq-navbar-custom">
+               <nav class="navbar navbar-expand-lg navbar-light p-0">
+                  <div class="iq-menu-bt align-self-center">
+                     <div class="wrapper-menu">
+                        <div class="main-circle"><i class="ri-more-fill"></i></div>
+                        <div class="hover-circle"><i class="ri-more-2-fill"></i></div>
+                     </div>
+                  </div>
+                  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                     <ul class="navbar-nav ms-auto navbar-list">
+                        <li class="nav-item iq-full-screen">
+                           <a href="#" class="iq-waves-effect" id="btnFullscreen"><i class="ri-fullscreen-line"></i></a>
+                        </li>
+                     </ul>
+                  </div>
+                  <ul class="navbar-list">
+                     <li class="nav-item">
+                        <div class="iq-breadcrumb">
+                           <a href="{{ url_for('doctor.index') }}" class="breadcrumb-item"><i class="ri-home-4-line"></i>Dashboard</a>
+                           <a href="{{ url_for('doctor.appointment_history') }}" class="breadcrumb-item active">Appointment History</a>
+                        </div>
+                     <li>
+                        <a href="#" class="search-toggle iq-waves-effect d-flex align-items-center">
+                           <img src="{{ url_for('static', filename='images/user/1.jpg') }}" class="img-fluid rounded" alt="user">
+                           <div class="caption">
+                              <h6 class="mb-0 line-height">{{ doctor_data.name if doctor_data.name else 'Name not set' }}</h6>
+                              <span class="font-size-12">Available</span>
+                           </div>
+                        </a>
+                        <div class="iq-sub-dropdown iq-user-dropdown">
+                           <div class="iq-card shadow-none m-0">
+                              <div class="iq-card-body p-0 ">
+                                 <div class="bg-primary p-3">
+                                    <h5 class="mb-0 text-white line-height">Hello {{ doctor_data.name if doctor_data.name else 'Name not set' }}</h5>
+                                    <span class="text-white font-size-12">Available</span>
+                                 </div>
+                                 <a href="{{ url_for('doctor.profile') }}" class="iq-sub-card iq-bg-primary-hover">
+                                    <div class="media align-items-center">
+                                       <div class="rounded iq-card-icon iq-bg-primary">
+                                          <i class="ri-file-user-line"></i>
+                                       </div>
+                                       <div class="media-body ms-3">
+                                          <h6 class="mb-0 ">My Profile</h6>
+                                          <p class="mb-0 font-size-12">View personal profile details.</p>
+                                       </div>
+                                    </div>
+                                 </a>
+                                 <a href="{{ url_for('doctor.edit_profile') }}" class="iq-sub-card iq-bg-primary-hover">
+                                    <div class="media align-items-center">
+                                       <div class="rounded iq-card-icon iq-bg-primary">
+                                          <i class="ri-profile-line"></i>
+                                       </div>
+                                       <div class="media-body ms-3">
+                                          <h6 class="mb-0 ">Edit Profile</h6>
+                                          <p class="mb-0 font-size-12">Modify your personal details.</p>
+                                       </div>
+                                    </div>
+                                 </a>
+                                 <div class="d-inline-block w-100 text-center p-3">
+                                    <a class="btn btn-primary iq-sign-btn" href="{{ url_for('auth.logout') }}" role="button">Sign out<i class="ri-login-box-line ms-2"></i></a>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </li>
+                  </ul>
+               </nav>
+            </div>
+         </div>
+         <!-- TOP Nav Bar END -->
+         <!-- Page Content  -->
+         <div id="content-page" class="content-page">
+            <div class="container-fluid">
+               <div class="row">
+                  <div class="col-sm-12">
+                     <div class="iq-card">
+                        <div class="iq-card-header d-flex justify-content-between">
+                           <div class="iq-header-title">
+                              <h4 class="card-title">Appointment History</h4>
+                           </div>
+                        </div>
+                        <div class="iq-card-body">
+                           <div class="table-responsive">
+                              <table id="appointments-history-table" class="table mb-0 table-striped">
+                                 <thead>
+                                    <tr>
+                                       <th>Patient Name</th>
+                                       <th>Patient ID</th>
+                                       <th>Hospital ID</th>
+                                       <th>Category</th>
+                                       <th>Appointment Date</th>
+                                       <th>Status</th>
+                                       <th>Details</th>
+                                    </tr>
+                                 </thead>
+                                 <tbody>
+                                    {% for appointment in appointments %}
+                                    <tr>
+                                       <td>{{ appointment.patientName }}</td>
+                                       <td>{{ appointment.patientId }}</td>
+                                       <td>{{ appointment.hospitalId }}</td>
+                                       <td>{{ appointment.category }}</td>
+                                       <td>{{ appointment.appointmentDate }}</td>
+                                       <td>
+                                          <span class="badge
+                                             {% if appointment.status == 'completed' %} bg-success
+                                             {% elif appointment.status == 'cancelled' %} bg-warning
+                                             {% elif appointment.status == 'deleted' %} bg-danger
+                                             {% else %} bg-info
+                                             {% endif %}">
+                                             {{ appointment.status }}
+                                          </span>
+                                       </td>
+                                       <td>
+                                          <button type="button" class="btn btn-info btn-sm view-details" 
+                                                data-id="{{ appointment._id }}" 
+                                                data-patient="{{ appointment.patientName }}" 
+                                                data-patient-id="{{ appointment.patientId }}"
+                                                data-hospital-id="{{ appointment.hospitalId }}"
+                                                data-category="{{ appointment.category }}"
+                                                data-date="{{ appointment.appointmentDate }}"
+                                                data-status="{{ appointment.status }}">
+                                             <i class="ri-eye-line"></i> View
+                                          </button>
+                                       </td>
+                                    </tr>
+                                    {% endfor %}
+                                 </tbody>
+                              </table>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+
+         <!-- Appointment Details Modal -->
+         <div class="modal fade" id="appointmentDetailsModal" tabindex="-1" aria-labelledby="appointmentDetailsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+               <div class="modal-content">
+                  <div class="modal-header bg-primary text-white">
+                     <h5 class="modal-title" id="appointmentDetailsModalLabel">Appointment Details</h5>
+                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                     <div class="row">
+                        <div class="col-md-6">
+                           <h6 class="mb-2">Patient Information</h6>
+                           <table class="table table-bordered">
+                              <tr>
+                                 <th class="bg-light">Patient Name</th>
+                                 <td id="modal-patient-name"></td>
+                              </tr>
+                              <tr>
+                                 <th class="bg-light">Patient ID</th>
+                                 <td id="modal-patient-id"></td>
+                              </tr>
+                           </table>
+                        </div>
+                        <div class="col-md-6">
+                           <h6 class="mb-2">Appointment Information</h6>
+                           <table class="table table-bordered">
+                              <tr>
+                                 <th class="bg-light">Hospital ID</th>
+                                 <td id="modal-hospital-id"></td>
+                              </tr>
+                              <tr>
+                                 <th class="bg-light">Category</th>
+                                 <td id="modal-category"></td>
+                              </tr>
+                              <tr>
+                                 <th class="bg-light">Date & Time</th>
+                                 <td id="modal-date"></td>
+                              </tr>
+                              <tr>
+                                 <th class="bg-light">Status</th>
+                                 <td id="modal-status"></td>
+                              </tr>
+                           </table>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="modal-footer">
+                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  </div>
+               </div>
+            </div>
+         </div>
+
+      </div>
+      <!-- Wrapper END -->
+      
+      <!-- Optional JavaScript -->
+      <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+      <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+      <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+      <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+      <!-- DataTables JS -->
+      <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
+      <!-- Appear JavaScript -->
+      <script src="{{ url_for('static', filename='js/jquery.appear.js') }}"></script>
+      <!-- Countdown JavaScript -->
+      <script src="{{ url_for('static', filename='js/countdown.min.js') }}"></script>
+      <!-- Counterup JavaScript -->
+      <script src="{{ url_for('static', filename='js/waypoints.min.js') }}"></script>
+      <script src="{{ url_for('static', filename='js/jquery.counterup.min.js') }}"></script>
+      <!-- Wow JavaScript -->
+      <script src="{{ url_for('static', filename='js/wow.min.js') }}"></script>
+      <!-- Apexcharts JavaScript -->
+      <script src="{{ url_for('static', filename='js/apexcharts.js') }}"></script>
+      <!-- Swiper Slider JavaScript -->
+      <script src="{{ url_for('static', filename='js/swiper-bundle.min.js') }}"></script>
+      <!-- Select2 JavaScript -->
+      <script src="{{ url_for('static', filename='js/select2.min.js') }}"></script>
+      <!-- Custom JavaScript -->
+      <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+
+      <script>
+         $(document).ready(function() {
+            // Initialize DataTable
+            $('#appointments-history-table').DataTable({
+               "order": [[4, "desc"]], // Sort by appointment date descending
+               "columnDefs": [
+                  { "orderable": false, "targets": 6 } // Disable sorting on the Actions column
+               ]
+            });
+
+            // Handle view details button click
+            $('.view-details').on('click', function() {
+               const appointmentId = $(this).data('id');
+               const patientName = $(this).data('patient');
+               const patientId = $(this).data('patient-id');
+               const hospitalId = $(this).data('hospital-id');
+               const category = $(this).data('category');
+               const date = $(this).data('date');
+               const status = $(this).data('status');
+
+               // Populate modal with appointment details
+               $('#modal-patient-name').text(patientName);
+               $('#modal-patient-id').text(patientId);
+               $('#modal-hospital-id').text(hospitalId);
+               $('#modal-category').text(category);
+               $('#modal-date').text(date);
+               
+               // Set status with appropriate badge color
+               let statusBadgeClass = 'badge ';
+               if (status === 'completed') statusBadgeClass += 'bg-success';
+               else if (status === 'cancelled') statusBadgeClass += 'bg-warning';
+               else if (status === 'deleted') statusBadgeClass += 'bg-danger';
+               else statusBadgeClass += 'bg-info';
+               
+               $('#modal-status').html(`<span class="${statusBadgeClass}">${status}</span>`);
+               
+               // Show the modal
+               $('#appointmentDetailsModal').modal('show');
+            });
+         });
+      </script>
+   </body>
+</html> 

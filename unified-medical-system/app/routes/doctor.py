@@ -286,7 +286,34 @@ def appointments():
 @doctor_bp.route('/appointment_history')
 @login_required
 def appointment_history():
-    return render_template('doctor/appointments_history.html')
+    doctor_id = session['umsId']
+    
+    # Fetch past appointments for the logged-in doctor
+    appointments = list(mongo.db.appointments.find({
+        'doctorId': doctor_id,
+        '$or': [
+            {'appointmentDate': {'$lt': datetime.now()}},  # Past appointments
+            {'status': {'$in': ['completed', 'cancelled', 'deleted']}}  # Completed or cancelled appointments
+        ]
+    }).sort('appointmentDate', -1))  # Sort by appointment date descending (newest first)
+
+    # Fetch patient names
+    patient_ids = [appointment.get('patientId') for appointment in appointments if appointment.get('patientId')]
+    patients = {p['umsId']: p['name'] for p in mongo.db.users.find({'umsId': {'$in': patient_ids}})}
+
+    # Add patient names to appointments and format dates
+    for appointment in appointments:
+        appointment['patientName'] = patients.get(appointment.get('patientId'), 'Unknown')
+        if 'appointmentDate' in appointment and appointment['appointmentDate']:
+            appointment['appointmentDate'] = appointment['appointmentDate'].strftime('%Y-%m-%d %H:%M')
+        appointment['_id'] = str(appointment['_id'])  # Convert ObjectId to string
+
+    # Fetch doctor data
+    doctor_data = mongo.db.users.find_one({'umsId': session['umsId']})
+    
+    return render_template('doctor/appointments_history.html', 
+                           appointments=json.loads(json_util.dumps(appointments)), 
+                           doctor_data=doctor_data)
 
 @doctor_bp.route('/calendar')
 @login_required
